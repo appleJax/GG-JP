@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Videogame Translation Contest - Twitter Bot",
   "main": "server.js",
+  "scripts": {
+    "start": "NODE_ENV=dev node server.js"
+  },
   "author": "appleJax <appleJax@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
