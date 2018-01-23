@@ -20,6 +20,6 @@ function tweetRandomCard() {
 
 
 module.exports = {
-  //start: () => setTimeout(tweetRandomCard, 2 * HOURS);
-  start: () => setTimeout(tweetRandomCard, HOURS / 60);
+  //start: () => setTimeout(tweetRandomCard, 2 * HOURS)
+  start: () => setTimeout(tweetRandomCard, HOURS / 60)
 };
