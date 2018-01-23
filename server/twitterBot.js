@@ -10,6 +10,12 @@ const {
 
 const twit = require('twit');
 
+const config2 = {
+  consumer_key: TWITTER_API_KEY,
+  consumer_secret: TWITTER_API_SECRET,
+  app_only_auth: true
+}
+
 const config = {
   consumer_key: TWITTER_API_KEY,
   consumer_secret: TWITTER_API_SECRET,
@@ -17,7 +23,7 @@ const config = {
   access_token_secret: TWITTER_TOKEN_SECRET
 };
 
-const Twitter = new twit(config);
+const Twitter = new twit(config2);
 const HOURS = 3600000;
 
 //
@@ -62,6 +68,7 @@ function postMedia() {
 //  search twitter for all tweets containing the hashtag '#videogame-translation'
 //
 function searchTwitter() {
+  console.log('Searching twitter...')
   Twitter.get('search/tweets', { q: '#videogame-translation' }, (err, data, response) => {
     if (err) console.log('Error:', err);
     console.log('Data:', data);
