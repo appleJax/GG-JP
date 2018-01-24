@@ -1,5 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const url = process.env.MONGODB_URI;
+const unzip = require('unzip');
+const processUpload = require('./processAnkiJson');
 
 module.exports = {
   getRandomCard() {
@@ -14,7 +16,7 @@ module.exports = {
       db.close();
       return randomCard;
     });
-  }
+  },
 
   processNewScore(req, res) {
       MongoClient.connect(url, (err, db) => {
@@ -37,11 +39,35 @@ module.exports = {
           });
         }
       });
-    }
+    },
 
     addDeck(req, res) {
-      
-      // TODO: use processAnkiJson to add new deck to database
+      const filePath = req.file.path;
+      fs.createReadStream(filePath)
+        .pipe(unzip.Extract({ path: 'uploads' }));
+
+      const newCards = processUpload();
+
+      Mongoclient.connect(url, (err, db) => {
+        const collection = db.collection('newCards');
+
+        // Initialize the Ordered Batch
+        // You can use initializeUnorderedBulkOp to initialize Unordered Batch
+        const batch = collection.initializeUnorderedBulkOp();
+
+        for (let i = 0; i < newCards.length; ++i) {
+          batch.insert(newCard[i]);
+        }
+
+        // Execute the operations
+        batch.execute((err, result) => {
+          if (err) console.error(err);
+          console.log('Successfully added new card deck!!!');
+          db.close();
+        });
+      });
+
+      res.redirect('/');
     }
 
 }

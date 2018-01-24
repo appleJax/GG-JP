@@ -1,6 +1,6 @@
 const DB = require('./dbOps');
-const upload = multer({ dest: 'uploads/' });
-const processCards = require('./server/processAnkiJson');
+const upload = require('multer')({ dest: 'uploads/' });
+const processCards = require('./processAnkiJson');
 
 module.exports = (app) => {
 
