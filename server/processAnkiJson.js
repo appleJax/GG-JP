@@ -1,20 +1,22 @@
 const fs = require('fs');
+const path = require('path');
+const unzip = require('unzip-stream');
 
 function processUpload(zipfilePath) {
-  fs.createReadStream(filePath)
+  fs.createReadStream(zipfilePath)
     .pipe(unzip.Extract({ path: 'uploads' }));
 
-  const uploads = __dirname + 'uploads';
+  const uploads = path.resolve(__dirname, '../uploads');
   const files = fs.readdirSync(uploads);
   const allNewCards = [];
 
   for (let file of files) {
-    const jsonFile = `${uploads}/${file}`;
+    const currentFile = `${uploads}/${file}`;
     const stats = fs.statSync(currentFile);
 
     if (stats.isFile() && file.match(/.+\.json$/)) {
 
-      const contents = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
+      const contents = JSON.parse(fs.readFileSync(currentFile, 'utf8'));
       const newCards = contents.notes.map(card => {
         let [
           expression,
@@ -48,8 +50,14 @@ function processUpload(zipfilePath) {
     }
   }
 
-  for (let file of files)
-      fs.unlinkSync(`${uploads}/${file}`);
+  for (let file of files) {
+    const root = `${uploads}/${file}`;
+
+    if (fs.lstatSync(root).isFile())
+      fs.unlinkSync(root);
+    else if (fs.lstatSync(root).isDirectory())
+      deleteFolderRecursive(root);
+  }
 
   return allNewCards;
 }
@@ -78,5 +86,19 @@ function getBase64(string) {
   }
   return base64;
 }
+
+function deleteFolderRecursive(rootPath) {
+  if (fs.existsSync(rootPath)) {
+    fs.readdirSync(rootPath).forEach((file, index) => {
+      const curPath = rootPath + "/" + file;
+      if (fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(rootPath);
+  }
+};
 
 module.exports = processUpload;

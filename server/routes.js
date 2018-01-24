@@ -12,4 +12,8 @@ module.exports = (app) => {
     DB.processNewScore(req, res);
   });
 
+  app.get('/cards/new', (req, res) => {
+    DB.getNewCards(req, res);
+  });
+
 } // module.exports
