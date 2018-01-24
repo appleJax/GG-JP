@@ -1,12 +1,13 @@
 const MongoClient = require('mongodb').MongoClient;
 const url = process.env.MONGODB_URI;
+const DB = process.env.MONGO_DB;
 const processUpload = require('./processAnkiJson');
 
 module.exports = {
   getRandomCard() {
     MongoClient.connect(url, (err, mongo) => {
-      const newCards = mongo.db('ankiCards').collection('newCards');
-      const oldCards = mongo.db('ankiCards').collection('oldCards');
+      const newCards = mongo.db(DB).collection('newCards');
+      const oldCards = mongo.db(DB).collection('oldCards');
       const randomCard = newCards.findOne();
 
       oldCards.insert(randomCard);
@@ -20,7 +21,7 @@ module.exports = {
   processNewScore(req, res) {
       MongoClient.connect(url, (err, mongo) => {
         const handle = req.body.handle;
-        const collection = mongo.db('ankiCards').collection('leaderBoard');
+        const collection = mongo.db(DB).collection('leaderBoard');
         const user = collection.findOne({ handle });
 
         if (user) {
@@ -46,7 +47,7 @@ module.exports = {
         console.log('new cards:', newCards);
 
         MongoClient.connect(url, (err, mongo) => {
-          const collection = mongo.db('ankiCards').collection('newCards');
+          const collection = mongo.db(DB).collection('newCards');
 
           // Initialize the Ordered Batch
           // You can use initializeUnorderedBulkOp to initialize Unordered Batch
@@ -71,7 +72,7 @@ module.exports = {
 
     getNewCards(req, res) {
       MongoClient.connect(url, (err, mongo) => {
-        const collection = mongo.db('ankiCards').collection('newCards');
+        const collection = mongo.db(DB).collection('newCards');
 
         collection.find({}).toArray((err, docs) => {
           res.json(docs);
