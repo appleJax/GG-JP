@@ -7,7 +7,7 @@ module.exports = {
     const legend = (expression.match(/\:\:.+\:\:(.+)\}\}/) || [,])[1];
     const normalized = stripXs(groupQuestionMarks(legend));
 
-    const wordBlank = flatten(split(normalized)).map(group => {
+    return flatten(split(normalized)).map(group => {
       if (group === '.')
         return '[]';
 
@@ -28,8 +28,6 @@ module.exports = {
       // else (negated group)
       return `[≠ ${group}]`
     }).join(' ');
-
-    return expression.replace(/\{\{.*\}\}/, wordBlank);
   }
 
 } // module.exports

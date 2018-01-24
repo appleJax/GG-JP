@@ -36,15 +36,15 @@ function processUpload(zipfilePath) {
             ] = card.fields;
 
             return {
-              expression:  formatExpression(stripTags(expression)),
-              reading:     stripTags(reading),
-              japMeaning:  stripTags(japMeaning),
-              engMeaning:  stripTags(engMeaning),
-              officialEng: stripTags(officialEng),
+              expression:  formatExpression(stripHtml(expression)),
+              reading:     stripHtml(reading),
+              japMeaning:  stripHtml(japMeaning),
+              engMeaning:  stripHtml(engMeaning),
+              officialEng: stripHtml(officialEng),
               questionImg: getBase64(questionImg),
               answerImg:   getBase64(answerImg),
               prevLineImg: getBase64(prevLineImg),
-              notes:       stripTags(notes),
+              notes:       stripHtml(notes),
               noteID
             };
           });
@@ -67,8 +67,8 @@ function processUpload(zipfilePath) {
   });
 }
 
-function stripTags(string) {
-  return string.replace(/<.*?>/g, '');
+function stripHtml(string) {
+  return string.replace(/<.*?>|&.*;/g, '');
 }
 
 function getSrc(string) {
