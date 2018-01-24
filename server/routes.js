@@ -8,12 +8,16 @@ module.exports = (app) => {
     DB.addDeck(req, res);
   });
 
-  app.post('/newscore', (req, res) => {
+  app.post('/scores/new', (req, res) => {
     DB.processNewScore(req, res);
   });
 
   app.get('/cards/new', (req, res) => {
     DB.getNewCards(req, res);
+  });
+
+  app.get('/cards/old', (req, res) => {
+    DB.getOldCards(req, res);
   });
 
 } // module.exports

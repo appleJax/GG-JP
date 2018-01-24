@@ -25,29 +25,20 @@ const userConfig = {
 const Twitter = new twit(userConfig);
 const HOURS = 3600000;
 
-//
-// post a text-only tweet
-//
-function tweetRandomMessage() {
-  const randNum = Math.round(Math.random() * 999999);
-  Twitter.post('statuses/update', { status: `Message #${randNum}` }, (err, data, response) => {
-    if (err) console.error(err);
-    console.log('Data:', data);
-  });
-}
 
+function consoleRandomCard() {
+  DB.getRandomCard()
+    .then(({ questionImg, reading, expression }) =>
+      console.log(questionImg, reading, expression));
+}
 
 //
 // tweet a random anki card
 //
 function tweetRandomCard() {
-  const {
-    questionImg,
-    reading,
-    expression
-  } = DB.getRandomCard();
-
-  postMedia(questionImg, reading, expression);
+  DB.getRandomCard()
+    .then(({ questionImg, reading, expression }) =>
+      postMedia(questionImg, reading, expression));
 }
 
 //
@@ -67,7 +58,7 @@ function postMedia(b64Image, altText, message) {
         const params = { status: message, media_ids: [mediaIdStr] };
 
         Twitter.post('statuses/update', params, (err, data, response) => {
-          console.log(data)
+          // console.log(data);
         });
       }
     });
@@ -100,6 +91,5 @@ function searchTwitter(hashtag) {
 
 module.exports = {
   //start: () => setInterval(tweetRandomCard, 2*HOURS)
-  //start: () => setInterval(tweetRandomMessage, 5000)
   start: () => setInterval(tweetRandomCard, 5000)
 };

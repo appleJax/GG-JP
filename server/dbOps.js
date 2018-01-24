@@ -5,16 +5,21 @@ const processUpload = require('./processAnkiJson');
 
 module.exports = {
   getRandomCard() {
-    MongoClient.connect(url, (err, mongo) => {
-      const newCards = mongo.db(DB).collection('newCards');
-      const oldCards = mongo.db(DB).collection('oldCards');
-      const randomCard = newCards.findOne();
-
-      oldCards.insert(randomCard);
-      newCards.remove(randomCard);
-
-      mongo.close();
-      return randomCard;
+    return new Promise((resolve, reject) => {
+      MongoClient.connect(url, (err, mongo) => {
+        const newCards = mongo.db(DB).collection('newCards');
+        const oldCards = mongo.db(DB).collection('oldCards');
+        newCards.findOne({}, (err, randomCard) => {
+          oldCards.insert(randomCard, (err, res) => {
+            if (err) console.error(err);
+            newCards.remove(randomCard, (err, res) => {
+              if (err) console.error(err);
+              mongo.close();
+              resolve(randomCard);
+            });
+          });
+        });
+      });
     });
   },
 
@@ -22,30 +27,28 @@ module.exports = {
       MongoClient.connect(url, (err, mongo) => {
         const handle = req.body.handle;
         const collection = mongo.db(DB).collection('leaderBoard');
-        const user = collection.findOne({ handle });
-
-        if (user) {
-          const newScore = user.score + 1;
-          collection.update({ handle }, newScore, (err, result) => {
-            if (err) console.error(err);
-            mongo.close();
-            res.end();
-          });
-        } else {
-          collection.insert({ handle, score: 1 }, (err, result) => {
-            if (err) console.error(err);
-            mongo.close();
-            res.end();
-          });
-        }
+        const user = collection.findOne({ handle }, (err, user) => {
+          if (user) {
+            const newScore = user.score + 1;
+            collection.update({ handle }, newScore, (err, result) => {
+              if (err) console.error(err);
+              mongo.close();
+              res.end();
+            });
+          } else {
+            collection.insert({ handle, score: 1 }, (err, result) => {
+              if (err) console.error(err);
+              mongo.close();
+              res.end();
+            });
+          }
+        });
       });
     },
 
     addDeck(req, res) {
       const filePath = req.file.path;
       processUpload(filePath).then(newCards => {
-        console.log('new cards:', newCards);
-
         MongoClient.connect(url, (err, mongo) => {
           const collection = mongo.db(DB).collection('newCards');
 
@@ -54,14 +57,12 @@ module.exports = {
           const batch = collection.initializeUnorderedBulkOp();
 
           for (let i = 0; i < newCards.length; ++i) {
-            console.log(`New card #${i}:`, newCards[i]);
             batch.insert(newCards[i]);
           }
 
           // Execute the operations
           batch.execute((err, result) => {
             if (err) console.error(err);
-            console.log('Successfully added new card deck!!!');
             mongo.close();
           });
         });
@@ -73,6 +74,18 @@ module.exports = {
     getNewCards(req, res) {
       MongoClient.connect(url, (err, mongo) => {
         const collection = mongo.db(DB).collection('newCards');
+
+        collection.find({}).toArray((err, docs) => {
+          res.json(docs);
+          mongo.close();
+          res.end();
+        })
+      });
+    },
+
+    getOldCards(req, res) {
+      MongoClient.connect(url, (err, mongo) => {
+        const collection = mongo.db(DB).collection('oldCards');
 
         collection.find({}).toArray((err, docs) => {
           res.json(docs);

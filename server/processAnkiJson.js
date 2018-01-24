@@ -1,21 +1,19 @@
 const fs = require('fs');
 const path = require('path');
 const unzip = require('unzip-stream');
+const { formatExpression } = require('./utils');
 
 function processUpload(zipfilePath) {
   return new Promise((resolve, reject) => {
-    console.log('Zipfile path:', zipfilePath)
     const stream = fs.createReadStream(zipfilePath)
       .pipe(unzip.Extract({ path: 'uploads' }));
 
     stream.on('close', () => {
       const uploads = path.resolve(__dirname, '../uploads');
       const files = fs.readdirSync(uploads);
-      console.log('rootDir:', uploads);
       let allNewCards = [];
 
       for (let file of files) {
-        console.log('File found:', file);
         const currentFile = `${uploads}/${file}`;
         const stats = fs.statSync(currentFile);
 
@@ -38,7 +36,7 @@ function processUpload(zipfilePath) {
             ] = card.fields;
 
             return {
-              expression:  addBlank(stripTags(expression)),
+              expression:  formatExpression(stripTags(expression)),
               reading:     stripTags(reading),
               japMeaning:  stripTags(japMeaning),
               engMeaning:  stripTags(engMeaning),
@@ -71,10 +69,6 @@ function processUpload(zipfilePath) {
 
 function stripTags(string) {
   return string.replace(/<.*?>/g, '');
-}
-
-function addBlank(string) {
-  return string.replace(/\{\{.*\}\}/, '...');
 }
 
 function getSrc(string) {
