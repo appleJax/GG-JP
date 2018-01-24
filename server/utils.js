@@ -61,7 +61,7 @@ function flatten(deep, flat = []) {
     return flat;
 
   let [head, ...tail] = deep;
-  return this.scalar(head)
-    ? this.flatten(tail, flat.concat(head))
-    : this.flatten(tail, flat.concat(this.flatten(head)));
+  return scalar(head)
+    ? flatten(tail, flat.concat(head))
+    : flatten(tail, flat.concat(flatten(head)));
 }
