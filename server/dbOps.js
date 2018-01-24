@@ -42,28 +42,31 @@ module.exports = {
 
     addDeck(req, res) {
       const filePath = req.file.path;
-      const newCards = processUpload(filePath);
+      processUpload(filePath).then(newCards => {
+        console.log('new cards:', newCards);
 
-      MongoClient.connect(url, (err, mongo) => {
-        const collection = mongo.db('ankiCards').collection('newCards');
+        MongoClient.connect(url, (err, mongo) => {
+          const collection = mongo.db('ankiCards').collection('newCards');
 
-        // Initialize the Ordered Batch
-        // You can use initializeUnorderedBulkOp to initialize Unordered Batch
-        const batch = collection.initializeUnorderedBulkOp();
+          // Initialize the Ordered Batch
+          // You can use initializeUnorderedBulkOp to initialize Unordered Batch
+          const batch = collection.initializeUnorderedBulkOp();
 
-        for (let i = 0; i < newCards.length; ++i) {
-          batch.insert(newCards[i]);
-        }
+          for (let i = 0; i < newCards.length; ++i) {
+            console.log(`New card #${i}:`, newCards[i]);
+            batch.insert(newCards[i]);
+          }
 
-        // Execute the operations
-        batch.execute((err, result) => {
-          if (err) console.error(err);
-          console.log('Successfully added new card deck!!!');
-          mongo.close();
+          // Execute the operations
+          batch.execute((err, result) => {
+            if (err) console.error(err);
+            console.log('Successfully added new card deck!!!');
+            mongo.close();
+          });
         });
-      });
 
-      res.redirect('/');
+        res.redirect('/');
+      });
     },
 
     getNewCards(req, res) {
