@@ -43,10 +43,7 @@ module.exports = {
 
     addDeck(req, res) {
       const filePath = req.file.path;
-      fs.createReadStream(filePath)
-        .pipe(unzip.Extract({ path: 'uploads' }));
-
-      const newCards = processUpload();
+      const newCards = processUpload(filePath);
 
       Mongoclient.connect(url, (err, db) => {
         const collection = db.collection('newCards');

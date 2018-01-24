@@ -1,6 +1,9 @@
 const fs = require('fs');
 
-function processUpload() {
+function processUpload(zipfilePath) {
+  fs.createReadStream(filePath)
+    .pipe(unzip.Extract({ path: 'uploads' }));
+
   const uploads = __dirname + 'uploads';
   const files = fs.readdirSync(uploads);
   const allNewCards = [];
