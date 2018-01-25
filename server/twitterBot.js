@@ -28,21 +28,21 @@ const HOURS = 3600000;
 
 function tweetRandomQuestion() {
   DB.getRandomQuestion()
-    .then(({ questionImg, questionAltText, questionText, cardId }) =>
+    .then(({ questionImg, questionAltText, questionText, cardId }) => {
       postMedia(questionImg, questionAltText, questionText)
-        .then(questionId =>
-          setTimeout(() => tweetCardAnswer(cardId, questionId), 2000)
-        );
-    );
+        .then(questionId => {
+          setTimeout(() => tweetCardAnswer(cardId, questionId), 2000);
+        }).catch(console.error);
+    });
 }
 
-function tweetCardAnswer(cardId, questionId) {
+function tweetCardAnswer(cardId, questionId, pollRepliesTimer) {
   DB.getCardAnswer(cardId)
     .then(({answerImg, answerAltText, answerText}) => {
-      const quoteQuestion = `\nhttps://twitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
-      answerText += quoteQuestion;
+      const questionLink = `\nhttps://twitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
+      answerText += questionLink;
       postMedia(answerImg, answerAltText, answerText);
-    });
+    }).catch(console.error);
 }
 
 //
@@ -52,18 +52,24 @@ function postMedia(b64Image, altText, tweetText) {
   return new Promise((resolve, reject) => {
     // first we must post the media to Twitter
     Twitter.post('media/upload', { media_data: b64Image }, (err, data, response) => {
+      if (err) console.error(err);
       // now we can assign alt text to the media, for use by screen readers and
       // other text-based presentations and interpreters
       const mediaIdStr = data.media_id_string;
       const meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
 
       Twitter.post('media/metadata/create', meta_params, (err, data, response) => {
+        if (err) console.error(err);
         if (!err) {
           // now we can reference the media and post a tweet (media will attach to the tweet)
-          const params = { status: tweetText, media_ids: [mediaIdStr] };
+          const params = {
+            status: tweetText,
+            media_ids: [mediaIdStr]
+          };
 
           Twitter.post('statuses/update', params, (err, data, response) => {
             //console.log(data);
+            if (err) console.error(err);
             resolve(data.id_str);
           });
         }
@@ -81,8 +87,10 @@ function searchTwitter(hashtag) {
     if (err) console.log('Error:', err);
     const matches = data.statuses.map(item => {
       const {
+        created_at,
         text,
         user: {
+          id,
           name,
           screen_name: handle,
           profile_img_url_https: avatar
@@ -95,8 +103,19 @@ function searchTwitter(hashtag) {
   });
 }
 
+function searchReply(questionId) {
+  // https://twitter.com/devTest222/status/956429745784348673
+  // in_reply_to_status_id_str: questionId
+  // tweet: { created_at, text, user: { id, name, screen_name, profile_image_url_https }}
+  Twitter.get('statuses/mentions_timeline', { since_id: questionId }, (err, data, response) => {
+    if (err) console.log('Error:', err);
+    console.log('Data:', data);
+  });
+}
+
 
 module.exports = {
   //start: () => setInterval(tweetRandomCard, 2*HOURS)
-  start: () => setInterval(tweetRandomQuestion, 5000)
+  //start: () => setInterval(tweetRandomQuestion, 5000)
+  start: () => setInterval(searchReply, 5000)
 };

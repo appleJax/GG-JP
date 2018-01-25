@@ -25,7 +25,7 @@ module.exports = {
     if (notes.length > 0)
       tweetText += `\nNotes: ${notes}`;
 
-    tweetText += `\nID${cardID}`;
+    tweetText += `\nQID${cardID}`;
     return tweetText;
   },
 
