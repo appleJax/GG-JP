@@ -1,0 +1,1857 @@
+{
+    "__type__": "Deck", 
+    "children": [], 
+    "crowdanki_uuid": "0a67c24f-017e-11e8-8838-d20015cf5c80", 
+    "deck_config_uuid": "35bba545-0084-11e8-b67c-d20015cf5c80", 
+    "deck_configurations": [
+        {
+            "__type__": "DeckConfig", 
+            "autoplay": true, 
+            "crowdanki_uuid": "35bba545-0084-11e8-b67c-d20015cf5c80", 
+            "dyn": false, 
+            "lapse": {
+                "delays": [
+                    1
+                ], 
+                "leechAction": 0, 
+                "leechFails": 8, 
+                "minInt": 1, 
+                "mult": 0.0
+            }, 
+            "maxTaken": 60, 
+            "name": "Default", 
+            "new": {
+                "bury": true, 
+                "delays": [
+                    1, 
+                    10
+                ], 
+                "initialFactor": 2500, 
+                "ints": [
+                    1, 
+                    4, 
+                    7
+                ], 
+                "order": 1, 
+                "perDay": 20, 
+                "separate": true
+            }, 
+            "replayq": true, 
+            "rev": {
+                "bury": true, 
+                "ease4": 1.3, 
+                "fuzz": 0.05, 
+                "ivlFct": 1.0, 
+                "maxIvl": 36500, 
+                "minSpace": 1, 
+                "perDay": 100
+            }, 
+            "timer": 0
+        }
+    ], 
+    "desc": "", 
+    "dyn": 0, 
+    "extendNew": 10, 
+    "extendRev": 50, 
+    "media_files": [
+        "zeroMissionJP_0000004C.png", 
+        "zeroMissionJP_00000012.png", 
+        "zeroMissionJP_0000002C (1).png", 
+        "zeroMissionJP_00000022.png", 
+        "zeroMissionJP_00000028.png", 
+        "zeroMissionJP_00000057.png", 
+        "zeroMissionJP_00000004.png", 
+        "zeroMissionJP_0000002B.png", 
+        "zeroMissionJP_00000009.png", 
+        "zeroMissionJP_0000002A.png", 
+        "zeroMissionJP_00000055 (1).png", 
+        "zeroMissionJP_0000000A (1).png", 
+        "zeroMissionJP_00000057 (1).png", 
+        "zeroMissionJP_00000025.png", 
+        "zeroMissionJP_0000001A (1).png", 
+        "zeroMissionJP_00000030.png", 
+        "zeroMissionJP_00000064 (1).png", 
+        "zeroMissionJP_00000071 (1).png", 
+        "zeroMissionJP_00000041 (1).png", 
+        "zeroMissionJP_00000005.png", 
+        "zeroMissionJP_00000058 (1).png", 
+        "zeroMissionJP_0000006E.png", 
+        "zeroMissionJP_0000003E.png", 
+        "zeroMissionJP_0000001A.png", 
+        "zeroMissionJP_0000002E.png", 
+        "zeroMissionJP_00000024 (1).png", 
+        "zeroMissionJP_0000002C.png", 
+        "zeroMissionJP_00000000.png", 
+        "zeroMissionJP_0000000C (1).png", 
+        "zeroMissionJP_00000064.png", 
+        "zeroMissionJP_0000000E (1).png", 
+        "zeroMissionJP_00000027.png", 
+        "zeroMissionJP_0000004B.png", 
+        "zeroMissionJP_0000001F (1).png", 
+        "zeroMissionJP_00000031.png", 
+        "zeroMissionJP_0000004A-6.png", 
+        "zeroMissionJP_00000032.png", 
+        "_gpne08-25.jpg", 
+        "zeroMissionJP_0000003F (1).png", 
+        "zeroMissionJP_00000037.png", 
+        "zeroMissionJP_00000022 (1).png", 
+        "zeroMissionJP_0000001B.png", 
+        "zeroMissionJP_00000042.png", 
+        "zeroMissionJP_00000014 (1).png", 
+        "zeroMissionJP_0000001D.png", 
+        "zeroMissionJP_00000013 (1).png", 
+        "zeroMissionJP_00000013.png", 
+        "zeroMissionJP_0000004A.png", 
+        "zeroMissionJP_00000017 (1).png", 
+        "zeroMissionJP_0000001B (1).png", 
+        "zeroMissionJP_00000043 (1).png", 
+        "zeroMissionJP_00000004 (1).png", 
+        "zeroMissionJP_00000038.png", 
+        "zeroMissionJP_0000004D (1).png", 
+        "zeroMissionJP_0000002F.png", 
+        "zeroMissionJP_00000041.png", 
+        "_kobigraph_slim.ttf", 
+        "zeroMissionJP_0000001F.png", 
+        "zeroMissionJP_00000039 (1).png", 
+        "zeroMissionJP_00000058.png", 
+        "zeroMissionJP_0000000F (1).png", 
+        "zeroMissionJP_0000002F (1).png", 
+        "zeroMissionJP_0000004A-3.png", 
+        "zeroMissionJP_0000003B (1).png", 
+        "zeroMissionJP_00000020.png", 
+        "zeroMissionJP_00000018 (1).png", 
+        "zeroMissionJP_0000002E (1).png", 
+        "zeroMissionJP_0000000F.png", 
+        "zeroMissionJP_00000031 (1).png", 
+        "zeroMissionJP_00000020 (1).png", 
+        "zeroMissionJP_00000055.png", 
+        "zeroMissionJP_00000043.png", 
+        "zeroMissionJP_00000071.png", 
+        "zeroMissionJP_00000025 (1).png", 
+        "zeroMissionJP_0000004A-5.png", 
+        "zeroMissionJP_00000026.png", 
+        "zeroMissionJP_0000004A-1.png", 
+        "zeroMissionJP_0000004A-2.png", 
+        "zeroMissionJP_00000016.png", 
+        "zeroMissionJP_00000002 (1).png", 
+        "zeroMissionJP_00000054 (1).png", 
+        "zeroMissionJP_00000014.png", 
+        "zeroMissionJP_0000000C.png", 
+        "zeroMissionJP_0000001C.png", 
+        "zeroMissionJP_00000056.png", 
+        "zeroMissionJP_0000005B (1).png", 
+        "zeroMissionJP_0000000F-1.png", 
+        "zeroMissionJP_0000004C (1).png", 
+        "zeroMissionJP_00000038 (1).png", 
+        "zeroMissionJP_0000006E (1).png", 
+        "zeroMissionJP_00000002.png", 
+        "zeroMissionJP_0000001E (1).png", 
+        "zeroMissionJP_0000001C (1).png", 
+        "zeroMissionJP_00000001 (1).png", 
+        "zeroMissionJP_00000017.png", 
+        "zeroMissionJP_0000005B.png", 
+        "zeroMissionJP_00000000 (1).png", 
+        "zeroMissionJP_00000056 (1).png", 
+        "zeroMissionJP_0000000E.png", 
+        "zeroMissionJP_00000018.png", 
+        "zeroMissionJP_00000039.png", 
+        "zeroMissionJP_00000024.png", 
+        "zeroMissionJP_0000000A.png", 
+        "zeroMissionJP_00000007 (1).png", 
+        "zeroMissionJP_00000026 (1).png", 
+        "zeroMissionJP_00000054.png", 
+        "zeroMissionJP_0000004B (1).png", 
+        "zeroMissionJP_00000032 (1).png", 
+        "zeroMissionJP_0000001E.png", 
+        "zeroMissionJP_0000003B.png", 
+        "zeroMissionJP_00000028 (1).png", 
+        "zeroMissionJP_0000004D.png", 
+        "zeroMissionJP_00000001.png", 
+        "zeroMissionJP_00000011.png", 
+        "zeroMissionJP_00000009 (1).png", 
+        "zeroMissionJP_00000023.png", 
+        "zeroMissionJP_0000004A-7.png", 
+        "zeroMissionJP_00000003 (1).png", 
+        "zeroMissionJP_00000005 (1).png", 
+        "zeroMissionJP_0000004A-8.png", 
+        "zeroMissionJP_0000003F.png", 
+        "zeroMissionJP_0000004A-4.png", 
+        "zeroMissionJP_00000012 (1).png", 
+        "zeroMissionJP_0000003A.png", 
+        "zeroMissionJP_00000007.png", 
+        "zeroMissionJP_00000019.png", 
+        "zeroMissionJP_0000002B (1).png", 
+        "zeroMissionJP_00000003.png"
+    ], 
+    "name": "Metroid Zero Mission JP", 
+    "note_models": [
+        {
+            "__type__": "NoteModel", 
+            "crowdanki_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "css": ".box {\n background: -webkit-linear-gradient(left, #DDEEFF 0%, #CCC 20%, #AAA 45%, #AAA 55%, #CCC 80%, #DDEEFF 100%);\n opacity: 1.00;\n box-shadow: -2px 2px 6px 1px #000;\n border-radius: 8px;\n padding: 50px 15px 30px 15px;\n}\n\n.card {\n font-family: arial;\n font-size: 44px;\n text-align: center;\n color: #fff;\n text-shadow: -1px 1px 1px #000;\n background-image: url('_gpne08-25.jpg');\n background-repeat: no-repeat;\n background-position: right bottom;\n background-attachment: fixed;\n margin: 50px 15px;\n}\n\n.hint { color: #DDEEFF; text-decoration: none; }\n\n.cloze { font-weight: bold; color: #FF33FF; }\n\nimg {width: 55%; height: auto; max-width: 1920px; max-height: 1080px; opacity: 1.00; image-rendering: pixelated;}\n.mobile img {width: 50%; height: auto; max-width: 1920px; max-height: 1080px; opacity: 1.00; image-rendering: pixelated;}\n\n.kobi { font-family: kobigraph; font-size: 28px; color: #666; }\n\n.notes { font-size: 24px; color: #666; }\n\n.reading { color: #FFF; }\n\nrt { font-weight: bold; color: #9900CC; }\n\ncode#typeans { font-size: 44px; font-family: calibri; }\ninput#typeans { font-size: 44px; text-align: center; color: #000; border-radius: 8px; max-width: 1000px; padding: 1px 5px; }\n\n.typeGood { font-family: arial; font-size: 44px; color: #009900; background-color: #00ff00; text-shadow: -1px 1px 1px #003300; }\n.typeBad { font-family: arial; font-size: 44px; color: #ff0000; background-color: #990000; text-shadow: -1px 1px 1px #330000; }\n.typeMissed {font-family: arial; font-size: 44px; color: #666; background-color: #ccc; text-shadow: -1px 1px 1px #000; }\n\n@font-face { font-family: kobigraph; src: url('_kobigraph_slim.ttf'); }\n\n/*\nrt { visibility: hidden; }\nruby:hover rt { visibility: visible; color: #FFF; }\n*/", 
+            "flds": [
+                {
+                    "font": "Meiryo", 
+                    "media": [], 
+                    "name": "Expression", 
+                    "ord": 0, 
+                    "rtl": false, 
+                    "size": 30, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Meiryo", 
+                    "media": [], 
+                    "name": "Reading", 
+                    "ord": 1, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Meiryo", 
+                    "media": [], 
+                    "name": "JapMeaning", 
+                    "ord": 2, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "EngMeaning", 
+                    "ord": 3, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "OfficialEng", 
+                    "ord": 4, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "QuestionImage", 
+                    "ord": 5, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "AnswerImage", 
+                    "ord": 6, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "Audio", 
+                    "ord": 7, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Meiryo", 
+                    "media": [], 
+                    "name": "PreviousLine", 
+                    "ord": 8, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "AlternateAnswers", 
+                    "ord": 9, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "WebLookup", 
+                    "ord": 10, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "Notes", 
+                    "ord": 11, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "Note ID", 
+                    "ord": 12, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }
+            ], 
+            "latexPost": "\\end{document}", 
+            "latexPre": "\\documentclass[12pt]{article}\n\\special{papersize=3in,5in}\n\\usepackage{amssymb,amsmath}\n\\pagestyle{empty}\n\\setlength{\\parindent}{0in}\n\\begin{document}\n", 
+            "name": "Japanese-Cloze-58fa2", 
+            "sortf": 12, 
+            "tags": [
+                "zero-mission"
+            ], 
+            "tmpls": [
+                {
+                    "afmt": "<div class='box'>\n{{#Tags}}<div class='notes'>[{{Tags}}]</div>{{/Tags}}\n{{cloze:Expression}}<br />\n{{type:cloze:Text}}<br />\n{{#Reading}}<div class='reading'>{{furigana:Reading}}</div><br /><br />{{/Reading}}\n{{#JapMeaning}}{{furigana:JapMeaning}}<br /><br />{{/JapMeaning}}\n{{#EngMeaning}}<div class='kobi'>{{EngMeaning}}</div><br />{{/EngMeaning}}\n{{#Audio}}{{Audio}}<br />{{/Audio}}\n{{#Notes}}<div class='notes'>[{{Notes}}]</div>{{/Notes}}\n{{#AnswerImage}}{{AnswerImage}}</div><br />{{/AnswerImage}}\n</div>", 
+                    "bafmt": "", 
+                    "bqfmt": "", 
+                    "did": null, 
+                    "name": "Cloze", 
+                    "ord": 0, 
+                    "qfmt": "<div class='box'>\n{{#Tags}}<div class='notes'>[{{Tags}}]</div>{{/Tags}}\n{{#PreviousLine}}<div class='reading'>{{hint:PreviousLine}}</div>{{/PreviousLine}}\n{{#QuestionImage}}{{QuestionImage}}</div><br />{{/QuestionImage}}\n{{cloze:Expression}}<br />\n{{type:cloze:Expression}}\n<span id='counter'></span>\n<script>\n$('#typeans').keyup(function() {\n    var text_length = $('#typeans').val().length;\n    $('#counter').html(text_length);\n});\n</script><br />\n{{#JapMeaning}}{{furigana:JapMeaning}}<br />{{/JapMeaning}}\n{{#EngMeaning}}<div class='kobi'>{{#JapMeaning}}<hr>{{hint:EngMeaning}}<br />{{/JapMeaning}}{{^JapMeaning}}{{EngMeaning}}{{/JapMeaning}}</div>{{/EngMeaning}}\n</div>", 
+                    "scratchPad": 0
+                }
+            ], 
+            "type": 1, 
+            "vers": []
+        }
+    ], 
+    "notes": [
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "オトナ{{c1::むき::..}} （漢字あり）<div>コドモ{{c1::むき::..}} （ひらがな）</div>", 
+                "オトナむき（ 漢字[かんじ]あり）コドモむき（ひらがな）", 
+                "<!--StartFragment-->その方面に適していること<!--EndFragment-->", 
+                "suitable for", 
+                "", 
+                "<img src=\"zeroMissionJP_0000000E.png\">", 
+                "<img src=\"zeroMissionJP_0000000E (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "向き", 
+                "", 
+                "1513311219052"
+            ], 
+            "flags": 0, 
+            "guid": "Ll<XW2VsE4", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "私が幼い日々を過ごした、第二のふるさと<div>「惑星ゼーベス」・・・今や魔の{{c1::巣くつ::...}}と化した</div><div>この星への、私のファーストアタックとなった、</div><div>通称「ZERO MISSION」</div><div>その戦いのすべてを、今ここに語ろう・・・</div><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; － サムス・アラン －<!--EndFragment--></div>", 
+                "私[わたし]が 幼[おさな]い 日々[ひび]を 過[す]ごした、 第[だい]二のふるさと<div>「 惑星[わくせい]ゼーベス」・・・ 今[いま]や 魔[ま]の 巣[そう]くつと 化[か]した</div><div>この 星[ほし]への、 私[わたし]のファーストアタックとなった、</div><div>&nbsp;通称[つうしょう]「ZERO MISSION」</div><div>その 戦[たたか]いのすべてを、 今[いま]ここに 語[かた]ろう・・・</div><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;－ サムス・アラン －</div>", 
+                "<!--StartFragment-->盗賊[とうぞく]や 悪人[あくにん]などが集まってかくれ住んでいる所<!--EndFragment-->", 
+                "den; nest; lair", 
+                "", 
+                "<img src=\"zeroMissionJP_0000000F.png\">", 
+                "<img src=\"zeroMissionJP_0000000F (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "巣窟", 
+                "", 
+                "1513312686128"
+            ], 
+            "flags": 0, 
+            "guid": "D(h(?5p-I6", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "ボールになり、せまい{{c1::通路::..}}を通ることができる", 
+                "ボールになり、せまい 通路[つうろ]を 通[とお]ることができる<!--EndFragment-->", 
+                "<!--StartFragment-->通行するための道路。通り道<!--EndFragment--><!--EndFragment-->", 
+                "passage", 
+                "", 
+                "<img src=\"zeroMissionJP_00000013.png\">", 
+                "<img src=\"zeroMissionJP_00000013 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000012 (1).png\">", 
+                "", 
+                "通路", 
+                "", 
+                "1513312950428"
+            ], 
+            "flags": 0, 
+            "guid": "E;ff,Mn.hc", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "体力<div>{{c1::全回復::...}} &nbsp;完了</div>", 
+                "体力[たいりょく]<div>&nbsp;全[ぜん] 回復[かいふく] 完了[かんりょう]</div>", 
+                "<!--StartFragment-->一度悪い状態になったものが、完全に元の状態になること<!--EndFragment-->", 
+                "full restoration", 
+                "", 
+                "<img src=\"zeroMissionJP_00000014.png\">", 
+                "<img src=\"zeroMissionJP_00000014 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "回復", 
+                "", 
+                "1513313175999"
+            ], 
+            "flags": 0, 
+            "guid": "F_l+9!q<#,", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "{{c1::射程距離::....}}の長いビーム", 
+                "射程[しゃてい] 距離[きょり]の 長[なが]いビーム", 
+                "<!--StartFragment-->鉄砲の弾丸の届く水平の最大<!--StartFragment-->へだたり<!--EndFragment--><!--EndFragment-->", 
+                "shooting distance", 
+                "", 
+                "<img src=\"zeroMissionJP_00000017.png\">", 
+                "<img src=\"zeroMissionJP_00000017 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000016.png\">", 
+                "", 
+                "射程距離", 
+                "", 
+                "1513313387355"
+            ], 
+            "flags": 0, 
+            "guid": "hXM?$}+5kz", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "ビームはL＋Bで ななめに{{c1::撃つ::..}}ことができる", 
+                "ビームはL＋Bで ななめに 撃[う]つことができる", 
+                "<!--StartFragment-->矢や弾を発射する<!--EndFragment-->", 
+                "<!--StartFragment-->fire; shoot<!--EndFragment-->", 
+                "", 
+                "<img src=\"zeroMissionJP_00000018.png\">", 
+                "<img src=\"zeroMissionJP_00000018 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000017 (1).png\">", 
+                "うつ", 
+                "撃つ", 
+                "", 
+                "1513313865434"
+            ], 
+            "flags": 0, 
+            "guid": "hZWdof$/<|", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "R+Bで{{c1::発射::..}}", 
+                "R+Bで 発射[はっしゃ]", 
+                "<!--StartFragment-->弾丸などを撃ち出すこと<!--EndFragment-->", 
+                "<!--StartFragment-->firing; shooting<!--EndFragment-->", 
+                "", 
+                "<img src=\"zeroMissionJP_0000001A.png\">", 
+                "<img src=\"zeroMissionJP_0000001A (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000019.png\">", 
+                "", 
+                "発射", 
+                "", 
+                "1513314104796"
+            ], 
+            "flags": 0, 
+            "guid": "s1O8;1<IAk", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "<div>{{c1::保有::..}}できるミサイルの最大値がUPした</div>", 
+                "保有[ほゆう]できるミサイルの 最大[さいだい] 値[ち]がUPした", 
+                "<!--StartFragment-->自分のものとして持っていること<!--EndFragment-->", 
+                "<!--StartFragment-->possess;&nbsp;<!--StartFragment-->retain<!--EndFragment--><!--EndFragment-->", 
+                "", 
+                "<img src=\"zeroMissionJP_0000001C.png\">", 
+                "<img src=\"zeroMissionJP_0000001C (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "保有", 
+                "", 
+                "1513314175252"
+            ], 
+            "flags": 0, 
+            "guid": "bUM(uySw%S", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "Bを押しつづけ パワーを{{c1::ため::..}}、はなすと発射", 
+                "Bを 押[お]しつづけパワーをため、はなすと 発射[はっしゃ]", 
+                "<!--StartFragment-->一か所に集めておく<!--EndFragment-->", 
+                "<!--StartFragment-->accumulate; store<!--EndFragment-->", 
+                "", 
+                "<img src=\"zeroMissionJP_0000001E.png\">", 
+                "<img src=\"zeroMissionJP_0000001E (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000001D.png\">", 
+                "溜め", 
+                "溜める", 
+                "", 
+                "1513314323480"
+            ], 
+            "flags": 0, 
+            "guid": "b7^|Qy/r(X", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "チャージアタック……パワーをためた状態で{{c1::回転::..}}ジャンプ", 
+                "チャージアタック……パワーをためた 状態[じょうたい]で 回転[かいてん]ジャンプ", 
+                "<!--StartFragment-->ぐるぐる回ること<!--EndFragment-->", 
+                "spin; rotation", 
+                "", 
+                "<img src=\"zeroMissionJP_0000001F.png\">", 
+                "<img src=\"zeroMissionJP_0000001F (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000001E (1).png\">", 
+                "", 
+                "回転", 
+                "", 
+                "1513315053229"
+            ], 
+            "flags": 0, 
+            "guid": "K*Z_S^g-U|", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "{{c1::体力::..}}の最大値がUPした", 
+                "体力[たいりょく]の 最大[さいだい] 値[ち]が UPした", 
+                "<!--StartFragment-->労働や運動に耐える身体の力<!--EndFragment--><!--EndFragment-->", 
+                "physical (bodily) strength; bodily power<!--EndFragment-->", 
+                "", 
+                "<img src=\"zeroMissionJP_00000020.png\">", 
+                "<img src=\"zeroMissionJP_00000020 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "体力", 
+                "", 
+                "1513315074329"
+            ], 
+            "flags": 0, 
+            "guid": "CA-%C9jgPb", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "BRINSTARのマップデータを{{c1::取得::≠獲.}}した", 
+                "BRINSTARのマップデータを 取得[しゅとく]した", 
+                "<!--StartFragment-->自分の物とすること。手に入れること<!--EndFragment-->", 
+                "acquisition", 
+                "", 
+                "<img src=\"zeroMissionJP_00000022.png\" />", 
+                "<img src=\"zeroMissionJP_00000022 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "取得", 
+                "", 
+                "1513315309273"
+            ], 
+            "flags": 0, 
+            "guid": "hf=FKM@6/A", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "ボールになったままBで{{c1::設置::..}}", 
+                "ボールになったままBで 設置[せっち]", 
+                "<!--StartFragment-->機械・設備などを備えつけること<!--EndFragment-->", 
+                "set up", 
+                "", 
+                "<img src=\"zeroMissionJP_00000024.png\" />", 
+                "<img src=\"zeroMissionJP_00000024 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000023.png\">", 
+                "", 
+                "設置", 
+                "", 
+                "1513315400764"
+            ], 
+            "flags": 0, 
+            "guid": "vUc:$j.z.~", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "武器 体力{{c1::ともに::...}}<div>全回復 完了</div>", 
+                "武器[ぶき] 体力[たいりょく]ともに<div>&nbsp;全[ぜん] 回復[かいふく] 完了[かんりょう]</div>", 
+                "「といっしょに」の意を表す<!--EndFragment-->", 
+                "along with", 
+                "", 
+                "<img src=\"zeroMissionJP_00000025.png\">", 
+                "<img src=\"zeroMissionJP_00000025 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "ともに", 
+                "", 
+                "1513315641465"
+            ], 
+            "flags": 0, 
+            "guid": "JVf|OoRZ<4", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "鳥人{{c1::遺跡::..}}", 
+                "鳥人[ちょうじん] 遺跡[いせき]", 
+                "<!--StartFragment-->過去の人間の 営為[えいい]の跡が残されている場所<!--EndFragment-->", 
+                "ruins", 
+                "", 
+                "<img src=\"zeroMissionJP_00000009.png\" />", 
+                "<img src=\"zeroMissionJP_00000009 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "遺跡", 
+                "", 
+                "1513315801908"
+            ], 
+            "flags": 0, 
+            "guid": "yi?QlF`rNV", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "{{c1::未詳::..}}アイテム", 
+                "未詳[みしょう]アイテム", 
+                "<!--StartFragment-->まだはっきりとわからないこと。確認できていないこと<!--EndFragment-->", 
+                "unknown; unconfirmed", 
+                "", 
+                "<img src=\"zeroMissionJP_0000000A.png\" />", 
+                "<img src=\"zeroMissionJP_0000000A (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "未詳", 
+                "", 
+                "1513316079206"
+            ], 
+            "flags": 0, 
+            "guid": "rg8lu6CmYs", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "解析{{c1::不能::..}}", 
+                "解析[かいせき] 不能[ふのう]", 
+                "<!--StartFragment-->できないこと。不可能<!--EndFragment-->", 
+                "unable to; impossible", 
+                "", 
+                "<img src=\"zeroMissionJP_0000000C.png\" />", 
+                "<img src=\"zeroMissionJP_0000000C (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000000A (1).png\">", 
+                "", 
+                "不能", 
+                "", 
+                "1513316225576"
+            ], 
+            "flags": 0, 
+            "guid": "B~_juxyIb]", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "現在のスーツに{{c1::不適合::...}}", 
+                "現在[げんざい]のスーツに 不適合[ふてきごう]", 
+                "<!--StartFragment-->条件・状況などに当てはまらないこと<!--EndFragment-->", 
+                "incompatible", 
+                "", 
+                "<img src=\"zeroMissionJP_00000026.png\" />", 
+                "<img src=\"zeroMissionJP_00000026 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000000C (1).png\">", 
+                "", 
+                "不適合", 
+                "", 
+                "1513316379112"
+            ], 
+            "flags": 0, 
+            "guid": "uy/yW<hSSZ", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "足場や壁の{{c1::カド::..}}につかまることができる", 
+                "足場[あしば]や 壁[かべ]のカドにつかまることができる", 
+                "<!--StartFragment-->二つの線や面が出合って生じるとがった部分<!--EndFragment-->", 
+                "corner", 
+                "", 
+                "<img src=\"zeroMissionJP_00000028.png\" />", 
+                "<img src=\"zeroMissionJP_00000028 (1).png\">", 
+                "<img src=\"zeroMissionJP_00000027.png\">", 
+                "", 
+                "かど", 
+                "<div>角</div>", 
+                "", 
+                "1513318086718"
+            ], 
+            "flags": 0, 
+            "guid": "raL*hHN5vY", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "敵を{{c1::凍らせる::....}}ことができるビーム", 
+                "敵[てき]を 凍[こお]らせることができるビーム", 
+                "<!--StartFragment-->水など液体のものを、<!--StartFragment-->温度が低いために固体にさせる<!--EndFragment-->", 
+                "freeze", 
+                "", 
+                "<img src=\"zeroMissionJP_0000002B.png\" />", 
+                "<img src=\"zeroMissionJP_0000002B (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000002A.png\">", 
+                "", 
+                "凍らせる", 
+                "", 
+                "1513318097299"
+            ], 
+            "flags": 0, 
+            "guid": "t<H|,AwC#?", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "凍らせた敵には {{c1::乗る::..}}ことができる", 
+                "凍[こお]らせた 敵[てき]には 乗[の]ることができる", 
+                "<!--StartFragment-->物の上にあがる<!--EndFragment-->", 
+                "get on (top of)", 
+                "", 
+                "<img src=\"zeroMissionJP_0000002C (1).png\" />", 
+                "<img src=\"zeroMissionJP_0000002C.png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000002B (1).png\">", 
+                "のる", 
+                "乗る", 
+                "", 
+                "1513318485290"
+            ], 
+            "flags": 0, 
+            "guid": "LvI/9FADh]", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "惑星ゼーベスの「メトロイド」を{{c1::殲滅::..}}せよ。そして…", 
+                "惑星[わくせい]ゼーベスの「メトロイド」を 殲滅[せんめつ]せよ。そして…", 
+                "<!--StartFragment-->皆殺[みなごろ]しにしてほろぼすこと。残らず滅ぼすこと<!--EndFragment-->", 
+                "extermination; annihilation", 
+                "", 
+                "<img src=\"zeroMissionJP_0000002E.png\" />", 
+                "<img src=\"zeroMissionJP_0000002E (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000071 (1).png\">", 
+                "", 
+                "殲滅", 
+                "", 
+                "1513319302224"
+            ], 
+            "flags": 0, 
+            "guid": "r`^O6^k!#o", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "機械{{c1::生命体::...}}「マザーブレイン」を破壊せよ。", 
+                "機械[きかい] 生命[せいめい] 体[たい]「マザーブレイン」を 破壊[はかい]せよ。", 
+                "命[いのち]を持つ個体。いきもの。 生物[せいぶつ]<!--EndFragment-->", 
+                "life-form", 
+                "", 
+                "<img src=\"zeroMissionJP_0000002F (1).png\" />", 
+                "<img src=\"zeroMissionJP_0000002F.png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000002E (1).png\">", 
+                "", 
+                "生命体", 
+                "", 
+                "1513319657842"
+            ], 
+            "flags": 0, 
+            "guid": "fzb1ffU]#H", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "敵からのダメージを{{c1::軽減::..}}する", 
+                "敵[てき]からのダメージを 軽減[けいげん]する", 
+                "<!--StartFragment-->減らして軽くすること<!--EndFragment-->", 
+                "reduction; mitigation", 
+                "", 
+                "<img src=\"zeroMissionJP_00000031.png\" />", 
+                "<img src=\"zeroMissionJP_00000031 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000030.png\">", 
+                "", 
+                "軽減", 
+                "", 
+                "1513322891093"
+            ], 
+            "flags": 0, 
+            "guid": "HRw~8gRm4e", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "また、{{c1::有毒::..}}液や高温エリアのダメージを受けない", 
+                "また、 有毒[ゆうどく] 液[えき]や 高温[こうおん]エリアのダメージを 受[う]けない", 
+                "<!--StartFragment-->毒性のあること<!--EndFragment--><!--EndFragment-->", 
+                "poisonous; toxic", 
+                "", 
+                "<img src=\"zeroMissionJP_00000032 (1).png\" />", 
+                "<img src=\"zeroMissionJP_00000032.png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000031 (1).png\">", 
+                "", 
+                "有毒", 
+                "", 
+                "1513323196043"
+            ], 
+            "flags": 0, 
+            "guid": "kffxs#C29[", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "走り続けると高速ダッシュし、{{c1::特定::..}}のブロックを破壊する", 
+                "走[はし]り 続[つづ]けると 高速[こうそく]ダッシュし、 特定[とくてい]のブロックを 破壊[はかい]する", 
+                "<!--StartFragment-->特に決まっていること<!--EndFragment-->", 
+                "specific", 
+                "", 
+                "<img src=\"zeroMissionJP_00000038.png\">", 
+                "<img src=\"zeroMissionJP_00000038 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000037.png\">", 
+                "", 
+                "特定", 
+                "", 
+                "1513323435327"
+            ], 
+            "flags": 0, 
+            "guid": "rU}j:ffnf7", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "高速ダッシュ中、{{c1::体当たり::....}}すると、敵にダメージを与える", 
+                "高速[こうそく]ダッシュ 中[ちゅう]、 体[たい] 当[あ]たりすると、 敵[てき]にダメージを 与[あた]える", 
+                "<!--StartFragment-->相手を倒すため，相手に自分の体をぶつけること<!--EndFragment-->", 
+                "hurl oneself at", 
+                "", 
+                "<img src=\"zeroMissionJP_00000039 (1).png\" />", 
+                "<img src=\"zeroMissionJP_00000039.png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000038 (1).png\">", 
+                "", 
+                "体当たり", 
+                "", 
+                "1513323698952"
+            ], 
+            "flags": 0, 
+            "guid": "PnV~}lFinH", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "ジャンプ{{c1::力::.}}がアップする", 
+                "ジャンプ 力[りょく]がアップする", 
+                "<!--StartFragment-->ちから<!--EndFragment-->", 
+                "power", 
+                "", 
+                "<img src=\"zeroMissionJP_0000003B.png\" />", 
+                "<img src=\"zeroMissionJP_0000003B (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000003A.png\">", 
+                "", 
+                "力", 
+                "", 
+                "1513323909455"
+            ], 
+            "flags": 0, 
+            "guid": "z2>`7oyuTU", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "SELECTでミサイルと{{c1::切りかえ::....}}、R+Bで発射", 
+                "SELECTでミサイルと 切[き]りかえ、R+Bで 発射[はっしゃ]", 
+                "<!--StartFragment-->今までのものをやめて、別のものに替える<!--EndFragment--><!--EndFragment-->", 
+                "change; switch", 
+                "", 
+                "<img src=\"zeroMissionJP_0000003F (1).png\" />", 
+                "<img src=\"zeroMissionJP_0000003F.png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000003E.png\">", 
+                "切り替え,切り換え,きりかえ", 
+                "切り換える", 
+                "", 
+                "1513324176925"
+            ], 
+            "flags": 0, 
+            "guid": "sI?}iTrCL4", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "保有できるスーパーミサイルの{{c1::最大値::...}}がUPした", 
+                "保有[ほゆう]できるスーパーミサイルの 最大[さいだい] 値[ち]がUPした", 
+                "<!--StartFragment-->最も大きい 値[あたい]<!--EndFragment--><!--EndFragment-->", 
+                "maximum value", 
+                "", 
+                "<img src=\"zeroMissionJP_00000041.png\" />", 
+                "<img src=\"zeroMissionJP_00000041 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "最大値", 
+                "", 
+                "1513324401299"
+            ], 
+            "flags": 0, 
+            "guid": "o.Dgyhe{Vd", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "回転ジャンプで体当たりすると、敵にダメージを{{c1::与える::...}}", 
+                "回転[かいてん]ジャンプで 体[たい] 当[あ]たりすると、 敵[てき]にダメージを 与[あた]える", 
+                "<!--StartFragment-->他者[たしゃ]に 何[なん]らかの影響を及ぼす<!--EndFragment-->", 
+                "dish out", 
+                "", 
+                "<img src=\"zeroMissionJP_00000043 (1).png\" />", 
+                "<img src=\"zeroMissionJP_00000043.png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000042.png\">", 
+                "", 
+                "与える", 
+                "", 
+                "1513324603331"
+            ], 
+            "flags": 0, 
+            "guid": "A%e!h^n>dC", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "最悪のタイミングで、ゼーベスに{{c1::帰還::..}}してきたスペースパイレーツに追撃され、私は、この無防備な身体のままでの脱出を余儀なくされた。", 
+                "最悪[さいあく]のタイミングで、ゼーベスに 帰還[きかん]してきたスペースパイレーツに 追撃[ついげき]され、 私[わたし]は、この 無防備[むぼうび]な 身体[しんたい]のままでの 脱出[だっしゅつ]を 余儀[よぎ]なくされた。", 
+                "<!--StartFragment-->遠方[えんぽう]の地から帰ってくること<!--EndFragment-->", 
+                "return (home)", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004A-1.png\" />", 
+                "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "", 
+                "", 
+                "", 
+                "帰還", 
+                "", 
+                "1513324858613"
+            ], 
+            "flags": 0, 
+            "guid": "c@J0,ETUl*", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "最悪のタイミングで、ゼーベスに帰還してきたスペースパイレーツに{{c1::追撃::..}}され、私は、この無防備な身体のままでの脱出を余儀なくされた。", 
+                "最悪[さいあく]のタイミングで、ゼーベスに 帰還[きかん]してきたスペースパイレーツに 追撃[ついげき]され、 私[わたし]は、この 無防備[むぼうび]な 身体[しんたい]のままでの 脱出[だっしゅつ]を 余儀[よぎ]なくされた。", 
+                "<!--StartFragment-->逃げる敵を撃つために追いかけること<!--StartFragment-->。おいうち<!--EndFragment--><!--EndFragment-->", 
+                "pursuit; chase", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004A-2.png\" />", 
+                "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "", 
+                "", 
+                "", 
+                "追撃", 
+                "", 
+                "1513325764381"
+            ], 
+            "flags": 0, 
+            "guid": "B2mm]O@^DN", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "最悪のタイミングで、ゼーベスに帰還してきたスペースパイレーツに追撃され、私は、この{{c1::無防備::...}}な身体のままでの脱出を余儀なくされた。", 
+                "最悪[さいあく]のタイミングで、ゼーベスに 帰還[きかん]してきたスペースパイレーツに 追撃[ついげき]され、 私[わたし]は、この 無防備[むぼうび]な 身体[しんたい]のままでの 脱出[だっしゅつ]を 余儀[よぎ]なくされた。", 
+                "<!--StartFragment-->攻撃や災害を防ぐ準備がないこと<!--EndFragment-->", 
+                "defenseless", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004A-3.png\" />", 
+                "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "", 
+                "", 
+                "", 
+                "無防備", 
+                "", 
+                "1513325873410"
+            ], 
+            "flags": 0, 
+            "guid": "Led!`kqgm+", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "最悪のタイミングで、ゼーベスに帰還してきたスペースパイレーツに追撃され、私は、この無防備な身体のままでの脱出を{{c1::余儀::.≠方}}なくされた。", 
+                "最悪[さいあく]のタイミングで、ゼーベスに 帰還[きかん]してきたスペースパイレーツに 追撃[ついげき]され、 私[わたし]は、この 無防備[むぼうび]な 身体[しんたい]のままでの 脱出[だっしゅつ]を 余儀[よぎ]なくされた。", 
+                "<!--StartFragment-->それ以外に取るべき方法がないさま。そうする以外にない。やむを得ない<!--EndFragment--><!--EndFragment--><!--EndFragment-->", 
+                "<!--StartFragment-->unavoidable<!--EndFragment-->", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004A-4.png\" />", 
+                "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "", 
+                "", 
+                "よぎ", 
+                "余儀", 
+                "", 
+                "1513325949394"
+            ], 
+            "flags": 0, 
+            "guid": "t.HeExh%ts", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "その私に残されたものは、{{c1::護身::..}}用と呼ぶことさえ、はばかられるような、この一丁の銃だけだ。", 
+                "その 私[わたし]に 残[のこ]されたものは、 護身[ごしん] 用[よう]と 呼[よ]ぶことさえ、はばかられるような、この 一丁[いっちょう]の 銃[じゅう]だけだ。", 
+                "<!--StartFragment-->自分の身を守ること。危険から身を守ること<!--EndFragment-->", 
+                "self-defense", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004A-5.png\" />", 
+                "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "", 
+                "", 
+                "", 
+                "護身", 
+                "", 
+                "1513326118798"
+            ], 
+            "flags": 0, 
+            "guid": "c,&9S9*d2", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "その私に残されたものは、護身用と呼ぶことさえ、{{c1::はばから::....}}れるような、この一丁の銃だけだ。", 
+                "その 私[わたし]に 残[のこ]されたものは、 護身[ごしん] 用[よう]と 呼[よ]ぶことさえ、はばかられるような、この 一丁[いっちょう]の 銃[じゅう]だけだ。", 
+                "<!--StartFragment-->さしさわりがあるとして、さしひかえる。遠慮する<!--EndFragment-->", 
+                "hesitate (to); be afraid (to)", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004A-6.png\" />", 
+                "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "", 
+                "", 
+                "", 
+                "憚る", 
+                "", 
+                "1513326252188"
+            ], 
+            "flags": 0, 
+            "guid": "jZ7Ny;nQA", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "これだけを{{c1::頼り::..}}に、私は今、活路を求めてスペースパイレーツのマザーシップへの潜入を、試みようとしている。", 
+                "これだけを 頼[たよ]りに、 私[わたし]は 今[いま]、 活路[かつろ]を 求[もと]めてスペースパイレーツのマザーシップへの 潜入[せんにゅう]を、 試[こころ]みようとしている。", 
+                "<!--StartFragment-->たのみとする物や人<!--EndFragment-->", 
+                "with (only) the help of", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004A-7.png\" />", 
+                "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "", 
+                "", 
+                "", 
+                "頼り", 
+                "", 
+                "1513326485553"
+            ], 
+            "flags": 0, 
+            "guid": "hf~8h~S2n}", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "これだけを頼りに、私は今、{{c1::活路::..}}を求めてスペースパイレーツのマザーシップへの潜入を、試みようとしている。", 
+                "これだけを 頼[たよ]りに、 私[わたし]は 今[いま]、 活路[かつろ]を 求[もと]めてスペースパイレーツのマザーシップへの 潜入[せんにゅう]を、 試[こころ]みようとしている。", 
+                "<!--StartFragment-->行き 詰[づ]まった状況から抜け出す方法。生きるための道や方法<!--EndFragment-->", 
+                "a way out", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004A-8.png\" />", 
+                "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "", 
+                "", 
+                "", 
+                "活路", 
+                "", 
+                "1513326909881"
+            ], 
+            "flags": 0, 
+            "guid": "xA^[YnFc|C", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "{{c1::はたして::....}}、生きて帰れるのだろうか…", 
+                "はたして、 生[い]きて 帰[かえ]れるのだろうか…", 
+                "（疑問表現・仮定表現を伴って）疑いの気持ちや仮定であることを強調する語。ほんとうに<!--EndFragment-->", 
+                "I wonder…; will…really (happen)?", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004B (1).png\">", 
+                "<img src=\"zeroMissionJP_0000004B.png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "果たして", 
+                "果たして", 
+                "", 
+                "1513326962177"
+            ], 
+            "flags": 0, 
+            "guid": "m1GmL.0h_Z", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": []
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "私が幼い日々を過ごした、第二のふるさと<div>「惑星ゼーベス」・・・今や魔の巣くつと化した</div><div>この星への、私のファーストアタックとなった、</div><div>{{c1::通称::..}}「ZERO MISSION」</div><div>その戦いのすべてを、今ここに語ろう・・・</div><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; － サムス・アラン －</div>", 
+                "私[わたし]が 幼[おさな]い 日々[ひび]を 過[す]ごした、 第[だい]二のふるさと<div>「 惑星[わくせい]ゼーベス」・・・ 今[いま]や 魔[ま]の 巣[そう]くつと 化[か]した</div><div>この 星[ほし]への、 私[わたし]のファーストアタックとなった、</div><div>&nbsp;通称[つうしょう]「ZERO MISSION」</div><div>その 戦[たたか]いのすべてを、 今[いま]ここに 語[かた]ろう・・・</div><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;－ サムス・アラン －</div>", 
+                "（正式な名でなくて） 世間一般[<!--StartFragment-->せけんいっぱん<!--EndFragment-->]に通用している名前<!--EndFragment-->", 
+                "(commonly) known as", 
+                "", 
+                "<img src=\"zeroMissionJP_0000000F-1.png\" />", 
+                "<img src=\"zeroMissionJP_0000000F (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "通称", 
+                "", 
+                "1513327324512"
+            ], 
+            "flags": 0, 
+            "guid": "Qy;+A_0z-P", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": []
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "自動でパワーが{{c1::充填::..}}される短銃", 
+                "自動[じどう]でパワーが 充填[じゅうてん]される 短銃[たんじゅう]", 
+                "<div><div>物を詰めて欠けた所や 空所[くうしょ]を満たすこと</div></div>", 
+                "filling up", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004C.png\">", 
+                "<img src=\"zeroMissionJP_0000004C (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "充填", 
+                "", 
+                "16679989657"
+            ], 
+            "flags": 0, 
+            "guid": "i9<ILUz>B`", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "パワー充填発射で敵を{{c1::マヒ::..}}させる", 
+                "パワー 充填[じゅうてん] 発射[はっしゃ]で 敵[てき]をマヒさせる", 
+                "<div><div>はたらきが，にぶったり停止したりすること</div></div>", 
+                "paralysis; numbness", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004D.png\">", 
+                "<img src=\"zeroMissionJP_0000004D (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000004C (1).png\">", 
+                "麻痺", 
+                "麻痺", 
+                "", 
+                "16680784527"
+            ], 
+            "flags": 0, 
+            "guid": "QE-,sWMe1!", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "NORMAL [{{c1::ふつう::...}}]", 
+                "NORMAL[ふつう]", 
+                "<div><div>特別ではなく，一般的であること</div></div>", 
+                "normal", 
+                "", 
+                "<img src=\"zeroMissionJP_00000005.png\">", 
+                "<img src=\"zeroMissionJP_00000005 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "普通", 
+                "", 
+                "16681144372"
+            ], 
+            "flags": 0, 
+            "guid": "J:#FqffI_)", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "{{c1::伝説::..}}のパワードスーツを取得した", 
+                "伝説[でんせつ]のパワードスーツを 取得[しゅとく]した", 
+                "<div><div>言い伝えること。また，言い伝えられること。うわさ</div></div>", 
+                "legend(ary)", 
+                "", 
+                "<img src=\"zeroMissionJP_0000005B.png\">", 
+                "<img src=\"zeroMissionJP_0000005B (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "伝説", 
+                "", 
+                "16681446456"
+            ], 
+            "flags": 0, 
+            "guid": "hZs%K^bgK{", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "OPTIONS [オプション]に「ギャラリー」が{{c1::ついか::...}}されました。", 
+                "OPTIONS[オプション]に「ギャラリー」がついかされました。", 
+                "<div><div>すでにあるものに，あとからさらに加えること</div></div>", 
+                "addition", 
+                "", 
+                "<img src=\"zeroMissionJP_0000006E.png\">", 
+                "<img src=\"zeroMissionJP_0000006E (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "追加", 
+                "", 
+                "16681919737"
+            ], 
+            "flags": 0, 
+            "guid": "wB70W6c~N|", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "スリープモードから戻る時はSELECTとLとRを{{c1::同時::..}}に押してください", 
+                "スリープモードから 戻[もど]る 時[とき]はSELECTとLとRを 同時[どうじ]に 押[お]してください", 
+                "<div><div>おなじとき。おなじ時間</div></div>", 
+                "(at) the same time", 
+                "", 
+                "<img src=\"zeroMissionJP_00000007.png\">", 
+                "<img src=\"zeroMissionJP_00000007 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "同時", 
+                "", 
+                "16683138076"
+            ], 
+            "flags": 0, 
+            "guid": "mz{NC4)@~h", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "↓を2{{c1::回::≠度}}押す", 
+                "↓を 2 回[かい] 押[お]す", 
+                "<div><div>ある事柄を 反復[はんぷく]して行う時の一つのまとまり</div></div>", 
+                "time", 
+                "", 
+                "<img src=\"zeroMissionJP_00000012.png\">", 
+                "<img src=\"zeroMissionJP_00000012 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000011.png\">", 
+                "", 
+                "回", 
+                "", 
+                "16683363135"
+            ], 
+            "flags": 0, 
+            "guid": "z-tmH}$dB:", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "コピーするデータを{{c1::えらん::...}}でください", 
+                "コピーするデータをえらんでください", 
+                "<div><div>いくつかのもののうちで，条件にかなうものを決める。また，決めて 抜[ぬ]き 出[だ]す。選択する</div></div>", 
+                "pick out; select", 
+                "", 
+                "<img src=\"zeroMissionJP_00000000.png\">", 
+                "<img src=\"zeroMissionJP_00000000 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "選ぶ", 
+                "", 
+                "16683853776"
+            ], 
+            "flags": 0, 
+            "guid": "kWvdOsytx;", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "どこにコピーしますか？<div>コピー{{c1::さき::..}}をえらんでください</div>", 
+                "どこにコピーしますか？<div>コピーさきをえらんでください</div>", 
+                "<div><div>出かけて行く場所</div></div>", 
+                "destination", 
+                "", 
+                "<img src=\"zeroMissionJP_00000001.png\">", 
+                "<img src=\"zeroMissionJP_00000001 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000000 (1).png\">", 
+                "", 
+                "先", 
+                "", 
+                "16684637765"
+            ], 
+            "flags": 0, 
+            "guid": "O=wHjLx/Ji", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "レッドゲートを{{c1::開け::..}}ることができる", 
+                "レッドゲートを 開[あ]けることができる", 
+                "<div><div>出入り口や容器の口などを閉ざしていた物を動かして，人や物が通り抜けられるようにする。ひらく</div></div>", 
+                "open", 
+                "", 
+                "<img src=\"zeroMissionJP_0000001B.png\">", 
+                "<img src=\"zeroMissionJP_0000001B (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_0000001A (1).png\">", 
+                "あけ", 
+                "開ける", 
+                "", 
+                "16684978280"
+            ], 
+            "flags": 0, 
+            "guid": "kug~<gB,#m", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "どのデータを {{c1::けし::..}}ますか？", 
+                "どのデータを けしますか？", 
+                "<div><div>文字・図形・文様・色などを，見えなくする</div></div>", 
+                "erase", 
+                "", 
+                "<img src=\"zeroMissionJP_00000002.png\">", 
+                "<img src=\"zeroMissionJP_00000002 (1).png\">", 
+                "", 
+                "", 
+                "消し", 
+                "消す", 
+                "", 
+                "16685211028"
+            ], 
+            "flags": 0, 
+            "guid": "tXoYx]P.%_", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "このデータをけしても{{c1::よろしい::....}}ですか？", 
+                "このデータをけしてもよろしいですか？", 
+                "<div><div>「よい」の丁寧な，または改まった言い方。結構である。好ましい</div></div>", 
+                "all right; okay", 
+                "", 
+                "<img src=\"zeroMissionJP_00000003.png\">", 
+                "<img src=\"zeroMissionJP_00000003 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000002 (1).png\">", 
+                "", 
+                "よろしい", 
+                "", 
+                "16685498796"
+            ], 
+            "flags": 0, 
+            "guid": "l22*~>v$!]", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "これまでのセーブデータは {{c1::きえ::..}}てしまいます。よろしいですか？<div>(Sは{{c1::きえ::..}}ません)</div>", 
+                "これまでのセーブデータはきえてしまいます。よろしいですか？<div>(Sはきえません)</div>", 
+                "<div><div>目に見えていたものがなくなって，見えなくなる</div></div>", 
+                "disappear", 
+                "", 
+                "<img src=\"zeroMissionJP_00000004.png\">", 
+                "<img src=\"zeroMissionJP_00000004 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000003 (1).png\">", 
+                "消え", 
+                "消える", 
+                "", 
+                "16685759176"
+            ], 
+            "flags": 0, 
+            "guid": "CW~%-TVFA|", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "複数の敵を{{c1::貫く::..}}ビーム", 
+                "複数[ふくすう]の 敵[てき]を 貫[つらぬ]くビーム", 
+                "<div><div>物の端から端まで，または表から裏へ通す</div></div>", 
+                "pierce; penetrate", 
+                "", 
+                "<img src=\"zeroMissionJP_00000054.png\">", 
+                "<img src=\"zeroMissionJP_00000054 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "貫く", 
+                "", 
+                "16686082309"
+            ], 
+            "flags": 0, 
+            "guid": "i6R7Y{L@fU", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "敵からダメージを軽減し、{{c1::水中::.?}}でも自由に動ける", 
+                "敵[てき]からダメージを 軽減[けいげん]し、 水中[すいちゅう]でも 自由[じゆう]に 動[うご]ける", 
+                "<div><div>水のなか</div></div>", 
+                "underwater", 
+                "", 
+                "<img src=\"zeroMissionJP_00000055.png\">", 
+                "<img src=\"zeroMissionJP_00000055 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "水中", 
+                "", 
+                "16687414085"
+            ], 
+            "flags": 0, 
+            "guid": "hbn%?:}hUf", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "また、{{c1::溶岩::..?}}のダメージを受けない", 
+                "また、 溶岩[ようがん]のダメージを 受[う]けない", 
+                "<div><div>地下 深部[しんぶ]のマグマが 地表[ちひょう]に 噴出[ふんしゅつ]し， 流動[りゅうどう]している 溶融体[ようゆうたい]</div></div>", 
+                "lava", 
+                "", 
+                "<img src=\"zeroMissionJP_00000056.png\">", 
+                "<img src=\"zeroMissionJP_00000056 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000055 (1).png\">", 
+                "", 
+                "溶岩", 
+                "", 
+                "16687577126"
+            ], 
+            "flags": 0, 
+            "guid": "ARBYfa+!Aj", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "回転ジャンプ中に{{c1::再び::.≠た??}}ジャンプできる", 
+                "回転[かいてん]ジャンプ 中[ちゅう]に 再[ふたた]びジャンプできる", 
+                "<div><div>同じ動作状態などの重なること。にど</div></div>", 
+                "again; once more", 
+                "", 
+                "<img src=\"zeroMissionJP_00000057.png\">", 
+                "<img src=\"zeroMissionJP_00000057 (1).png\">", 
+                "", 
+                "", 
+                "再び", 
+                "", 
+                "", 
+                "16687907415"
+            ], 
+            "flags": 0, 
+            "guid": "I:RxkI4eRm", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "回転ジャンプの{{c1::下降::≠降.}}中にもう一度A", 
+                "回転[かいてん]ジャンプの 下降[かこう] 中[ちゅう]にもう 一度[いちど]A", 
+                "<div><div>さがっていくこと。降下</div></div>", 
+                "descent", 
+                "", 
+                "<img src=\"zeroMissionJP_00000058.png\">", 
+                "<img src=\"zeroMissionJP_00000058 (1).png\">", 
+                "", 
+                "<img src=\"zeroMissionJP_00000057 (1).png\">", 
+                "", 
+                "下降", 
+                "", 
+                "16688113928"
+            ], 
+            "flags": 0, 
+            "guid": "v^|*VIm^+I", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "自爆装置{{c1::作動::≠(始,起).}}！<div>脱出せよ！</div>", 
+                "自爆[じばく] 装置[そうち] 作動[さどう]！<div>&nbsp;脱出[だっしゅつ]せよ！</div>", 
+                "<div><div>機械が運転しはじめること</div></div>", 
+                "activation; set in motion", 
+                "", 
+                "<img src=\"zeroMissionJP_00000064.png\">", 
+                "<img src=\"zeroMissionJP_00000064 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "作動", 
+                "", 
+                "16688349978"
+            ], 
+            "flags": 0, 
+            "guid": "w!`d^z1C$]", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }, 
+        {
+            "__type__": "Note", 
+            "data": "", 
+            "fields": [
+                "{{c1::緊急::≠非.}}指令", 
+                "緊急[きんきゅう] 指令[しれい]", 
+                "<div><div>非常に重大な事態となり，その対応・処置に急を要すること</div></div>", 
+                "emergency", 
+                "EMERGENCY ORDER", 
+                "<img src=\"zeroMissionJP_00000071.png\">", 
+                "<img src=\"zeroMissionJP_00000071 (1).png\">", 
+                "", 
+                "", 
+                "", 
+                "緊急", 
+                "", 
+                "16688819498"
+            ], 
+            "flags": 0, 
+            "guid": "e>60eZ12d0", 
+            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "tags": [
+                "zero-mission"
+            ]
+        }
+    ]
+}

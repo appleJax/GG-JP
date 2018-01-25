@@ -4,7 +4,8 @@ const {
   TWITTER_API_KEY,
   TWITTER_API_SECRET,
   TWITTER_TOKEN,
-  TWITTER_TOKEN_SECRET
+  TWITTER_TOKEN_SECRET,
+  TWITTER_ACCOUNT
 } = process.env;
 
 const twit = require('twit');
@@ -25,42 +26,48 @@ const userConfig = {
 const Twitter = new twit(userConfig);
 const HOURS = 3600000;
 
-
-function consoleRandomCard() {
-  DB.getRandomCard()
-    .then(({ questionImg, reading, expression }) =>
-      console.log(questionImg, reading, expression));
+function tweetRandomQuestion() {
+  DB.getRandomQuestion()
+    .then(({ questionImg, questionAltText, questionText, cardId }) =>
+      postMedia(questionImg, questionAltText, questionText)
+        .then(questionId =>
+          setTimeout(() => tweetCardAnswer(cardId, questionId), 2000)
+        );
+    );
 }
 
-//
-// tweet a random anki card
-//
-function tweetRandomCard() {
-  DB.getRandomCard()
-    .then(({ questionImg, reading, expression }) =>
-      postMedia(questionImg, reading, expression));
+function tweetCardAnswer(cardId, questionId) {
+  DB.getCardAnswer(cardId)
+    .then(({answerImg, answerAltText, answerText}) => {
+      const quoteQuestion = `\nhttps://twitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
+      answerText += quoteQuestion;
+      postMedia(answerImg, answerAltText, answerText);
+    });
 }
 
 //
 // post a tweet with media
 //
-function postMedia(b64Image, altText, message) {
-  // first we must post the media to Twitter
-  Twitter.post('media/upload', { media_data: b64Image }, (err, data, response) => {
-    // now we can assign alt text to the media, for use by screen readers and
-    // other text-based presentations and interpreters
-    const mediaIdStr = data.media_id_string;
-    const meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
+function postMedia(b64Image, altText, tweetText) {
+  return new Promise((resolve, reject) => {
+    // first we must post the media to Twitter
+    Twitter.post('media/upload', { media_data: b64Image }, (err, data, response) => {
+      // now we can assign alt text to the media, for use by screen readers and
+      // other text-based presentations and interpreters
+      const mediaIdStr = data.media_id_string;
+      const meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
 
-    Twitter.post('media/metadata/create', meta_params, (err, data, response) => {
-      if (!err) {
-        // now we can reference the media and post a tweet (media will attach to the tweet)
-        const params = { status: message, media_ids: [mediaIdStr] };
+      Twitter.post('media/metadata/create', meta_params, (err, data, response) => {
+        if (!err) {
+          // now we can reference the media and post a tweet (media will attach to the tweet)
+          const params = { status: tweetText, media_ids: [mediaIdStr] };
 
-        Twitter.post('statuses/update', params, (err, data, response) => {
-          // console.log(data);
-        });
-      }
+          Twitter.post('statuses/update', params, (err, data, response) => {
+            //console.log(data);
+            resolve(data.id_str);
+          });
+        }
+      });
     });
   });
 }
@@ -91,5 +98,5 @@ function searchTwitter(hashtag) {
 
 module.exports = {
   //start: () => setInterval(tweetRandomCard, 2*HOURS)
-  start: () => setInterval(tweetRandomCard, 5000)
+  start: () => setInterval(tweetRandomQuestion, 5000)
 };

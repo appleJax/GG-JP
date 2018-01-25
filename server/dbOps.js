@@ -1,10 +1,10 @@
 const MongoClient = require('mongodb').MongoClient;
 const url = process.env.MONGODB_URI;
 const DB = process.env.MONGO_DB;
-const processUpload = require('./processAnkiJson');
+const { processUpload } = require('./processAnkiJson');
 
 module.exports = {
-  getRandomCard() {
+  getRandomQuestion() {
     return new Promise((resolve, reject) => {
       MongoClient.connect(url, (err, mongo) => {
         const newCards = mongo.db(DB).collection('newCards');
@@ -18,6 +18,18 @@ module.exports = {
               resolve(randomCard);
             });
           });
+        });
+      });
+    });
+  },
+
+  getCardAnswer(cardId) {
+    return new Promise((resolve, reject) => {
+      MongoClient.connect(url, (err, mongo) => {
+        const oldCards = mongo.db(DB).collection('oldCards');
+        oldCards.findOne({ cardId }, (err, answerCard) => {
+          mongo.close();
+          resolve(answerCard);
         });
       });
     });

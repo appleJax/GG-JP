@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 require('./server/routes')(app);
 
-//twitterBot.start();
+twitterBot.start();
 
 app.listen(app.get('port'), () =>
   console.log('Listening on port', app.get('port'))
