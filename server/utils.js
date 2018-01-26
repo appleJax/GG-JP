@@ -48,6 +48,15 @@ module.exports = {
       otherAnswers = altAnswers.split(',');
 
     return [acceptedAnswer].concat(otherAnswers);
+  },
+
+  via(promise) {
+   return promise
+     .then(data => data)
+     .catch(err => {
+       console.error('Error:',err);
+       return {};
+     });
   }
 
 } // module.exports

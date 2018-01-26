@@ -10,6 +10,10 @@ module.exports = {
         const newCards = mongo.db(DB).collection('newCards');
         const oldCards = mongo.db(DB).collection('oldCards');
         newCards.findOne({}, (err, randomCard) => {
+          if (err || randomCard == null) {
+            reject("Empty deck. Please Add More Cards to DB.");
+            return;
+          }
           oldCards.insert(randomCard, (err, res) => {
             if (err) console.error(err);
             newCards.remove(randomCard, (err, res) => {

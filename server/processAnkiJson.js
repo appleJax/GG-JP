@@ -43,7 +43,8 @@ function parseAnkiJson(filePath) {
       questionImg,
       answerImg,
       , // audio
-      , // prevLineImg,
+      prevLineImg,
+      prevLineAltText,
       altAnswers,
       webLookup, // use for every answer so people can look up pronunciation
                  // https://ejje.weblio.jp/content/[webLookup (e.g. 切り換える)]
@@ -55,14 +56,16 @@ function parseAnkiJson(filePath) {
     const answers = getAnswers(expression, altAnswers);
 
     return {
-      questionAltText: formatQuestionAltText(expression),
+      cardId,
       questionText:    formatQuestionText(expression, engMeaning, notes, cardId),
       questionImg:     getBase64(questionImg),
-      answerAltText:   formatAnswerAltText(expression),
+      questionAltText: formatQuestionAltText(expression),
+      prevLineImg:     getBase64(prevLineImg),
+      prevLineAltText,
       answerText:      formatAnswerText(answers, webLookup, cardId),
       answerImg:       getBase64(answerImg),
-      answers,
-      cardId
+      answerAltText:   formatAnswerAltText(expression),
+      answers
     };
   });
 }
@@ -90,14 +93,16 @@ function getSrc(string) {
 }
 
 function getBase64(string) {
-  let base64 = null;
+  if (!string || string.length === 0) return;
+
+  let base64;
   try {
     base64 = fs.readFileSync(
       `${UPLOADS_PATH}/media/${getSrc(string)}`,
       { encoding: 'base64' }
     );
   } catch (e) {
-    // returning null...
+    // returning undefined...
   }
   return base64;
 }

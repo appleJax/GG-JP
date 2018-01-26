@@ -1,4 +1,5 @@
 const DB = require('./dbOps');
+const { via } = require('./utils');
 
 const {
   TWITTER_API_KEY,
@@ -26,53 +27,75 @@ const userConfig = {
 const Twitter = new twit(userConfig);
 const HOURS = 3600000;
 
-function tweetRandomQuestion() {
-  DB.getRandomQuestion()
-    .then(({ questionImg, questionAltText, questionText, cardId }) => {
-      postMedia(questionImg, questionAltText, questionText)
-        .then(questionId => {
-          setTimeout(() => tweetCardAnswer(cardId, questionId), 2000);
-        }).catch(console.error);
-    });
+async function tweetRandomQuestion() {
+  const {
+    cardId,
+    questionText,
+    questionImg,
+    questionAltText,
+    prevLineImg,
+    prevLineAltText
+  } = await via(DB.getRandomQuestion());
+  if (!cardId) return;
+
+  const questionId = await via(
+    postMedia(questionText, questionImg, questionAltText, prevLineImg, prevLineAltText)
+  );
+  setTimeout(() => tweetCardAnswer(cardId, questionId), 2000);
 }
 
-function tweetCardAnswer(cardId, questionId, pollRepliesTimer) {
-  DB.getCardAnswer(cardId)
-    .then(({answerImg, answerAltText, answerText}) => {
-      const questionLink = `\nhttps://twitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
-      answerText += questionLink;
-      postMedia(answerImg, answerAltText, answerText);
-    }).catch(console.error);
+async function tweetCardAnswer(cardId, questionId, pollRepliesTimer) {
+  const {answerText, answerImg, answerAltText} = await via(
+    DB.getCardAnswer(cardId)
+  );
+  const questionLink = `\ntwitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
+  postMedia(answerText + questionLink, answerImg, answerAltText);
 }
 
 //
 // post a tweet with media
 //
-function postMedia(b64Image, altText, tweetText) {
+function postMedia(status, b64Image1, altText1, b64Image2, altText2) {
+  return new Promise(async (resolve, reject) => {
+    const media_id1 = await via(uploadMedia(b64Image1, altText1));
+    const media_ids = [media_id1];
+    if (b64Image2) {
+      const media_id2 = await via(uploadMedia(b64Image2, altText2));
+      media_ids.push(media_id2);
+    }
+
+    const params = { status, media_ids };
+    Twitter.post('statuses/update', params, (err, data, response) => {
+      if (err) {
+        console.error(err)
+        reject("Posting status failed.");
+      };
+      resolve(data.id_str);
+    });
+  });
+}
+
+function uploadMedia(b64Image, altText) {
   return new Promise((resolve, reject) => {
     // first we must post the media to Twitter
     Twitter.post('media/upload', { media_data: b64Image }, (err, data, response) => {
-      if (err) console.error(err);
+      if (err) {
+        console.error(err);
+        reject("Media upload failed.")
+        return;
+      }
       // now we can assign alt text to the media, for use by screen readers and
       // other text-based presentations and interpreters
       const mediaIdStr = data.media_id_string;
       const meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
 
       Twitter.post('media/metadata/create', meta_params, (err, data, response) => {
-        if (err) console.error(err);
-        if (!err) {
-          // now we can reference the media and post a tweet (media will attach to the tweet)
-          const params = {
-            status: tweetText,
-            media_ids: [mediaIdStr]
-          };
-
-          Twitter.post('statuses/update', params, (err, data, response) => {
-            //console.log(data);
-            if (err) console.error(err);
-            resolve(data.id_str);
-          });
+        if (err) {
+          console.error(err);
+          reject("Media upload succeeded, media creation failed.");
         }
+        // now we can reference the media and post a tweet (media will attach to the tweet)
+        resolve(mediaIdStr);
       });
     });
   });
@@ -82,7 +105,6 @@ function postMedia(b64Image, altText, tweetText) {
 //  search twitter for all tweets containing the given hashtag
 //
 function searchTwitter(hashtag) {
-  console.log('Searching twitter...')
   Twitter.get('search/tweets', { q: `#${hashtag}` }, (err, data, response) => {
     if (err) console.log('Error:', err);
     const matches = data.statuses.map(item => {
@@ -104,18 +126,23 @@ function searchTwitter(hashtag) {
 }
 
 function searchReply(questionId) {
+  const stream = Twitter.stream('statuses/filter', { track: '@devTest222' })
+
+  stream.on('tweet', (tweet) => {
+    console.log(tweet);
+  });
   // https://twitter.com/devTest222/status/956429745784348673
   // in_reply_to_status_id_str: questionId
   // tweet: { created_at, text, user: { id, name, screen_name, profile_image_url_https }}
-  Twitter.get('statuses/mentions_timeline', { since_id: questionId }, (err, data, response) => {
-    if (err) console.log('Error:', err);
-    console.log('Data:', data);
-  });
+  // Twitter.get('statuses/mentions_timeline', { since_id: questionId }, (err, data, response) => {
+  //   if (err) console.log('Error:', err);
+  //   console.log('Data:', data);
+  // });
 }
 
 
 module.exports = {
   //start: () => setInterval(tweetRandomCard, 2*HOURS)
-  //start: () => setInterval(tweetRandomQuestion, 5000)
-  start: () => setInterval(searchReply, 5000)
+  start: () => setInterval(tweetRandomQuestion, 5000)
+  // start: () => setInterval(searchReply, 5000)
 };

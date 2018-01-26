@@ -1,7 +1,7 @@
 {
     "__type__": "Deck", 
     "children": [], 
-    "crowdanki_uuid": "0a67c24f-017e-11e8-8838-d20015cf5c80", 
+    "crowdanki_uuid": "19ba8d5e-024f-11e8-a7dd-c82a14202f3b", 
     "deck_config_uuid": "35bba545-0084-11e8-b67c-d20015cf5c80", 
     "deck_configurations": [
         {
@@ -187,7 +187,7 @@
     "note_models": [
         {
             "__type__": "NoteModel", 
-            "crowdanki_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "crowdanki_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "css": ".box {\n background: -webkit-linear-gradient(left, #DDEEFF 0%, #CCC 20%, #AAA 45%, #AAA 55%, #CCC 80%, #DDEEFF 100%);\n opacity: 1.00;\n box-shadow: -2px 2px 6px 1px #000;\n border-radius: 8px;\n padding: 50px 15px 30px 15px;\n}\n\n.card {\n font-family: arial;\n font-size: 44px;\n text-align: center;\n color: #fff;\n text-shadow: -1px 1px 1px #000;\n background-image: url('_gpne08-25.jpg');\n background-repeat: no-repeat;\n background-position: right bottom;\n background-attachment: fixed;\n margin: 50px 15px;\n}\n\n.hint { color: #DDEEFF; text-decoration: none; }\n\n.cloze { font-weight: bold; color: #FF33FF; }\n\nimg {width: 55%; height: auto; max-width: 1920px; max-height: 1080px; opacity: 1.00; image-rendering: pixelated;}\n.mobile img {width: 50%; height: auto; max-width: 1920px; max-height: 1080px; opacity: 1.00; image-rendering: pixelated;}\n\n.kobi { font-family: kobigraph; font-size: 28px; color: #666; }\n\n.notes { font-size: 24px; color: #666; }\n\n.reading { color: #FFF; }\n\nrt { font-weight: bold; color: #9900CC; }\n\ncode#typeans { font-size: 44px; font-family: calibri; }\ninput#typeans { font-size: 44px; text-align: center; color: #000; border-radius: 8px; max-width: 1000px; padding: 1px 5px; }\n\n.typeGood { font-family: arial; font-size: 44px; color: #009900; background-color: #00ff00; text-shadow: -1px 1px 1px #003300; }\n.typeBad { font-family: arial; font-size: 44px; color: #ff0000; background-color: #990000; text-shadow: -1px 1px 1px #330000; }\n.typeMissed {font-family: arial; font-size: 44px; color: #666; background-color: #ccc; text-shadow: -1px 1px 1px #000; }\n\n@font-face { font-family: kobigraph; src: url('_kobigraph_slim.ttf'); }\n\n/*\nrt { visibility: hidden; }\nruby:hover rt { visibility: visible; color: #FFF; }\n*/", 
             "flds": [
                 {
@@ -265,7 +265,7 @@
                 {
                     "font": "Meiryo", 
                     "media": [], 
-                    "name": "PreviousLine", 
+                    "name": "PreviousLineImage", 
                     "ord": 8, 
                     "rtl": false, 
                     "size": 20, 
@@ -274,7 +274,7 @@
                 {
                     "font": "Arial", 
                     "media": [], 
-                    "name": "AlternateAnswers", 
+                    "name": "PreviousLineText", 
                     "ord": 9, 
                     "rtl": false, 
                     "size": 20, 
@@ -283,7 +283,7 @@
                 {
                     "font": "Arial", 
                     "media": [], 
-                    "name": "WebLookup", 
+                    "name": "AlternateAnswer", 
                     "ord": 10, 
                     "rtl": false, 
                     "size": 20, 
@@ -292,7 +292,7 @@
                 {
                     "font": "Arial", 
                     "media": [], 
-                    "name": "Notes", 
+                    "name": "WebLookup", 
                     "ord": 11, 
                     "rtl": false, 
                     "size": 20, 
@@ -301,8 +301,17 @@
                 {
                     "font": "Arial", 
                     "media": [], 
-                    "name": "Note ID", 
+                    "name": "Notes", 
                     "ord": 12, 
+                    "rtl": false, 
+                    "size": 20, 
+                    "sticky": false
+                }, 
+                {
+                    "font": "Arial", 
+                    "media": [], 
+                    "name": "Note ID", 
+                    "ord": 13, 
                     "rtl": false, 
                     "size": 20, 
                     "sticky": false
@@ -310,8 +319,8 @@
             ], 
             "latexPost": "\\end{document}", 
             "latexPre": "\\documentclass[12pt]{article}\n\\special{papersize=3in,5in}\n\\usepackage{amssymb,amsmath}\n\\pagestyle{empty}\n\\setlength{\\parindent}{0in}\n\\begin{document}\n", 
-            "name": "Japanese-Cloze-58fa2", 
-            "sortf": 12, 
+            "name": "Japanese-Cloze-65c17", 
+            "sortf": 13, 
             "tags": [
                 "zero-mission"
             ], 
@@ -323,7 +332,7 @@
                     "did": null, 
                     "name": "Cloze", 
                     "ord": 0, 
-                    "qfmt": "<div class='box'>\n{{#Tags}}<div class='notes'>[{{Tags}}]</div>{{/Tags}}\n{{#PreviousLine}}<div class='reading'>{{hint:PreviousLine}}</div>{{/PreviousLine}}\n{{#QuestionImage}}{{QuestionImage}}</div><br />{{/QuestionImage}}\n{{cloze:Expression}}<br />\n{{type:cloze:Expression}}\n<span id='counter'></span>\n<script>\n$('#typeans').keyup(function() {\n    var text_length = $('#typeans').val().length;\n    $('#counter').html(text_length);\n});\n</script><br />\n{{#JapMeaning}}{{furigana:JapMeaning}}<br />{{/JapMeaning}}\n{{#EngMeaning}}<div class='kobi'>{{#JapMeaning}}<hr>{{hint:EngMeaning}}<br />{{/JapMeaning}}{{^JapMeaning}}{{EngMeaning}}{{/JapMeaning}}</div>{{/EngMeaning}}\n</div>", 
+                    "qfmt": "<div class='box'>\n{{#Tags}}<div class='notes'>[{{Tags}}]</div>{{/Tags}}\n{{#PreviousLineImage}}<div class='reading'>{{hint:PreviousLineImage}}</div>{{/PreviousLineImage}}\n{{#QuestionImage}}{{QuestionImage}}</div><br />{{/QuestionImage}}\n{{cloze:Expression}}<br />\n{{type:cloze:Expression}}\n<span id='counter'></span>\n<script>\n$('#typeans').keyup(function() {\n    var text_length = $('#typeans').val().length;\n    $('#counter').html(text_length);\n});\n</script><br />\n{{#JapMeaning}}{{furigana:JapMeaning}}<br />{{/JapMeaning}}\n{{#EngMeaning}}<div class='kobi'>{{#JapMeaning}}<hr>{{hint:EngMeaning}}<br />{{/JapMeaning}}{{^JapMeaning}}{{EngMeaning}}{{/JapMeaning}}</div>{{/EngMeaning}}\n</div>", 
                     "scratchPad": 0
                 }
             ], 
@@ -346,13 +355,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "向き", 
                 "", 
                 "1513311219052"
             ], 
             "flags": 0, 
             "guid": "Ll<XW2VsE4", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -371,13 +381,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "巣窟", 
                 "", 
                 "1513312686128"
             ], 
             "flags": 0, 
             "guid": "D(h(?5p-I6", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -395,6 +406,7 @@
                 "<img src=\"zeroMissionJP_00000013 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000012 (1).png\">", 
+                "↓を2回押す", 
                 "", 
                 "通路", 
                 "", 
@@ -402,7 +414,7 @@
             ], 
             "flags": 0, 
             "guid": "E;ff,Mn.hc", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -421,13 +433,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "回復", 
                 "", 
                 "1513313175999"
             ], 
             "flags": 0, 
             "guid": "F_l+9!q<#,", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -445,6 +458,7 @@
                 "<img src=\"zeroMissionJP_00000017 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000016.png\">", 
+                "LONG BEAM ロングビーム", 
                 "", 
                 "射程距離", 
                 "", 
@@ -452,7 +466,7 @@
             ], 
             "flags": 0, 
             "guid": "hXM?$}+5kz", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -470,6 +484,7 @@
                 "<img src=\"zeroMissionJP_00000018 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000017 (1).png\">", 
+                "射程距離の長いビーム", 
                 "うつ", 
                 "撃つ", 
                 "", 
@@ -477,7 +492,7 @@
             ], 
             "flags": 0, 
             "guid": "hZWdof$/<|", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -495,6 +510,7 @@
                 "<img src=\"zeroMissionJP_0000001A (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000019.png\">", 
+                "MISSILE TANK ミサイルタンク", 
                 "", 
                 "発射", 
                 "", 
@@ -502,7 +518,7 @@
             ], 
             "flags": 0, 
             "guid": "s1O8;1<IAk", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -521,13 +537,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "保有", 
                 "", 
                 "1513314175252"
             ], 
             "flags": 0, 
             "guid": "bUM(uySw%S", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -545,6 +562,7 @@
                 "<img src=\"zeroMissionJP_0000001E (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000001D.png\">", 
+                "CHARGE BEAM チャージビーム", 
                 "溜め", 
                 "溜める", 
                 "", 
@@ -552,7 +570,7 @@
             ], 
             "flags": 0, 
             "guid": "b7^|Qy/r(X", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -570,6 +588,7 @@
                 "<img src=\"zeroMissionJP_0000001F (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000001E (1).png\">", 
+                "Bを押しつづけ パワーをため、はなすと発射", 
                 "", 
                 "回転", 
                 "", 
@@ -577,7 +596,7 @@
             ], 
             "flags": 0, 
             "guid": "K*Z_S^g-U|", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -596,13 +615,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "体力", 
                 "", 
                 "1513315074329"
             ], 
             "flags": 0, 
             "guid": "CA-%C9jgPb", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -621,13 +641,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "取得", 
                 "", 
                 "1513315309273"
             ], 
             "flags": 0, 
             "guid": "hf=FKM@6/A", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -645,6 +666,7 @@
                 "<img src=\"zeroMissionJP_00000024 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000023.png\">", 
+                "BOMB ボム", 
                 "", 
                 "設置", 
                 "", 
@@ -652,7 +674,7 @@
             ], 
             "flags": 0, 
             "guid": "vUc:$j.z.~", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -671,13 +693,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "ともに", 
                 "", 
                 "1513315641465"
             ], 
             "flags": 0, 
             "guid": "JVf|OoRZ<4", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -696,13 +719,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "遺跡", 
                 "", 
                 "1513315801908"
             ], 
             "flags": 0, 
             "guid": "yi?QlF`rNV", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -721,13 +745,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "未詳", 
                 "", 
                 "1513316079206"
             ], 
             "flags": 0, 
             "guid": "rg8lu6CmYs", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -745,6 +770,7 @@
                 "<img src=\"zeroMissionJP_0000000C (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000000A (1).png\">", 
+                "未詳アイテム", 
                 "", 
                 "不能", 
                 "", 
@@ -752,7 +778,7 @@
             ], 
             "flags": 0, 
             "guid": "B~_juxyIb]", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -770,6 +796,7 @@
                 "<img src=\"zeroMissionJP_00000026 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000000C (1).png\">", 
+                "解析不能", 
                 "", 
                 "不適合", 
                 "", 
@@ -777,7 +804,7 @@
             ], 
             "flags": 0, 
             "guid": "uy/yW<hSSZ", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -795,6 +822,7 @@
                 "<img src=\"zeroMissionJP_00000028 (1).png\">", 
                 "<img src=\"zeroMissionJP_00000027.png\">", 
                 "", 
+                "", 
                 "かど", 
                 "<div>角</div>", 
                 "", 
@@ -802,7 +830,7 @@
             ], 
             "flags": 0, 
             "guid": "raL*hHN5vY", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -820,6 +848,7 @@
                 "<img src=\"zeroMissionJP_0000002B (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000002A.png\">", 
+                "ICE BEAM アイスビーム", 
                 "", 
                 "凍らせる", 
                 "", 
@@ -827,7 +856,7 @@
             ], 
             "flags": 0, 
             "guid": "t<H|,AwC#?", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -845,6 +874,7 @@
                 "<img src=\"zeroMissionJP_0000002C.png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000002B (1).png\">", 
+                "敵を凍らせることができるビーム", 
                 "のる", 
                 "乗る", 
                 "", 
@@ -852,7 +882,7 @@
             ], 
             "flags": 0, 
             "guid": "LvI/9FADh]", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -870,6 +900,7 @@
                 "<img src=\"zeroMissionJP_0000002E (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000071 (1).png\">", 
+                "緊急指令", 
                 "", 
                 "殲滅", 
                 "", 
@@ -877,7 +908,7 @@
             ], 
             "flags": 0, 
             "guid": "r`^O6^k!#o", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -895,6 +926,7 @@
                 "<img src=\"zeroMissionJP_0000002F.png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000002E (1).png\">", 
+                "惑星ゼーベスの「メトロイド」を殲滅せよ。そして…", 
                 "", 
                 "生命体", 
                 "", 
@@ -902,7 +934,7 @@
             ], 
             "flags": 0, 
             "guid": "fzb1ffU]#H", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -920,6 +952,7 @@
                 "<img src=\"zeroMissionJP_00000031 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000030.png\">", 
+                "VARIA SUIT バリアスーツ", 
                 "", 
                 "軽減", 
                 "", 
@@ -927,7 +960,7 @@
             ], 
             "flags": 0, 
             "guid": "HRw~8gRm4e", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -945,6 +978,7 @@
                 "<img src=\"zeroMissionJP_00000032.png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000031 (1).png\">", 
+                "敵からのダメージを軽減する", 
                 "", 
                 "有毒", 
                 "", 
@@ -952,7 +986,7 @@
             ], 
             "flags": 0, 
             "guid": "kffxs#C29[", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -970,6 +1004,7 @@
                 "<img src=\"zeroMissionJP_00000038 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000037.png\">", 
+                "SPEED BOOSTER スピードブースター", 
                 "", 
                 "特定", 
                 "", 
@@ -977,7 +1012,7 @@
             ], 
             "flags": 0, 
             "guid": "rU}j:ffnf7", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -995,6 +1030,7 @@
                 "<img src=\"zeroMissionJP_00000039.png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000038 (1).png\">", 
+                "走り続けると高速ダッシュし、特定のブロックを破壊する", 
                 "", 
                 "体当たり", 
                 "", 
@@ -1002,7 +1038,7 @@
             ], 
             "flags": 0, 
             "guid": "PnV~}lFinH", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1020,6 +1056,7 @@
                 "<img src=\"zeroMissionJP_0000003B (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000003A.png\">", 
+                "HI-JUMP ハイジャンプ", 
                 "", 
                 "力", 
                 "", 
@@ -1027,7 +1064,7 @@
             ], 
             "flags": 0, 
             "guid": "z2>`7oyuTU", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1045,6 +1082,7 @@
                 "<img src=\"zeroMissionJP_0000003F.png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000003E.png\">", 
+                "SUPER MISSILE TANK スーパーミサイルタンク", 
                 "切り替え,切り換え,きりかえ", 
                 "切り換える", 
                 "", 
@@ -1052,7 +1090,7 @@
             ], 
             "flags": 0, 
             "guid": "sI?}iTrCL4", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1071,13 +1109,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "最大値", 
                 "", 
                 "1513324401299"
             ], 
             "flags": 0, 
             "guid": "o.Dgyhe{Vd", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1095,6 +1134,7 @@
                 "<img src=\"zeroMissionJP_00000043.png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000042.png\">", 
+                "SCREW ATTACK スクリューアタック", 
                 "", 
                 "与える", 
                 "", 
@@ -1102,7 +1142,7 @@
             ], 
             "flags": 0, 
             "guid": "A%e!h^n>dC", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1121,13 +1161,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "帰還", 
                 "", 
                 "1513324858613"
             ], 
             "flags": 0, 
             "guid": "c@J0,ETUl*", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1146,13 +1187,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "追撃", 
                 "", 
                 "1513325764381"
             ], 
             "flags": 0, 
             "guid": "B2mm]O@^DN", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1171,13 +1213,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "無防備", 
                 "", 
                 "1513325873410"
             ], 
             "flags": 0, 
             "guid": "Led!`kqgm+", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1195,6 +1238,7 @@
                 "<img src=\"zeroMissionJP_0000004A.png\">", 
                 "", 
                 "", 
+                "", 
                 "よぎ", 
                 "余儀", 
                 "", 
@@ -1202,7 +1246,7 @@
             ], 
             "flags": 0, 
             "guid": "t.HeExh%ts", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1221,13 +1265,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "護身", 
                 "", 
                 "1513326118798"
             ], 
             "flags": 0, 
             "guid": "c,&9S9*d2", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1246,13 +1291,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "憚る", 
                 "", 
                 "1513326252188"
             ], 
             "flags": 0, 
             "guid": "jZ7Ny;nQA", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1271,13 +1317,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "頼り", 
                 "", 
                 "1513326485553"
             ], 
             "flags": 0, 
             "guid": "hf~8h~S2n}", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1296,13 +1343,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "活路", 
                 "", 
                 "1513326909881"
             ], 
             "flags": 0, 
             "guid": "xA^[YnFc|C", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1320,6 +1368,7 @@
                 "<img src=\"zeroMissionJP_0000004B.png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000004A.png\">", 
+                "これだけを頼りに、私は今、活路を求めてスペースパイレーツのマザーシップへの潜入を、試みようとしている。", 
                 "果たして", 
                 "果たして", 
                 "", 
@@ -1327,7 +1376,7 @@
             ], 
             "flags": 0, 
             "guid": "m1GmL.0h_Z", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": []
         }, 
         {
@@ -1344,13 +1393,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "通称", 
                 "", 
                 "1513327324512"
             ], 
             "flags": 0, 
             "guid": "Qy;+A_0z-P", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": []
         }, 
         {
@@ -1367,13 +1417,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "充填", 
                 "", 
                 "16679989657"
             ], 
             "flags": 0, 
             "guid": "i9<ILUz>B`", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1391,6 +1442,7 @@
                 "<img src=\"zeroMissionJP_0000004D (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000004C (1).png\">", 
+                "自動でパワーが銃填される短銃", 
                 "麻痺", 
                 "麻痺", 
                 "", 
@@ -1398,7 +1450,7 @@
             ], 
             "flags": 0, 
             "guid": "QE-,sWMe1!", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1417,13 +1469,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "普通", 
                 "", 
                 "16681144372"
             ], 
             "flags": 0, 
             "guid": "J:#FqffI_)", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1442,13 +1495,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "伝説", 
                 "", 
                 "16681446456"
             ], 
             "flags": 0, 
             "guid": "hZs%K^bgK{", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1467,13 +1521,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "追加", 
                 "", 
                 "16681919737"
             ], 
             "flags": 0, 
             "guid": "wB70W6c~N|", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1492,13 +1547,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "同時", 
                 "", 
                 "16683138076"
             ], 
             "flags": 0, 
             "guid": "mz{NC4)@~h", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1516,6 +1572,7 @@
                 "<img src=\"zeroMissionJP_00000012 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000011.png\">", 
+                "MORPH BALL モーフボール", 
                 "", 
                 "回", 
                 "", 
@@ -1523,7 +1580,7 @@
             ], 
             "flags": 0, 
             "guid": "z-tmH}$dB:", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1542,13 +1599,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "選ぶ", 
                 "", 
                 "16683853776"
             ], 
             "flags": 0, 
             "guid": "kWvdOsytx;", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1566,6 +1624,7 @@
                 "<img src=\"zeroMissionJP_00000001 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000000 (1).png\">", 
+                "コピーするデータをえらんでください", 
                 "", 
                 "先", 
                 "", 
@@ -1573,7 +1632,7 @@
             ], 
             "flags": 0, 
             "guid": "O=wHjLx/Ji", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1591,6 +1650,7 @@
                 "<img src=\"zeroMissionJP_0000001B (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_0000001A (1).png\">", 
+                "R + Bで発射", 
                 "あけ", 
                 "開ける", 
                 "", 
@@ -1598,7 +1658,7 @@
             ], 
             "flags": 0, 
             "guid": "kug~<gB,#m", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1616,6 +1676,7 @@
                 "<img src=\"zeroMissionJP_00000002 (1).png\">", 
                 "", 
                 "", 
+                "", 
                 "消し", 
                 "消す", 
                 "", 
@@ -1623,7 +1684,7 @@
             ], 
             "flags": 0, 
             "guid": "tXoYx]P.%_", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1641,6 +1702,7 @@
                 "<img src=\"zeroMissionJP_00000003 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000002 (1).png\">", 
+                "どのデータをけしますか？", 
                 "", 
                 "よろしい", 
                 "", 
@@ -1648,7 +1710,7 @@
             ], 
             "flags": 0, 
             "guid": "l22*~>v$!]", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1666,6 +1728,7 @@
                 "<img src=\"zeroMissionJP_00000004 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000003 (1).png\">", 
+                "このデータをけしてもよろしいですか？", 
                 "消え", 
                 "消える", 
                 "", 
@@ -1673,7 +1736,7 @@
             ], 
             "flags": 0, 
             "guid": "CW~%-TVFA|", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1692,13 +1755,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "貫く", 
                 "", 
                 "16686082309"
             ], 
             "flags": 0, 
             "guid": "i6R7Y{L@fU", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1707,7 +1771,7 @@
             "__type__": "Note", 
             "data": "", 
             "fields": [
-                "敵からダメージを軽減し、{{c1::水中::.?}}でも自由に動ける", 
+                "敵からダメージを軽減し、{{c1::水中::..}}でも自由に動ける", 
                 "敵[てき]からダメージを 軽減[けいげん]し、 水中[すいちゅう]でも 自由[じゆう]に 動[うご]ける", 
                 "<div><div>水のなか</div></div>", 
                 "underwater", 
@@ -1717,13 +1781,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "水中", 
                 "", 
                 "16687414085"
             ], 
             "flags": 0, 
             "guid": "hbn%?:}hUf", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1732,7 +1797,7 @@
             "__type__": "Note", 
             "data": "", 
             "fields": [
-                "また、{{c1::溶岩::..?}}のダメージを受けない", 
+                "また、{{c1::溶岩::..}}のダメージを受けない", 
                 "また、 溶岩[ようがん]のダメージを 受[う]けない", 
                 "<div><div>地下 深部[しんぶ]のマグマが 地表[ちひょう]に 噴出[ふんしゅつ]し， 流動[りゅうどう]している 溶融体[ようゆうたい]</div></div>", 
                 "lava", 
@@ -1741,6 +1806,7 @@
                 "<img src=\"zeroMissionJP_00000056 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000055 (1).png\">", 
+                "敵からのダメージを軽減し、水中でも自由に動ける", 
                 "", 
                 "溶岩", 
                 "", 
@@ -1748,7 +1814,7 @@
             ], 
             "flags": 0, 
             "guid": "ARBYfa+!Aj", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1757,13 +1823,14 @@
             "__type__": "Note", 
             "data": "", 
             "fields": [
-                "回転ジャンプ中に{{c1::再び::.≠た??}}ジャンプできる", 
+                "回転ジャンプ中に{{c1::再び::.≠た}}ジャンプできる", 
                 "回転[かいてん]ジャンプ 中[ちゅう]に 再[ふたた]びジャンプできる", 
                 "<div><div>同じ動作状態などの重なること。にど</div></div>", 
                 "again; once more", 
                 "", 
                 "<img src=\"zeroMissionJP_00000057.png\">", 
                 "<img src=\"zeroMissionJP_00000057 (1).png\">", 
+                "", 
                 "", 
                 "", 
                 "再び", 
@@ -1773,7 +1840,7 @@
             ], 
             "flags": 0, 
             "guid": "I:RxkI4eRm", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1791,6 +1858,7 @@
                 "<img src=\"zeroMissionJP_00000058 (1).png\">", 
                 "", 
                 "<img src=\"zeroMissionJP_00000057 (1).png\">", 
+                "回転ジャンプ中に再びジャンプできる", 
                 "", 
                 "下降", 
                 "", 
@@ -1798,7 +1866,7 @@
             ], 
             "flags": 0, 
             "guid": "v^|*VIm^+I", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1817,13 +1885,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "作動", 
                 "", 
                 "16688349978"
             ], 
             "flags": 0, 
             "guid": "w!`d^z1C$]", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
@@ -1842,13 +1911,14 @@
                 "", 
                 "", 
                 "", 
+                "", 
                 "緊急", 
                 "", 
                 "16688819498"
             ], 
             "flags": 0, 
             "guid": "e>60eZ12d0", 
-            "note_model_uuid": "0a690351-017e-11e8-9e61-d20015cf5c80", 
+            "note_model_uuid": "19c20f0a-024f-11e8-ba0a-c82a14202f3b", 
             "tags": [
                 "zero-mission"
             ]
