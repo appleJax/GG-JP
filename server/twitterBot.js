@@ -1,5 +1,5 @@
 const DB = require('./dbOps');
-const { via } = require('./utils');
+const { tryCatch } = require('./utils');
 
 const {
   TWITTER_API_KEY,
@@ -35,17 +35,17 @@ async function tweetRandomQuestion() {
     questionAltText,
     prevLineImg,
     prevLineAltText
-  } = await via(DB.getRandomQuestion());
+  } = await tryCatch(DB.getRandomQuestion());
   if (!cardId) return;
 
-  const questionId = await via(
+  const questionId = await tryCatch(
     postMedia(questionText, questionImg, questionAltText, prevLineImg, prevLineAltText)
   );
   setTimeout(() => tweetCardAnswer(cardId, questionId), 2000);
 }
 
 async function tweetCardAnswer(cardId, questionId, pollRepliesTimer) {
-  const {answerText, answerImg, answerAltText} = await via(
+  const {answerText, answerImg, answerAltText} = await tryCatch(
     DB.getCardAnswer(cardId)
   );
   const questionLink = `\ntwitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
@@ -57,10 +57,10 @@ async function tweetCardAnswer(cardId, questionId, pollRepliesTimer) {
 //
 function postMedia(status, b64Image1, altText1, b64Image2, altText2) {
   return new Promise(async (resolve, reject) => {
-    const media_id1 = await via(uploadMedia(b64Image1, altText1));
+    const media_id1 = await tryCatch(uploadMedia(b64Image1, altText1));
     const media_ids = [media_id1];
     if (b64Image2) {
-      const media_id2 = await via(uploadMedia(b64Image2, altText2));
+      const media_id2 = await tryCatch(uploadMedia(b64Image2, altText2));
       media_ids.push(media_id2);
     }
 

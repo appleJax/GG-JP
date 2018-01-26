@@ -50,7 +50,7 @@ module.exports = {
     return [acceptedAnswer].concat(otherAnswers);
   },
 
-  via(promise) {
+  tryCatch(promise) {
    return promise
      .then(data => data)
      .catch(err => {

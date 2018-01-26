@@ -2,42 +2,70 @@ const MongoClient = require('mongodb').MongoClient;
 const url = process.env.MONGODB_URI;
 const DB = process.env.MONGO_DB;
 const { processUpload } = require('./processAnkiJson');
+const { tryCatch } = require('./utils');
 
 module.exports = {
   getRandomQuestion() {
-    return new Promise((resolve, reject) => {
-      MongoClient.connect(url, (err, mongo) => {
-        const newCards = mongo.db(DB).collection('newCards');
-        const oldCards = mongo.db(DB).collection('oldCards');
-        newCards.findOne({}, (err, randomCard) => {
-          if (err || randomCard == null) {
-            reject("Empty deck. Please Add More Cards to DB.");
-            return;
-          }
-          oldCards.insert(randomCard, (err, res) => {
-            if (err) console.error(err);
-            newCards.remove(randomCard, (err, res) => {
-              if (err) console.error(err);
-              mongo.close();
-              resolve(randomCard);
-            });
-          });
-        });
-      });
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const newCards = mongo.db(DB).collection('newCards');
+      const oldCards = mongo.db(DB).collection('oldCards');
+      const randomCard = await tryCatch(newCards.findOne());
+      if (randomCard == null) {
+        reject("Empty deck. Please Add More Cards to DB.");
+        return;
+      }
+      await tryCatch(oldCards.insert(randomCard));
+      await tryCatch(newCards.remove(randomCard));
+      mongo.close();
+      resolve(randomCard);
     });
   },
 
+  // getRandomQuestion() {
+  //   return new Promise((resolve, reject) => {
+  //     MongoClient.connect(url, (err, mongo) => {
+  //       const newCards = mongo.db(DB).collection('newCards');
+  //       const oldCards = mongo.db(DB).collection('oldCards');
+  //       newCards.findOne({}, (err, randomCard) => {
+  //         if (err || randomCard == null) {
+  //           reject("Empty deck. Please Add More Cards to DB.");
+  //           return;
+  //         }
+  //         oldCards.insert(randomCard, (err, res) => {
+  //           if (err) console.error(err);
+  //           newCards.remove(randomCard, (err, res) => {
+  //             if (err) console.error(err);
+  //             mongo.close();
+  //             resolve(randomCard);
+  //           });
+  //         });
+  //       });
+  //     });
+  //   });
+  // },
+
   getCardAnswer(cardId) {
-    return new Promise((resolve, reject) => {
-      MongoClient.connect(url, (err, mongo) => {
-        const oldCards = mongo.db(DB).collection('oldCards');
-        oldCards.findOne({ cardId }, (err, answerCard) => {
-          mongo.close();
-          resolve(answerCard);
-        });
-      });
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const oldCards = mongo.db(DB).collection('oldCards');
+      const answerCard = await tryCatch(oldCards.findOne({ cardId }));
+      mongo.close();
+      resolve(answerCard);
     });
   },
+
+  // getCardAnswer(cardId) {
+  //   return new Promise((resolve, reject) => {
+  //     MongoClient.connect(url, (err, mongo) => {
+  //       const oldCards = mongo.db(DB).collection('oldCards');
+  //       oldCards.findOne({ cardId }, (err, answerCard) => {
+  //         mongo.close();
+  //         resolve(answerCard);
+  //       });
+  //     });
+  //   });
+  // },
 
   processNewScore(req, res) {
       MongoClient.connect(url, (err, mongo) => {
