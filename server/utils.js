@@ -37,7 +37,7 @@ module.exports = {
     const answer_s = answers.length > 1 ? 'Answers' : 'Answer';
     let answerText = `${answer_s}: ${answers.join(', ')}`;
     answerText += '\nDefinition: ' + WEBLOOKUP_URL + urlencode(webLookup);
-    answerText += `\nID${cardId}`;
+    answerText += `\nQID${cardId}`;
     return answerText;
   },
 

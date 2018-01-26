@@ -22,29 +22,6 @@ module.exports = {
     });
   },
 
-  // getRandomQuestion() {
-  //   return new Promise((resolve, reject) => {
-  //     MongoClient.connect(url, (err, mongo) => {
-  //       const newCards = mongo.db(DB).collection('newCards');
-  //       const oldCards = mongo.db(DB).collection('oldCards');
-  //       newCards.findOne({}, (err, randomCard) => {
-  //         if (err || randomCard == null) {
-  //           reject("Empty deck. Please Add More Cards to DB.");
-  //           return;
-  //         }
-  //         oldCards.insert(randomCard, (err, res) => {
-  //           if (err) console.error(err);
-  //           newCards.remove(randomCard, (err, res) => {
-  //             if (err) console.error(err);
-  //             mongo.close();
-  //             resolve(randomCard);
-  //           });
-  //         });
-  //       });
-  //     });
-  //   });
-  // },
-
   getCardAnswer(cardId) {
     return new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
@@ -54,18 +31,6 @@ module.exports = {
       resolve(answerCard);
     });
   },
-
-  // getCardAnswer(cardId) {
-  //   return new Promise((resolve, reject) => {
-  //     MongoClient.connect(url, (err, mongo) => {
-  //       const oldCards = mongo.db(DB).collection('oldCards');
-  //       oldCards.findOne({ cardId }, (err, answerCard) => {
-  //         mongo.close();
-  //         resolve(answerCard);
-  //       });
-  //     });
-  //   });
-  // },
 
   processNewScore(req, res) {
       MongoClient.connect(url, (err, mongo) => {

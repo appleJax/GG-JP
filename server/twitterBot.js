@@ -39,17 +39,32 @@ async function tweetRandomQuestion() {
   if (!cardId) return;
 
   const questionId = await tryCatch(
-    postMedia(questionText, questionImg, questionAltText, prevLineImg, prevLineAltText)
+    postMedia(
+      questionText,
+      questionImg,
+      questionAltText,
+      prevLineImg,
+      prevLineAltText
+    )
   );
-  setTimeout(() => tweetCardAnswer(cardId, questionId), 2000);
+  setTimeout(() => tweetAnswer(cardId, questionId), 2000);
+  //setTimeout(() => tweetAnswer(cardId, questionId), 24*HOURS);
 }
 
-async function tweetCardAnswer(cardId, questionId, pollRepliesTimer) {
-  const {answerText, answerImg, answerAltText} = await tryCatch(
-    DB.getCardAnswer(cardId)
+async function tweetAnswer(cardId, questionId) {
+  const {
+    answerText,
+    answerImg,
+    answerAltText
+  } = await tryCatch(
+    DB.getAnswer(cardId)
   );
   const questionLink = `\ntwitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
-  postMedia(answerText + questionLink, answerImg, answerAltText);
+  postMedia(
+    answerText + questionLink,
+    answerImg,
+    answerAltText
+  );
 }
 
 //
@@ -75,6 +90,11 @@ function postMedia(status, b64Image1, altText1, b64Image2, altText2) {
   });
 }
 
+//
+// uploads a single image with altText to Twitter
+// returns media_id which is necessary for
+// attaching media to a tweet
+//
 function uploadMedia(b64Image, altText) {
   return new Promise((resolve, reject) => {
     // first we must post the media to Twitter
@@ -101,48 +121,53 @@ function uploadMedia(b64Image, altText) {
   });
 }
 
-//
-//  search twitter for all tweets containing the given hashtag
-//
-function searchTwitter(hashtag) {
-  Twitter.get('search/tweets', { q: `#${hashtag}` }, (err, data, response) => {
-    if (err) console.log('Error:', err);
-    const matches = data.statuses.map(item => {
-      const {
+async function openStream() {
+  const stream = Twitter.stream('statuses/filter', { track: `@${TWITTER_ACCOUNT}` });
+  stream.on('tweet', ({
+    in_reply_to_status_id_str,
+    created_at,
+    text,
+    user: {
+      id,
+      name,
+      screen_name,
+      profile_image_url_https
+    }
+  }) => {
+    if (in_reply_to_status_id_str) {
+      const reply = {
+        id,
+        name,
+        screen_name,
+        avatar: profile_image_url_https,
         created_at,
-        text,
-        user: {
-          id,
-          name,
-          screen_name: handle,
-          profile_img_url_https: avatar
-        }
-      } = item;
+        question: in_reply_to_status_id_str,
+        answer: text
+      };
+      const userAnswer = text.trim().slice(TWITTER_ACCOUNT.length + 2);
+      if (userAnswer === answer)
+        console.log(`Congratulations ${name}, you got it right!`);
 
-      return { text, name, handle, avatar };
-    })
-    console.log('Matches:', matches);
+      console.log('Reply to question:\n', reply);
+      return;
+    }
+    console.log('Another mention...')
+  });
+
+  stream.on('disconnect', (disconnectMsg) => {
+    console.error('Tweet stream disconnected: ', disconnectMsg);
+    setTimeout(() => stream.start(), 100);
   });
 }
 
-function searchReply(questionId) {
-  const stream = Twitter.stream('statuses/filter', { track: '@devTest222' })
-
-  stream.on('tweet', (tweet) => {
-    console.log(tweet);
-  });
-  // https://twitter.com/devTest222/status/956429745784348673
-  // in_reply_to_status_id_str: questionId
-  // tweet: { created_at, text, user: { id, name, screen_name, profile_image_url_https }}
-  // Twitter.get('statuses/mentions_timeline', { since_id: questionId }, (err, data, response) => {
-  //   if (err) console.log('Error:', err);
-  //   console.log('Data:', data);
-  // });
+function initializeBot() {
+  openStream();
+  setInterval(tweetRandomQuestion, 2*HOURS);
 }
 
 
 module.exports = {
   //start: () => setInterval(tweetRandomCard, 2*HOURS)
-  start: () => setInterval(tweetRandomQuestion, 5000)
-  // start: () => setInterval(searchReply, 5000)
+  // start: () => setTimeout(() => searchReply('956774024440315904', '回'), 1000)
+  start: initializeBot
 };
