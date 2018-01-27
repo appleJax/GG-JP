@@ -8,8 +8,8 @@ module.exports = (app) => {
     DB.addDeck(req, res);
   });
 
-  app.post('/scores/new', (req, res) => {
-    DB.processNewScore(req, res);
+  app.post('/scores/edit', (req, res) => {
+    DB.adjustScore(req, res);
   });
 
   app.get('/cards/new', (req, res) => {

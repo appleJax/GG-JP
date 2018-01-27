@@ -2,8 +2,11 @@
 // [≠ 降,下] [] 降 [] ([?] [?])
 const urlencode = require('urlencode');
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
+const HOURS = 3600000;
 
 module.exports = {
+
+  HOURS,
 
   formatQuestionAltText(expression) {
     const hint = formatHint(expression);
@@ -50,6 +53,30 @@ module.exports = {
     return [acceptedAnswer].concat(otherAnswers);
   },
 
+  calculateScore(answerPostedAt, {questionPostedAt, alreadyAnswered}) {
+    const timeToAnswer = Math.floor(
+      (new Date(answerPostedAt) - new Date(questionPostedAt)) / HOURS
+    );
+    const baseline = 24 - timeToAnswer;
+    let bonus = 0;
+    switch (alreadyAnswered.length) {
+      case 0:
+        bonus = 10;
+        break;
+      case 1:
+        bonus = 7;
+        break;
+      case 2:
+        bonus = 5;
+        break;
+      default:
+        bonus = 0;
+        break;
+    }
+
+    return baseline + bonus;
+  },
+
   tryCatch(promise) {
    return promise
      .then(data => data)
@@ -57,6 +84,14 @@ module.exports = {
        console.error('Error:',err);
        return {};
      });
+  },
+
+  valid(index) {
+    return index !== -1;
+  },
+
+  contains(item, list) {
+    return valid(list.indexOf(item));
   }
 
 } // module.exports

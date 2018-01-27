@@ -1,31 +1,12 @@
 const DB = require('./dbOps');
-const { tryCatch } = require('./utils');
+const { HOURS, tryCatch, calculateScore } = require('./utils');
+const Twitter = require('./twitterConfig');
 
-const {
-  TWITTER_API_KEY,
-  TWITTER_API_SECRET,
-  TWITTER_TOKEN,
-  TWITTER_TOKEN_SECRET,
-  TWITTER_ACCOUNT
-} = process.env;
-
-const twit = require('twit');
-
-const appConfig = {
-  consumer_key: TWITTER_API_KEY,
-  consumer_secret: TWITTER_API_SECRET,
-  app_only_auth: true
-}
-
-const userConfig = {
-  consumer_key: TWITTER_API_KEY,
-  consumer_secret: TWITTER_API_SECRET,
-  access_token: TWITTER_TOKEN,
-  access_token_secret: TWITTER_TOKEN_SECRET
+module.exports = {
+  // start: () => setInterval(tweetRandomCard, 2*HOURS)
+  // start: () => setTimeout(() => searchReply('956774024440315904', '回'), 1000)
+  start: initializeBot
 };
-
-const Twitter = new twit(userConfig);
-const HOURS = 3600000;
 
 async function tweetRandomQuestion() {
   const {
@@ -34,7 +15,8 @@ async function tweetRandomQuestion() {
     questionImg,
     questionAltText,
     prevLineImg,
-    prevLineAltText
+    prevLineAltText,
+    answers
   } = await tryCatch(DB.getRandomQuestion());
   if (!cardId) return;
 
@@ -47,6 +29,7 @@ async function tweetRandomQuestion() {
       prevLineAltText
     )
   );
+  DB.addToLiveQuestions({cardId, questionId, answers});
   setTimeout(() => tweetAnswer(cardId, questionId), 2000);
   //setTimeout(() => tweetAnswer(cardId, questionId), 24*HOURS);
 }
@@ -123,31 +106,47 @@ function uploadMedia(b64Image, altText) {
 
 async function openStream() {
   const stream = Twitter.stream('statuses/filter', { track: `@${TWITTER_ACCOUNT}` });
+
   stream.on('tweet', ({
-    in_reply_to_status_id_str,
-    created_at,
+    in_reply_to_status_id_str: questionId,
+    created_at: answerPostedAt,
     text,
     user: {
-      id,
+      id: userId,
       name,
-      screen_name,
-      profile_image_url_https
+      screen_name: handle,
+      profile_image_url_https: avatar
     }
   }) => {
-    if (in_reply_to_status_id_str) {
-      const reply = {
-        id,
-        name,
-        screen_name,
-        avatar: profile_image_url_https,
-        created_at,
-        question: in_reply_to_status_id_str,
-        answer: text
-      };
-      const userAnswer = text.trim().slice(TWITTER_ACCOUNT.length + 2);
-      if (userAnswer === answer)
-        console.log(`Congratulations ${name}, you got it right!`);
+    const liveQuestions = await tryCatch(DB.getLiveQuestions());
+    const foundQuestion = liveQuestions.filter(obj => obj.questionId === questionId)[0];
+    console.log('Live Questions:\n', liveQuestions);
+    console.log('Found Question:\n', foundQuestion);
 
+    if (foundQuestion) {
+      const {
+        alreadyAnswered,
+        answers: acceptedAnswers
+      } = foundQuestion;
+      if (contains(userId, alreadyAnswered))
+        return;
+
+      const userAnswer = text.trim().slice(TWITTER_ACCOUNT.length + 2);
+      if (contains(userAnswer, acceptedAnswers)) {
+        console.log(`Congratulations ${name}, you got it right!`);
+        const points = calculateScore(answerPostedAt, foundQuestion);
+        const reply = {
+          userId,
+          name,
+          handle,
+          avatar,
+          answerPostedAt,
+          questionId,
+          answer: userAnswer,
+          points
+        };
+        DB.postNewScore(reply);
+      }
       console.log('Reply to question:\n', reply);
       return;
     }
@@ -155,7 +154,7 @@ async function openStream() {
   });
 
   stream.on('disconnect', (disconnectMsg) => {
-    console.error('Tweet stream disconnected: ', disconnectMsg);
+    console.error('Tweet stream disconnected:', disconnectMsg);
     setTimeout(() => stream.start(), 100);
   });
 }
@@ -164,10 +163,3 @@ function initializeBot() {
   openStream();
   setInterval(tweetRandomQuestion, 2*HOURS);
 }
-
-
-module.exports = {
-  //start: () => setInterval(tweetRandomCard, 2*HOURS)
-  // start: () => setTimeout(() => searchReply('956774024440315904', '回'), 1000)
-  start: initializeBot
-};

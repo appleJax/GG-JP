@@ -22,86 +22,113 @@ module.exports = {
     });
   },
 
-  getCardAnswer(cardId) {
+  getAnswer(cardId) {
     return new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
       const oldCards = mongo.db(DB).collection('oldCards');
       const answerCard = await tryCatch(oldCards.findOne({ cardId }));
+      const liveQuestions = mongo.db(DB).collection('liveQuestions');
+      await tryCatch(liveQuestions.remove({ cardId }));
       mongo.close();
       resolve(answerCard);
     });
   },
 
-  processNewScore(req, res) {
-      MongoClient.connect(url, (err, mongo) => {
-        const handle = req.body.handle;
-        const collection = mongo.db(DB).collection('leaderBoard');
-        const user = collection.findOne({ handle }, (err, user) => {
-          if (user) {
-            const newScore = user.score + 1;
-            collection.update({ handle }, newScore, (err, result) => {
-              if (err) console.error(err);
-              mongo.close();
-              res.end();
-            });
-          } else {
-            collection.insert({ handle, score: 1 }, (err, result) => {
-              if (err) console.error(err);
-              mongo.close();
-              res.end();
-            });
-          }
-        });
-      });
-    },
+  async addToLiveQuestions(record) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const liveQuestions = mongo.db(DB).collection('liveQuestions');
+    await tryCatch(liveQuestions.insert(record));
+    mongo.close();
+  },
 
-    addDeck(req, res) {
-      const filePath = req.file.path;
-      processUpload(filePath).then(newCards => {
-        MongoClient.connect(url, (err, mongo) => {
-          const collection = mongo.db(DB).collection('newCards');
+  getLiveQuestions() {
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const collection = mongo.db(DB).collection('liveQuestions');
+      const liveQuestions = await tryCatch(collection.find().toArray());
+      resolve(liveQuestions);
+    });
+  },
 
-          // Initialize the Ordered Batch
-          // You can use initializeUnorderedBulkOp to initialize Unordered Batch
-          const batch = collection.initializeUnorderedBulkOp();
+  async postNewScore({
+    userId,
+    name,
+    handle,
+    avatar,
+    created_at,
+    questionId,
+    answer,
+    points
+  }) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const scoreBoard = mongo.db(DB).collection('scoreBoard');
+    const user = await tryCatch(scoreBoard.findOne({ userId }));
+    if (user != null) { // update score
+      const newScore = user.score + 1;
+      await tryCatch(scoreBoard.update({ userId }, updatedRecord));
 
-          for (let i = 0; i < newCards.length; ++i) {
-            batch.insert(newCards[i]);
-          }
+    } else { // create new user record
+      // TODO create new user record
+      await tryCatch(scoreBoard.insert({ userId, score: 1 });
+    }
+    mongo.close();
+  },
 
-          // Execute the operations
-          batch.execute((err, result) => {
-            if (err) console.error(err);
-            mongo.close();
-          });
-        });
+  adjustScore(req, res) {
+    // TODO adjust a score manually
+  },
 
-        res.redirect('/');
-      });
-    },
+  getScoreBoard() {
+    // TODO return scores collection
+  },
 
-    getNewCards(req, res) {
+  addDeck(req, res) {
+    const filePath = req.file.path;
+    processUpload(filePath).then(newCards => {
       MongoClient.connect(url, (err, mongo) => {
         const collection = mongo.db(DB).collection('newCards');
 
-        collection.find({}).toArray((err, docs) => {
-          res.json(docs);
-          mongo.close();
-          res.end();
-        })
-      });
-    },
+        // Initialize the Ordered Batch
+        // You can use initializeUnorderedBulkOp to initialize Unordered Batch
+        const batch = collection.initializeUnorderedBulkOp();
 
-    getOldCards(req, res) {
-      MongoClient.connect(url, (err, mongo) => {
-        const collection = mongo.db(DB).collection('oldCards');
+        for (let i = 0; i < newCards.length; ++i) {
+          batch.insert(newCards[i]);
+        }
 
-        collection.find({}).toArray((err, docs) => {
-          res.json(docs);
+        // Execute the operations
+        batch.execute((err, result) => {
+          if (err) console.error(err);
           mongo.close();
-          res.end();
-        })
+        });
       });
-    }
+
+      res.redirect('/');
+    });
+  },
+
+  getNewCards(req, res) {
+    MongoClient.connect(url, (err, mongo) => {
+      const collection = mongo.db(DB).collection('newCards');
+
+      collection.find({}).toArray((err, docs) => {
+        res.json(docs);
+        mongo.close();
+        res.end();
+      })
+    });
+  },
+
+  getOldCards(req, res) {
+    MongoClient.connect(url, (err, mongo) => {
+      const collection = mongo.db(DB).collection('oldCards');
+
+      collection.find({}).toArray((err, docs) => {
+        res.json(docs);
+        mongo.close();
+        res.end();
+      })
+    });
+  }
 
 }
