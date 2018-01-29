@@ -1,12 +1,25 @@
 const DB = require('./dbOps');
-const { HOURS, tryCatch, calculateScore } = require('./utils');
+const {
+  HOURS,
+  addQuestionLink,
+  calculateScore,
+  contains,
+  extractAnswer,
+  tryCatch
+} = require('./utils');
 const Twitter = require('./twitterConfig');
+const { TWITTER_ACCOUNT } = process.env;
 
 module.exports = {
   // start: () => setInterval(tweetRandomCard, 2*HOURS)
-  // start: () => setTimeout(() => searchReply('956774024440315904', '回'), 1000)
   start: initializeBot
 };
+
+function initializeBot() {
+  openStream();
+  // setInterval(tweetRandomQuestion, 1*HOURS);
+  setInterval(tweetRandomQuestion, 10000);
+}
 
 async function tweetRandomQuestion() {
   const {
@@ -20,7 +33,10 @@ async function tweetRandomQuestion() {
   } = await tryCatch(DB.getRandomQuestion());
   if (!cardId) return;
 
-  const questionId = await tryCatch(
+  const {
+    questionId,
+    questionPostedAt
+  } = await tryCatch(
     postMedia(
       questionText,
       questionImg,
@@ -29,7 +45,16 @@ async function tweetRandomQuestion() {
       prevLineAltText
     )
   );
-  DB.addToLiveQuestions({cardId, questionId, answers});
+
+  const liveQuestion = {
+    cardId,
+    questionId,
+    answers,
+    questionPostedAt,
+    cachedPoints: [],
+    alreadyAnswered: []
+  };
+  DB.addLiveQuestion(liveQuestion);
   setTimeout(() => tweetAnswer(cardId, questionId), 2000);
   //setTimeout(() => tweetAnswer(cardId, questionId), 24*HOURS);
 }
@@ -40,11 +65,17 @@ async function tweetAnswer(cardId, questionId) {
     answerImg,
     answerAltText
   } = await tryCatch(
-    DB.getAnswer(cardId)
+    // EFFECTS:
+    // - removes question from liveQuestions
+    // - adds cached points to scoreBoard
+    //
+    // RETURNS:
+    // AnswerCard
+    DB.revealAnswerWorkflow(cardId)
   );
-  const questionLink = `\ntwitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
+
   postMedia(
-    answerText + questionLink,
+    addQuestionLink(answerText, questionId),
     answerImg,
     answerAltText
   );
@@ -59,7 +90,7 @@ function postMedia(status, b64Image1, altText1, b64Image2, altText2) {
     const media_ids = [media_id1];
     if (b64Image2) {
       const media_id2 = await tryCatch(uploadMedia(b64Image2, altText2));
-      media_ids.push(media_id2);
+      media_ids.unshift(media_id2);
     }
 
     const params = { status, media_ids };
@@ -68,14 +99,20 @@ function postMedia(status, b64Image1, altText1, b64Image2, altText2) {
         console.error(err)
         reject("Posting status failed.");
       };
-      resolve(data.id_str);
+      const result = {
+        questionId:       data.id_str,
+        questionPostedAt: data.created_at
+      };
+      resolve(result);
     });
   });
 }
 
-//
+// EFFECTS:
 // uploads a single image with altText to Twitter
-// returns media_id which is necessary for
+//
+// RETURNS:
+// media_id which is necessary for
 // attaching media to a tweet
 //
 function uploadMedia(b64Image, altText) {
@@ -104,10 +141,10 @@ function uploadMedia(b64Image, altText) {
   });
 }
 
-async function openStream() {
+function openStream() {
   const stream = Twitter.stream('statuses/filter', { track: `@${TWITTER_ACCOUNT}` });
 
-  stream.on('tweet', ({
+  stream.on('tweet', async ({
     in_reply_to_status_id_str: questionId,
     created_at: answerPostedAt,
     text,
@@ -115,13 +152,14 @@ async function openStream() {
       id: userId,
       name,
       screen_name: handle,
-      profile_image_url_https: avatar
+      profile_image_url_https: avatar,
+      profile_background_image_url_https: profileBackground
     }
   }) => {
     const liveQuestions = await tryCatch(DB.getLiveQuestions());
-    const foundQuestion = liveQuestions.filter(obj => obj.questionId === questionId)[0];
-    console.log('Live Questions:\n', liveQuestions);
-    console.log('Found Question:\n', foundQuestion);
+    const foundQuestion = liveQuestions.filter(
+      obj => obj.questionId === questionId
+    )[0];
 
     if (foundQuestion) {
       const {
@@ -131,35 +169,29 @@ async function openStream() {
       if (contains(userId, alreadyAnswered))
         return;
 
-      const userAnswer = text.trim().slice(TWITTER_ACCOUNT.length + 2);
+      const userAnswer = extractAnswer(text);
       if (contains(userAnswer, acceptedAnswers)) {
-        console.log(`Congratulations ${name}, you got it right!`);
         const points = calculateScore(answerPostedAt, foundQuestion);
-        const reply = {
+        const newUser = {
           userId,
           name,
           handle,
           avatar,
-          answerPostedAt,
-          questionId,
-          answer: userAnswer,
-          points
+          profileBackground,
+          score: 0,
+          correctAnswers: []
         };
-        DB.postNewScore(reply);
+        DB.addNewUser(newUser);
+        DB.updateLiveQuestion(questionId, { userId, points });
+
+      } else {
+        DB.updateLiveQuestion(questionId, { userId, points: 0 });
       }
-      console.log('Reply to question:\n', reply);
-      return;
     }
-    console.log('Another mention...')
   });
 
   stream.on('disconnect', (disconnectMsg) => {
     console.error('Tweet stream disconnected:', disconnectMsg);
     setTimeout(() => stream.start(), 100);
   });
-}
-
-function initializeBot() {
-  openStream();
-  setInterval(tweetRandomQuestion, 2*HOURS);
 }

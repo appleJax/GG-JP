@@ -1,4 +1,5 @@
 const fs = require('fs');
+const PNG = require('pngjs2').PNG;
 const path = require('path');
 const unzip = require('unzip-stream');
 const UPLOADS_PATH = path.resolve(__dirname, '../uploads');
@@ -7,22 +8,26 @@ const {
   formatQuestionText,
   formatAnswerAltText,
   formatAnswerText,
-  getAnswers
+  getAnswers,
+  tryCatch
 } = require('./utils');
 
 
 module.exports = {
   processUpload,
-  parseAnkiJson
+  parseAnkiJson,
+  optimizeImages
 }
 
 function processUpload(zipfilePath) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const stream = fs.createReadStream(zipfilePath)
       .pipe(unzip.Extract({ path: 'uploads' }));
 
-    stream.on('close', () => {
+    stream.on('close', async () => {
       const files = fs.readdirSync(UPLOADS_PATH);
+      await tryCatch(optimizeImages(UPLOADS_PATH + '/media'));
+      console.log('Finished optimizing images!');
       const newCards = extractCardInfo(files);
 
       cleanUp(files);
@@ -62,11 +67,35 @@ function parseAnkiJson(filePath) {
       questionAltText: formatQuestionAltText(expression),
       prevLineImg:     getBase64(prevLineImg),
       prevLineAltText,
-      answerText:      formatAnswerText(answers, webLookup, cardId),
+      answerText:      formatAnswerText(answers, engMeaning, webLookup, cardId),
       answerImg:       getBase64(answerImg),
       answerAltText:   formatAnswerAltText(expression),
       answers
     };
+  });
+}
+
+function optimizeImages(dirPath) {
+  return new Promise((resolve, reject) => {
+    const filesProcessing = [];
+    fs.readdirSync(dirPath).forEach(file => {
+      if (/.*\.png$/.test(file)) {
+        const currentFile = dirPath + "/" + file;
+        const contents = fs.readFileSync(currentFile);
+        const writeStream = fs.createWriteStream(currentFile);
+        const currentImage = new Promise((res, rej) =>
+          writeStream.on('close', res)
+        );
+        filesProcessing.push(currentImage);
+        new PNG({ filterType: 4, deflateLevel: 1 })
+          .parse(contents, (err, png) => {
+            png.data[3] -= 1;
+            png.pack().pipe(writeStream);
+          });
+      }
+    });
+
+    Promise.all(filesProcessing).then(resolve);
   });
 }
 
@@ -120,7 +149,7 @@ function cleanUp(files) {
 
 function deleteFolderRecursive(rootPath) {
   if (fs.existsSync(rootPath)) {
-    fs.readdirSync(rootPath).forEach((file, index) => {
+    fs.readdirSync(rootPath).forEach(file => {
       const curPath = rootPath + "/" + file;
       if (fs.lstatSync(curPath).isDirectory()) { // recurse
         deleteFolderRecursive(curPath);

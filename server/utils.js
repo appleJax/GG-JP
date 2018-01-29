@@ -1,8 +1,7 @@
-// "{{c1::下降::x(降,下).降.??}}"
-// [≠ 降,下] [] 降 [] ([?] [?])
 const urlencode = require('urlencode');
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
 const HOURS = 3600000;
+const { TWITTER_ACCOUNT } = process.env;
 
 module.exports = {
 
@@ -12,8 +11,8 @@ module.exports = {
     const hint = formatHint(expression);
     const [min, max] = minMaxChars(hint);
     const minMax = min === max ? min : `${min} to ${max}`;
-    const char_s = max > 1 ? 'characters' : 'character';
-    const screenReaderHint = `(${minMax} ${char_s})`;
+    const s = max > 1 ? 's' : '';
+    const screenReaderHint = `(${minMax} character${s})`;
     return expression.replace(/\{\{.+?\}\}/g, screenReaderHint);
   },
 
@@ -36,12 +35,20 @@ module.exports = {
     return expression.replace(/\{\{.*?\:\:(.+?)\:\:.*?\}\}/g, '$1');
   },
 
-  formatAnswerText(answers, webLookup, cardId) {
-    const answer_s = answers.length > 1 ? 'Answers' : 'Answer';
-    let answerText = `${answer_s}: ${answers.join(', ')}`;
+  formatAnswerText(answers, engMeaning, webLookup, cardId) {
+    const s = answers.length > 1 ? 's' : '';
+    let answerText = `Answer${s}: ${answers.join(', ')}`;
+    answerText += `\nEnglish Meaning: "${engMeaning}"`;
     answerText += '\nDefinition: ' + WEBLOOKUP_URL + urlencode(webLookup);
     answerText += `\nQID${cardId}`;
     return answerText;
+  },
+
+  addQuestionLink(answerText, questionId) {
+    const questionLink = `Question: twitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
+    const lines = answerText.split('\n');
+    lines.splice(-1, 0, questionLink);
+    return lines.join('\n');
   },
 
   getAnswers(expression, altAnswers) {
@@ -77,6 +84,10 @@ module.exports = {
     return baseline + bonus;
   },
 
+  extractAnswer(text) {
+    return text.trim().slice(TWITTER_ACCOUNT.length + 2);
+  },
+
   tryCatch(promise) {
    return promise
      .then(data => data)
@@ -86,16 +97,16 @@ module.exports = {
      });
   },
 
-  valid(index) {
-    return index !== -1;
-  },
-
   contains(item, list) {
     return valid(list.indexOf(item));
   }
 
 } // module.exports
 
+
+function valid(index) {
+  return index !== -1;
+}
 
 function needsHint(hint) {
   return hint.replace(/\[\]/g, '').trim().length !== 0;
