@@ -2,7 +2,7 @@ const fs = require('fs');
 const PNG = require('pngjs2').PNG;
 const path = require('path');
 const unzip = require('unzip-stream');
-const UPLOADS_PATH = path.resolve(__dirname, '../uploads');
+const UPLOADS_PATH = path.resolve(__dirname + '/../../uploads');
 const {
   formatQuestionAltText,
   formatQuestionText,
@@ -34,6 +34,46 @@ function processUpload(zipfilePath) {
       resolve(newCards);
     });
   });
+}
+
+function optimizeImages(dirPath) {
+  return new Promise((resolve, reject) => {
+    const filesProcessing = [];
+    fs.readdirSync(dirPath).forEach(file => {
+      if (/.*\.png$/.test(file)) {
+        const currentFile = dirPath + "/" + file;
+        const contents = fs.readFileSync(currentFile);
+        const writeStream = fs.createWriteStream(currentFile);
+        const currentImage = new Promise((res, rej) =>
+          writeStream.on('close', res)
+        );
+        filesProcessing.push(currentImage);
+        new PNG({ filterType: 4, deflateLevel: 1 })
+          .parse(contents, (err, png) => {
+            // Give upper left pixel an opacity
+            // of 254 so Twitter won't convert
+            // to jpeg
+            png.data[3] -= 1;
+            png.pack().pipe(writeStream);
+          });
+      }
+    });
+    Promise.all(filesProcessing).then(resolve);
+  });
+}
+
+function extractCardInfo(files) {
+  let allNewCards = [];
+  for (let file of files) {
+    const currentFile = `${UPLOADS_PATH}/${file}`;
+    const stats = fs.statSync(currentFile);
+
+    if (stats.isFile() && file.match(/.+\.json$/)) {
+      const newCards = parseAnkiJson(currentFile);
+      allNewCards = allNewCards.concat(newCards);
+    }
+  }
+  return allNewCards;
 }
 
 function parseAnkiJson(filePath) {
@@ -73,44 +113,6 @@ function parseAnkiJson(filePath) {
       answers
     };
   });
-}
-
-function optimizeImages(dirPath) {
-  return new Promise((resolve, reject) => {
-    const filesProcessing = [];
-    fs.readdirSync(dirPath).forEach(file => {
-      if (/.*\.png$/.test(file)) {
-        const currentFile = dirPath + "/" + file;
-        const contents = fs.readFileSync(currentFile);
-        const writeStream = fs.createWriteStream(currentFile);
-        const currentImage = new Promise((res, rej) =>
-          writeStream.on('close', res)
-        );
-        filesProcessing.push(currentImage);
-        new PNG({ filterType: 4, deflateLevel: 1 })
-          .parse(contents, (err, png) => {
-            png.data[3] -= 1;
-            png.pack().pipe(writeStream);
-          });
-      }
-    });
-
-    Promise.all(filesProcessing).then(resolve);
-  });
-}
-
-function extractCardInfo(files) {
-  let allNewCards = [];
-  for (let file of files) {
-    const currentFile = `${UPLOADS_PATH}/${file}`;
-    const stats = fs.statSync(currentFile);
-
-    if (stats.isFile() && file.match(/.+\.json$/)) {
-      const newCards = parseAnkiJson(currentFile);
-      allNewCards = allNewCards.concat(newCards);
-    }
-  }
-  return allNewCards;
 }
 
 function stripHtml(string) {

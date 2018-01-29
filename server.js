@@ -4,13 +4,13 @@ if (process.env.NODE_ENV == 'dev')
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const twitterBot = require('./server/twitterBot');
+const twitterBot = require('./src/server/twitterBot');
 
 app.set('port', (process.env.PORT || 3000));
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/dist'));
 app.use(bodyParser.json());
 
-require('./server/routes')(app);
+require('./src/server/routes')(app);
 
 twitterBot.start();
 
