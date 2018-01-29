@@ -1,4 +1,4 @@
-const { optimizeImages } = require('../server/processAnkiJson');
+const { optimizeImages } = require('../src/processAnkiJson');
 
 
 test('adds alpha channel to images', () => {

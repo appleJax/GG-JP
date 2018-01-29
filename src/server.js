@@ -3,16 +3,17 @@ if (process.env.NODE_ENV == 'dev')
 
 const express = require('express');
 const app = express();
+const path = require('path');
 const bodyParser = require('body-parser');
-const twitterBot = require('./src/server/twitterBot');
+const twitterBot = require('./twitterBot');
 
 app.set('port', (process.env.PORT || 3000));
-app.use(express.static(__dirname + '/dist'));
+app.use(express.static(path.resolve(__dirname, '../dist')));
 app.use(bodyParser.json());
 
-require('./src/server/routes')(app);
+require('./api')(app);
 
-twitterBot.start();
+//twitterBot.start();
 
 app.listen(app.get('port'), () =>
   console.log('Listening on port', app.get('port'))

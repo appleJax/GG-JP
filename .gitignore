@@ -1,5 +1,5 @@
-.env
 **/.DS_Store
-assets
+.env
+dist
 node_modules
-uploads/*
+uploads

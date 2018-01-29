@@ -1,4 +1,4 @@
-const { parseAnkiJson } = require('../server/processAnkiJson');
+const { parseAnkiJson } = require('../src/processAnkiJson');
 
 
 test('parseAnkiJson produces a new Cards in the correct format', () => {
