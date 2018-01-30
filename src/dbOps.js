@@ -84,7 +84,7 @@ module.exports = {
     // TODO adjust a score manually
   },
 
-  async getScoreBoard(req, res) {
+  async getScores(req, res) {
     getCollection(req, res, 'scoreBoard');
   },
 

@@ -19,4 +19,8 @@ module.exports = (app) => {
     DB.getOldCards(req, res);
   });
 
+  app.get('/scores', (req, res) => {
+    DB.getScores(req, res);
+  });
+
 } // module.exports

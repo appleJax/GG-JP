@@ -32,6 +32,9 @@
     "webpack-node-externals": "^1.6.0"
   },
   "jest": {
+    "moduleNameMapper": {
+      "^Utils$": "<rootDir>/src/utils.js"
+    },
     "testEnvironment": "node"
   }
 }

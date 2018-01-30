@@ -64,24 +64,9 @@ module.exports = {
     const timeToAnswer = Math.floor(
       (new Date(answerPostedAt) - new Date(questionPostedAt)) / HOURS
     );
-    const baseline = 24 - timeToAnswer;
-    let bonus = 0;
-    switch (alreadyAnswered.length) {
-      case 0:
-        bonus = 10;
-        break;
-      case 1:
-        bonus = 7;
-        break;
-      case 2:
-        bonus = 5;
-        break;
-      default:
-        bonus = 0;
-        break;
-    }
+    const score = 24 - timeToAnswer;
 
-    return baseline + bonus;
+    return Math.max(score, 0);
   },
 
   extractAnswer(text) {
