@@ -10,15 +10,15 @@ const {
 const Twitter = require('./twitterConfig');
 const { TWITTER_ACCOUNT } = process.env;
 
+const [QUESTION_INTERVAL, ANSWER_INTERVAL] = [5000, 40000];
+
 module.exports = {
-  // start: () => setInterval(tweetRandomCard, 2*HOURS)
   start: initializeBot
 };
 
 function initializeBot() {
   openStream();
-  // setInterval(tweetRandomQuestion, 1*HOURS);
-  setInterval(tweetRandomQuestion, 10000);
+  setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
 }
 
 async function tweetRandomQuestion() {
@@ -55,8 +55,7 @@ async function tweetRandomQuestion() {
     alreadyAnswered: []
   };
   DB.addLiveQuestion(liveQuestion);
-  setTimeout(() => tweetAnswer(cardId, questionId), 2000);
-  //setTimeout(() => tweetAnswer(cardId, questionId), 24*HOURS);
+  setTimeout(() => tweetAnswer(cardId, questionId), ANSWER_INTERVAL);
 }
 
 async function tweetAnswer(cardId, questionId) {

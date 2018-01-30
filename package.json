@@ -6,7 +6,8 @@
   "scripts": {
     "build": "webpack --config webpack.dev.config.js",
     "deploy": "webpack --config webpack.prod.config.js",
-    "start": "NODE_ENV=dev node ./src/server.js",
+    "server": "NODE_ENV=dev node ./dist/server.js",
+    "start": "npm run build && npm run server",
     "test": "jest"
   },
   "author": "appleJax <appleJax@users.noreply.github.com>",
@@ -22,9 +23,13 @@
     "urlencode": "^1.1.0"
   },
   "devDependencies": {
+    "clean-webpack-plugin": "^0.1.18",
+    "copy-webpack-plugin": "^4.3.1",
     "dotenv": "^4.0.0",
     "jest-cli": "^22.1.4",
-    "webpack": "^3.10.0"
+    "source-map-support": "^0.5.3",
+    "webpack": "^3.10.0",
+    "webpack-node-externals": "^1.6.0"
   },
   "jest": {
     "testEnvironment": "node"

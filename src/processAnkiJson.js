@@ -2,7 +2,7 @@ const fs = require('fs');
 const PNG = require('pngjs2').PNG;
 const path = require('path');
 const unzip = require('unzip-stream');
-const UPLOADS_PATH = path.resolve(__dirname + '/../../uploads');
+const UPLOADS_PATH = path.resolve(__dirname, '../uploads');
 const {
   formatQuestionAltText,
   formatQuestionText,
