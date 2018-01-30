@@ -22,6 +22,11 @@ module.exports = {
       entryOnly: false
     })
   ],
+  resolve: {
+    alias: {
+      Utils$: __dirname + '/src/utils.js'
+    }
+  },
   output: {
     filename: 'server.js',
     path: __dirname + '/dist'

@@ -6,7 +6,7 @@ const {
   contains,
   extractAnswer,
   tryCatch
-} = require('./utils');
+} = require('Utils');
 const Twitter = require('./twitterConfig');
 const { TWITTER_ACCOUNT } = process.env;
 

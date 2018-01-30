@@ -10,7 +10,7 @@ const {
   formatAnswerText,
   getAnswers,
   tryCatch
-} = require('./utils');
+} = require('Utils');
 
 
 module.exports = {
