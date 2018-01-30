@@ -1,4 +1,4 @@
-# translation-contest
+# GG-JP
 A bot that tweets anki cards and maintains leaderboard of correct answers.
 
 ## Under Construction
