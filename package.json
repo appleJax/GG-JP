@@ -23,6 +23,11 @@
     "urlencode": "^1.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0-beta.39",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.39",
+    "@babel/preset-env": "^7.0.0-beta.39",
+    "babel-loader": "^8.0.0-beta.0",
+    "babel-polyfill": "^6.26.0",
     "clean-webpack-plugin": "^0.1.18",
     "copy-webpack-plugin": "^4.3.1",
     "dotenv": "^4.0.0",
@@ -33,7 +38,7 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "^Utils$": "<rootDir>/src/utils.js"
+      "^Utils$": "<rootDir>/src/utils"
     },
     "testEnvironment": "node"
   }

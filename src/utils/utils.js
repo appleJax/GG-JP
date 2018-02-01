@@ -24,8 +24,7 @@ module.exports = {
     if (needsHint(hint))
       tweetText += `\nHint: ${hint}`;
 
-    if (notes.length > 0)
-      tweetText += `\nNotes: ${notes}`;
+    if (notes) tweetText += `\nNotes: ${notes}`;
 
     tweetText += `\nQID${cardID}`;
     return tweetText;

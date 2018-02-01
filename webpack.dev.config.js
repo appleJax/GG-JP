@@ -4,15 +4,32 @@ const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
 
 module.exports = {
-  entry: {
-    server: './src/server.js'
-  },
+  entry: [
+    'babel-polyfill',
+    './src/server.js'
+  ],
   devtool: 'sourcemap',
   target: 'node',
   node: {
     __dirname: false
   },
   externals: [nodeExternals()],
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env'
+            ]
+          }
+        }
+      }
+    ]
+  },
   plugins: [
     new CleanWebpackPlugin(__dirname + '/dist'),
     new CopyWebpackPlugin([ { from: 'src/static' } ]),
@@ -24,7 +41,7 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      Utils$: __dirname + '/src/utils.js'
+      Utils: __dirname + '/src/utils'
     }
   },
   output: {

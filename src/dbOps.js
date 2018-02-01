@@ -71,11 +71,29 @@ module.exports = {
 
   async addNewUser(newUser) {
     const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreBoard = mongo.db(DB).collection('scoreBoard');
+    const scoreboard = mongo.db(DB).collection('scoreboard');
     const { userId } = newUser;
-    const user = await tryCatch(scoreBoard.findOne({ userId }));
-    if (user == null) {
-      await tryCatch(scoreBoard.insert(newUser));
+    const user = await tryCatch(scoreboard.findOne({userId}));
+    if (user) {
+      const {
+        name,
+        handle,
+        avatar,
+        profileBanner,
+        following
+      } = newUser;
+
+      await tryCatch(
+        scoreboard.update({ userId }, {
+            $set: { name },
+            $set: { handle },
+            $set: { avatar },
+            $set: { profileBanner },
+            $set: { following }
+        })
+      );
+    } else {
+      await tryCatch(scoreboard.insert(newUser));
     }
     mongo.close();
   },
@@ -84,8 +102,17 @@ module.exports = {
     // TODO adjust a score manually
   },
 
-  async getScores(req, res) {
-    getCollection(req, res, 'scoreBoard');
+  getScores(req, res) {
+    getCollection(req, res, 'scoreboard');
+  },
+
+  async getScore(req, res) {
+    const { handle } = req.params;
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const collection = mongo.db(DB).collection('scoreboard');
+    const user = await tryCatch(collection.findOne({handle}));
+    res.json(user);
+    mongo.close();
   },
 
   async addDeck(req, res) {
@@ -129,14 +156,14 @@ function removeLiveQuestion(mongo, cardId) {
     const collection = mongo.db(DB).collection('liveQuestions');
     const currentQuestion = await tryCatch(collection.findOne({cardId}));
     await tryCatch(collection.remove(currentQuestion));
-    await tryCatch(addPointsToScoreboard(mongo, currentQuestion));
+    await tryCatch(addPointsToscoreboard(mongo, currentQuestion));
     resolve();
   });
 }
 
-function addPointsToScoreboard(mongo, { cachedPoints, questionId }) {
+function addPointsToscoreboard(mongo, { cachedPoints, cardId }) {
   return new Promise(async (resolve, reject) => {
-    const scoreBoard = mongo.db(DB).collection('scoreBoard');
+    const scoreboard = mongo.db(DB).collection('scoreboard');
     const ops = [];
 
     for (let i = 0; i < cachedPoints.length; ++i) {
@@ -148,7 +175,7 @@ function addPointsToScoreboard(mongo, { cachedPoints, questionId }) {
             $inc: { score: points },
             $push: {
               correctAnswers: {
-                questionId,
+                cardId,
                 points
               }
             }
@@ -161,7 +188,7 @@ function addPointsToScoreboard(mongo, { cachedPoints, questionId }) {
       return;
     }
 
-    await tryCatch(scoreBoard.bulkWrite(ops));
+    await tryCatch(scoreboard.bulkWrite(ops));
     resolve();
   });
 }
