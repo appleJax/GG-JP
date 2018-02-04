@@ -5,22 +5,34 @@ const {
   calculateScore,
   contains,
   extractAnswer,
-  tryCatch,
-  getFollowing,
-  postMedia
+  getTimeUntil,
+  postMedia,
+  tryCatch
 } = require('Utils');
 const Twitter = require('./twitterConfig');
 const { TWITTER_ACCOUNT } = process.env;
 
-const [QUESTION_INTERVAL, ANSWER_INTERVAL] = [30000, 40000];
+const ANSWER_INTERVAL = 40000;
+let QUESTION_INTERVAL = 30000;
 
 module.exports = {
-  start: initializeBot
+  start: () => {
+    openStream();
+    setStartTimes();
+  }
 };
 
-function initializeBot() {
-  openStream();
-  setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
+function setStartTimes() {
+  const timeUntil7PM = getTimeUntil(19);
+  const timeUntilMidnight = getTimeUntil(0);
+
+  setTimeout(() => {
+    setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
+  }, timeUntil7PM);
+
+  setTimeout(() => {
+    setInterval(weeklyMonthlyReset, 24*HOURS);
+  }, timeUntilMidnight);
 }
 
 async function tweetRandomQuestion() {
@@ -122,6 +134,8 @@ function openStream() {
           profileBanner,
           following,
           score: 0,
+          monthlyScore: 0,
+          weeklyScore: 0,
           correctAnswers: []
         };
         DB.addNewUser(newUser);
@@ -137,4 +151,13 @@ function openStream() {
     console.error('Tweet stream disconnected:', disconnectMsg);
     setTimeout(() => stream.start(), 100);
   });
+}
+
+function weeklyMonthlyReset() {
+  const now = Date.now();
+  const resetWeeklyScore = now.getDay() === 0;
+  const resetMonthlyScore = now.getDate() === 1;
+
+  if (resetWeeklyScore || resetMonthlyScore)
+    DB.weeklyMonthlyReset(resetWeeklyScore, resetMonthlyScore);
 }

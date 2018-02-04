@@ -1,7 +1,8 @@
 const urlencode = require('urlencode');
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
-const HOURS = 3600000;
 const { TWITTER_ACCOUNT } = process.env;
+
+const HOURS = 3600000;
 
 module.exports = {
 
@@ -70,6 +71,21 @@ module.exports = {
 
   extractAnswer(text) {
     return text.trim().slice(TWITTER_ACCOUNT.length + 2);
+  },
+
+  getTimeUntil(hour) {
+    // https://stackoverflow.com/questions/4455282/call-a-javascript-function-at-a-specific-time-of-day
+    const now = new Date();
+    const millisUntilTime = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      hour, 0, 0, 0) - now;
+
+    if (millisUntilTime < 0) // already passed for today, wait until tomorrow
+      millisUntilTime += 24*HOURS;
+
+    return millisUntilTime;
   },
 
   tryCatch(promise) {

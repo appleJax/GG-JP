@@ -2,7 +2,7 @@ const MongoClient = require('mongodb').MongoClient;
 const url = process.env.MONGODB_URI;
 const DB = process.env.MONGO_DB;
 const { processUpload } = require('./processAnkiJson');
-const { tryCatch } = require('Utils');
+const { A_MONTH_AGO, A_WEEK_AGO, tryCatch } = require('Utils');
 
 module.exports = {
   getRandomQuestion() {
@@ -103,7 +103,16 @@ module.exports = {
   },
 
   getScores(req, res) {
-    getCollection(req, res, 'scoreboard');
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const collection = mongo.db(DB).collection('scoreboard');
+    const data = await tryCatch(
+      collection.find()
+                .project('_id', 0)
+                .sort('score', -1)
+                .toArray()
+    );
+    res.json(data);
+    mongo.close();
   },
 
   async getScore(req, res) {
@@ -138,6 +147,28 @@ module.exports = {
 
   getOldCards(req, res) {
     getCollection(req, res, 'oldCards');
+  },
+
+  async weeklyMonthlyReset(resetWeeklyScore, resetMonthlyScore) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const collection = mongo.db(DB).collection('scoreboard');
+
+    let reset;
+    if (resetWeeklyScore && resetMonthlyScore)
+      reset = {
+        $set: { weeklyScore:  0 },
+        $set: { monthlyScore: 0 }
+      };
+    else if (resetWeeklyScore)
+      reset = { $set: { weeklyScore: 0 } };
+    else
+      reset = { $set: { monthlyScore: 0 } };
+
+    collection.update(
+      {}, reset, { multi: true }
+    );
+
+    mongo.close();
   }
 
 } // module.exports
@@ -146,7 +177,11 @@ module.exports = {
 async function getCollection(req, res, collectionName) {
   const mongo = await tryCatch(MongoClient.connect(url));
   const collection = mongo.db(DB).collection(collectionName);
-  const data = await tryCatch(collection.find({}).toArray());
+  const data = await tryCatch(
+    collection.find()
+              .project({_id: 0})
+              .toArray()
+  );
   res.json(data);
   mongo.close();
 }
@@ -156,14 +191,15 @@ function removeLiveQuestion(mongo, cardId) {
     const collection = mongo.db(DB).collection('liveQuestions');
     const currentQuestion = await tryCatch(collection.findOne({cardId}));
     await tryCatch(collection.remove(currentQuestion));
-    await tryCatch(addPointsToscoreboard(mongo, currentQuestion));
+    await tryCatch(addPointsToScoreboard(mongo, currentQuestion));
     resolve();
   });
 }
 
-function addPointsToscoreboard(mongo, { cachedPoints, cardId }) {
+function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
   return new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
+    const answerPostedAt = new Date().getTime();
     const ops = [];
 
     for (let i = 0; i < cachedPoints.length; ++i) {
@@ -173,8 +209,11 @@ function addPointsToscoreboard(mongo, { cachedPoints, cardId }) {
           "filter" : { userId },
           "update" : {
             $inc: { score: points },
+            $inc: { weeklyScore: points },
+            $inc: { monthlyScore: points },
             $push: {
               correctAnswers: {
+                answerPostedAt,
                 cardId,
                 points
               }
