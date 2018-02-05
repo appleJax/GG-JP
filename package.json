@@ -4,9 +4,9 @@
   "description": "Videogame Translation Contest - Twitter Bot",
   "main": "src/server.js",
   "scripts": {
-    "build": "webpack --config webpack.dev.config.js",
-    "deploy": "webpack --config webpack.prod.config.js",
-    "server": "NODE_ENV=dev node ./dist/server.js",
+    "build": "webpack --config webpack.dev.js",
+    "deploy": "webpack --config webpack.prod.js",
+    "server": "node ./dist/server.js",
     "start": "npm run build && npm run server",
     "test": "jest"
   },
@@ -34,6 +34,7 @@
     "jest-cli": "^22.1.4",
     "source-map-support": "^0.5.3",
     "webpack": "^3.10.0",
+    "webpack-merge": "^4.1.1",
     "webpack-node-externals": "^1.6.0"
   },
   "jest": {

@@ -32,12 +32,7 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(__dirname + '/dist'),
-    new CopyWebpackPlugin([ { from: 'src/static' } ]),
-    new webpack.BannerPlugin({
-      banner: 'require("source-map-support").install();',
-      raw: true,
-      entryOnly: false
-    })
+    new CopyWebpackPlugin([ { from: 'src/static' } ])
   ],
   resolve: {
     alias: {
