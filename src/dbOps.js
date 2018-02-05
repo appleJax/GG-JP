@@ -2,7 +2,7 @@ const MongoClient = require('mongodb').MongoClient;
 const url = process.env.MONGODB_URI;
 const DB = process.env.MONGO_DB;
 const { processUpload } = require('./processAnkiJson');
-const { A_MONTH_AGO, A_WEEK_AGO, tryCatch } = require('Utils');
+const { tryCatch } = require('Utils');
 
 module.exports = {
   getRandomQuestion() {
