@@ -133,8 +133,8 @@ module.exports = {
     const collection = mongo.db(DB).collection('scoreboard');
     const data = await tryCatch(
       collection.find()
-                .project('_id', 0)
                 .sort('score', -1)
+                .project({'_id': 0})
                 .toArray()
     );
     res.json(data);
