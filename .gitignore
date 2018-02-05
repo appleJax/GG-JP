@@ -1,6 +1,5 @@
 **/.DS_Store
 .env
-dist
 node_modules
 uploads
 TODO.md

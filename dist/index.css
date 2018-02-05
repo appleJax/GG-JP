@@ -1,0 +1,37 @@
+html, body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+}
+
+.upload-form {
+  margin: 20px;
+  text-align: center;
+}
+
+.upload-form__label {
+  display: block;
+  margin: 10px;
+}
+
+.btn {
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.btn--input {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.btn--submit {
+  background: #4386fa;
+  border: none;
+  box-shadow: 0 0 10px #1356ca inset;
+  color: white;
+}
+
+.btn--submit:hover {
+  background: #5396ff;
+  cursor: pointer;
+}
