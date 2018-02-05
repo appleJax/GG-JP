@@ -33,10 +33,36 @@ module.exports = {
     });
   },
 
-  async addLiveQuestion(record) {
+  async addLiveQuestion(record, mediaUrls) {
+    const { cardId } = record;
     const mongo = await tryCatch(MongoClient.connect(url));
     const liveQuestions = mongo.db(DB).collection('liveQuestions');
+    const oldCards = mongo.db(DB).collection('oldCards');
     await tryCatch(liveQuestions.insert(record));
+    await tryCatch(
+      oldCards.updateOne(
+        {cardId},
+        {
+          $set: { mediaUrls },
+          $unset: { questionImg: '', prevLineImg: '' }
+        }
+      )
+    )
+    mongo.close();
+  },
+
+  async addMediaUrlsToCard(cardId, [mediaUrl]) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const oldCards = mongo.db(DB).collection('oldCards');
+    await tryCatch(
+      oldCards.updateOne(
+        {cardId},
+        {
+          $push: { mediaUrls: mediaUrl },
+          $unset: { answerImg: '' }
+        }
+      )
+    )
     mongo.close();
   },
 
@@ -69,7 +95,7 @@ module.exports = {
     });
   },
 
-  async addNewUser(newUser) {
+  async addOrUpdateUser(newUser) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
     const { userId } = newUser;
@@ -84,7 +110,7 @@ module.exports = {
       } = newUser;
 
       await tryCatch(
-        scoreboard.update({ userId }, {
+        scoreboard.updateOne({ userId }, {
             $set: { name },
             $set: { handle },
             $set: { avatar },
@@ -102,7 +128,7 @@ module.exports = {
     // TODO adjust a score manually
   },
 
-  getScores(req, res) {
+  async getScores(req, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const collection = mongo.db(DB).collection('scoreboard');
     const data = await tryCatch(
@@ -208,9 +234,11 @@ function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
         updateOne : {
           "filter" : { userId },
           "update" : {
-            $inc: { score: points },
-            $inc: { weeklyScore: points },
-            $inc: { monthlyScore: points },
+            $inc: {
+              score: points,
+              weeklyScore: points,
+              monthlyScore: points
+            },
             $push: {
               correctAnswers: {
                 answerPostedAt,

@@ -5,6 +5,7 @@ const {
   calculateScore,
   contains,
   extractAnswer,
+  getFollowing,
   getTimeUntil,
   postMedia,
   tryCatch
@@ -13,13 +14,17 @@ const Twitter = require('./twitterConfig');
 const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 40000;
-let QUESTION_INTERVAL = 30000;
+let QUESTION_INTERVAL = 10000;
 
 module.exports = {
   start: () => {
     openStream();
-    setStartTimes();
+    setInterval(tweetRandomQuestion, QUESTION_INTERVAL)
   }
+  // start: () => {
+  //   openStream();
+  //   setStartTimes();
+  // }
 };
 
 function setStartTimes() {
@@ -49,7 +54,8 @@ async function tweetRandomQuestion() {
 
   const {
     questionId,
-    questionPostedAt
+    questionPostedAt,
+    mediaUrls
   } = await tryCatch(
     postMedia(
       questionText,
@@ -68,7 +74,7 @@ async function tweetRandomQuestion() {
     cachedPoints: [],
     alreadyAnswered: []
   };
-  DB.addLiveQuestion(liveQuestion);
+  DB.addLiveQuestion(liveQuestion, mediaUrls);
   setTimeout(() => tweetAnswer(cardId, questionId), ANSWER_INTERVAL);
 }
 
@@ -87,11 +93,15 @@ async function tweetAnswer(cardId, questionId) {
     DB.revealAnswerWorkflow(cardId)
   );
 
-  postMedia(
-    addQuestionLink(answerText, questionId),
-    answerImg,
-    answerAltText
+  const { mediaUrls } = await tryCatch(
+    postMedia(
+      addQuestionLink(answerText, questionId),
+      answerImg,
+      answerAltText
+    )
   );
+
+  DB.addMediaUrlsToCard(cardId, mediaUrls);
 }
 
 function openStream() {
@@ -138,7 +148,7 @@ function openStream() {
           weeklyScore: 0,
           correctAnswers: []
         };
-        DB.addNewUser(newUser);
+        DB.addOrUpdateUser(newUser);
         DB.updateLiveQuestion(questionId, { userId, points });
 
       } else {

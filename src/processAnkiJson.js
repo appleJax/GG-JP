@@ -110,7 +110,8 @@ function parseAnkiJson(filePath) {
       answerText:      formatAnswerText(answers, engMeaning, webLookup, cardId),
       answerImg:       getBase64(answerImg),
       answerAltText:   formatAnswerAltText(expression),
-      answers
+      answers,
+      mediaUrls: []
     };
   });
 }

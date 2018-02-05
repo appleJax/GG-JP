@@ -8,22 +8,26 @@ module.exports = {
   //
   postMedia(status, b64Image1, altText1, b64Image2, altText2) {
     return new Promise(async (resolve, reject) => {
-      const media_id1 = await tryCatch(uploadMedia(b64Image1, altText1));
-      const media_ids = [media_id1];
+      const mediaId1 = await tryCatch(uploadMedia(b64Image1, altText1));
+      const media_ids = [mediaId1];
       if (b64Image2) {
-        const media_id2 = await tryCatch(uploadMedia(b64Image2, altText2));
-        media_ids.unshift(media_id2);
+        const mediaId2 = await tryCatch(uploadMedia(b64Image2, altText2));
+        media_ids.unshift(mediaId2);
       }
 
-      const params = { status, media_ids };
+      const params = { status, media_ids, tweet_mode: 'extended' };
       Twitter.post('statuses/update', params, (err, data, response) => {
         if (err) {
           console.error(err)
           reject("Posting status failed.");
         };
+        const mediaUrls = data.extended_entities.media.map(
+          obj => obj.media_url_https
+        );
         const result = {
           questionId:       data.id_str,
-          questionPostedAt: data.created_at
+          questionPostedAt: data.created_at,
+          mediaUrls
         };
         resolve(result);
       });
