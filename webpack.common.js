@@ -5,7 +5,6 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
-    'babel-polyfill',
     './src/server.js'
   ],
   devtool: 'sourcemap',

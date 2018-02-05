@@ -3,6 +3,10 @@ const common = require('./webpack.common.js');
 const webpack = require('webpack');
 
 module.exports = merge(common, {
+  entry: [
+    'babel-polyfill',
+    './src/server.js'
+  ],
   devtool: 'inline-source-map',
   plugins: [
     new webpack.BannerPlugin({
