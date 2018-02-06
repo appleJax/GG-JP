@@ -12,7 +12,7 @@ module.exports = {
       const oldCards = mongo.db(DB).collection('oldCards');
       const randomCard = await tryCatch(newCards.findOne());
       if (randomCard == null) {
-        reject("Empty deck. Please Add More Cards to DB.");
+        reject(new Error("Empty deck. Please Add More Cards to DB."));
         return;
       }
       await tryCatch(oldCards.insert(randomCard));
@@ -133,7 +133,7 @@ module.exports = {
     const collection = mongo.db(DB).collection('scoreboard');
     const data = await tryCatch(
       collection.find()
-                .sort('score', -1)
+                .sort('weeklyScore', -1)
                 .project({'_id': 0})
                 .toArray()
     );

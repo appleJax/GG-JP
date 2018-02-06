@@ -19,7 +19,7 @@ module.exports = {
       Twitter.post('statuses/update', params, (err, data, response) => {
         if (err) {
           console.error(err)
-          reject("Posting status failed.");
+          reject(new Error("Posting status failed."));
         };
         const mediaUrls = data.extended_entities.media.map(
           obj => obj.media_url_https
@@ -59,7 +59,7 @@ function uploadMedia(b64Image, altText) {
     Twitter.post('media/upload', { media_data: b64Image }, (err, data, response) => {
       if (err) {
         console.error(err);
-        reject("Media upload failed.")
+        reject(new Error("Media upload failed."));
         return;
       }
       // now we can assign alt text to the media, for use by screen readers and
@@ -70,7 +70,7 @@ function uploadMedia(b64Image, altText) {
       Twitter.post('media/metadata/create', meta_params, (err, data, response) => {
         if (err) {
           console.error(err);
-          reject("Media upload succeeded, media creation failed.");
+          reject(new Error("Media upload succeeded, media creation failed."));
         }
         // now we can reference the media and post a tweet (media will attach to the tweet)
         resolve(mediaIdStr);
