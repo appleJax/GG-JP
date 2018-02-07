@@ -21,7 +21,6 @@ module.exports = {
           console.error(err)
           reject(new Error("Posting status failed."));
         };
-        console.log('Ext entities:', data.extended_entities.media);
         const mediaUrls = data.extended_entities.media.map(
           obj => ({
             image: obj.media_url_https,
