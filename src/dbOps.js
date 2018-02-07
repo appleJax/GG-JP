@@ -38,7 +38,10 @@ module.exports = {
     const mongo = await tryCatch(MongoClient.connect(url));
     const liveQuestions = mongo.db(DB).collection('liveQuestions');
     const oldCards = mongo.db(DB).collection('oldCards');
-    await tryCatch(liveQuestions.insert(record));
+    await tryCatch(liveQuestions.insert({
+      ...record,
+      mediaUrls
+    }));
     await tryCatch(
       oldCards.updateOne(
         {cardId},
@@ -225,7 +228,9 @@ function removeLiveQuestion(mongo, cardId) {
 function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
   return new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
+    const oldCards = mongo.db(DB).collection('oldCards');
     const answerPostedAt = new Date().getTime();
+    oldCards.updateOne({cardId}, {$set: {answerPostedAt}});
     const ops = [];
 
     for (let i = 0; i < cachedPoints.length; ++i) {

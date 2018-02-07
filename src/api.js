@@ -13,6 +13,10 @@ module.exports = (app) => {
     next();
   });
 
+  app.get('/api/live', (req, res) => {
+    res.json(DB.getLiveQuestions());
+  });
+
   app.get('/api/scores', (req, res) => {
     DB.getScores(req, res);
   });
