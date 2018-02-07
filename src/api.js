@@ -21,7 +21,7 @@ module.exports = (app) => {
     DB.getScores(req, res);
   });
 
-  app.get('/api/cards/:ids', (req, res) => {
+  app.get('/api/cards', (req, res) => {
     DB.getCards(req, res);
   });
 
