@@ -13,8 +13,8 @@ const {
 const Twitter = require('./twitterConfig');
 const { TWITTER_ACCOUNT } = process.env;
 
-const ANSWER_INTERVAL = 40000;
-let QUESTION_INTERVAL = 10000;
+const ANSWER_INTERVAL = 2000;
+let QUESTION_INTERVAL = 5000;
 
 module.exports = {
   start: () => {

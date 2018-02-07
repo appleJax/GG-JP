@@ -144,6 +144,7 @@ module.exports = {
     mongo.close();
   },
 
+  // TODO - delete this method if not needed
   async getScore(req, res) {
     const { handle } = req.params;
     const mongo = await tryCatch(MongoClient.connect(url));
@@ -197,6 +198,17 @@ module.exports = {
       {}, reset, { multi: true }
     );
 
+    mongo.close();
+  },
+
+  async getCards(req, res) {
+    const { ids } = req.params;
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const collection = mongo.db(DB).collection('oldCards');
+    const data = await tryCatch(
+      collection.find({cardId: {$in: ids}).toArray()
+    );
+    res.json(data);
     mongo.close();
   }
 

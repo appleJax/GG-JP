@@ -15,7 +15,7 @@ module.exports = {
         media_ids.unshift(mediaId2);
       }
 
-      const params = { status, media_ids, tweet_mode: 'extended' };
+      const params = { status, media_ids, tweet_mode: 'extended', include_ext_alt_text: true };
       Twitter.post('statuses/update', params, (err, data, response) => {
         if (err) {
           console.error(err)
