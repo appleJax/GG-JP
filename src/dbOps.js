@@ -206,7 +206,7 @@ module.exports = {
     const mongo = await tryCatch(MongoClient.connect(url));
     const collection = mongo.db(DB).collection('oldCards');
     const data = await tryCatch(
-      collection.find({cardId: {$in: ids}).toArray()
+      collection.find({cardId: {$in: ids}}).toArray()
     );
     res.json(data);
     mongo.close();
