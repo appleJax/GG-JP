@@ -14,7 +14,8 @@ module.exports = (app) => {
   });
 
   app.get('/api/live', (req, res) => {
-    res.json(DB.getLiveQuestions());
+    const liveQuestions = await tryCatch(DB.getLiveQuestions());
+    res.json({ data: liveQuestions });
   });
 
   app.get('/api/scores', (req, res) => {
