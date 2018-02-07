@@ -98,6 +98,14 @@ module.exports = {
     });
   },
 
+  async serveLiveQuestions(req, res) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const collection = mongo.db(DB).collection('liveQuestions');
+    const liveQuestions = await tryCatch(collection.find().toArray());
+    res.json(liveQuestions);
+    mongo.close();
+  },
+
   async addOrUpdateUser(newUser) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
