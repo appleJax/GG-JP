@@ -64,8 +64,7 @@ module.exports = {
     const oldCards = mongo.db(DB).collection('oldCards');
     await tryCatch(
       oldCards.updateOne(
-        {cardId},
-        {
+        { cardId }, {
           $push: { mediaUrls: mediaUrl },
           $unset: { answerImg: '', answerAltText: '' }
         }
@@ -77,18 +76,17 @@ module.exports = {
   async updateLiveQuestion(questionId, userPoints) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const liveQuestions = mongo.db(DB).collection('liveQuestions');
-    const { userId, points } = userPoints;
-    const update = {
-      $push: {
-        alreadyAnswered: userId,
-      }
-    };
-
-    if (points > 0)
-      update.$push.cachedPoints = userPoints;
+    const { userId } = userPoints;
 
     await tryCatch(
-      liveQuestions.update({questionId}, update)
+      liveQuestions.update(
+        { questionId }, {
+          $push: {
+            alreadyAnswered: userId,
+            cachedPoints: userPoints
+          }
+        }
+      )
     );
     mongo.close();
   },
@@ -149,7 +147,7 @@ module.exports = {
     const collection = mongo.db(DB).collection('scoreboard');
     const data = await tryCatch(
       collection.find()
-                .sort('weeklyScore', -1)
+                .sort('weeklyStats.score', -1)
                 .project({'_id': 0})
                 .toArray()
     );
@@ -192,20 +190,21 @@ module.exports = {
     getCollection(req, res, 'oldCards');
   },
 
-  async weeklyMonthlyReset(resetWeeklyScore, resetMonthlyScore) {
+  async weeklyMonthlyReset(resetWeeklyStats, resetMonthlyStats) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const collection = mongo.db(DB).collection('scoreboard');
 
-    let reset;
-    if (resetWeeklyScore && resetMonthlyScore)
-      reset = {
-        $set: { weeklyScore:  0 },
-        $set: { monthlyScore: 0 }
-      };
-    else if (resetWeeklyScore)
-      reset = { $set: { weeklyScore: 0 } };
-    else
-      reset = { $set: { monthlyScore: 0 } };
+    const zero = {
+      score: 0,
+      attempts: 0,
+      correct: 0
+    };
+    const reset = { $set: {} };
+    if (resetWeeklyStats)
+      reset.$set.weeklyStats = zero;
+
+    if (resetMonthlyStats)
+      reset.$set.monthlyStats = zero;
 
     collection.update(
       {}, reset, { multi: true }
@@ -271,29 +270,39 @@ function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
     const oldCards = mongo.db(DB).collection('oldCards');
     const answerPostedAt = new Date().getTime();
     oldCards.updateOne({cardId}, {$set: {answerPostedAt}});
-    const ops = [];
 
+    const ops = [];
     for (let i = 0; i < cachedPoints.length; ++i) {
       const { userId, points } = cachedPoints[i];
-      ops.push({
-        updateOne : {
-          "filter" : { userId },
-          "update" : {
+      const op = {
+        updateOne: {
+          filter: { userId },
+          update: {
             $inc: {
-              score: points,
-              weeklyScore: points,
-              monthlyScore: points
-            },
-            $push: {
-              correctAnswers: {
-                answerPostedAt,
-                cardId,
-                points
-              }
+              'allTimeStats.score': points,
+              'monthlyStats.score': points,
+              'weeklyStats.score':  points,
+              'allTimeStats.attempts': 1,
+              'monthlyStats.attempts': 1,
+              'weeklyStats.attempts':  1
             }
           }
         }
-      });
+      };
+      if (points > 0) {
+        op.updateOne.update.$push = {
+          'allTimeStats.correct': {
+            answerPostedAt,
+            cardId,
+            points
+          }
+        };
+
+        op.updateOne.update.$inc['monthlyStats.correct'] = 1;
+        op.updateOne.update.$inc['weeklyStats.correct']  = 1;
+      }
+
+      ops.push(op);
     }
     if (ops.length === 0) {
       resolve();

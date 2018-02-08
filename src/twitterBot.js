@@ -13,8 +13,8 @@ const {
 const Twitter = require('./twitterConfig');
 const { TWITTER_ACCOUNT } = process.env;
 
-const ANSWER_INTERVAL = 60000;
-let QUESTION_INTERVAL = 5000;
+const ANSWER_INTERVAL = 40000;
+let QUESTION_INTERVAL = 10000;
 
 module.exports = {
   start: () => {
@@ -121,9 +121,9 @@ function openStream() {
     }
   }) => {
     const liveQuestions = await tryCatch(DB.getLiveQuestions());
-    const foundQuestion = liveQuestions.filter(
-      obj => obj.questionId === questionId
-    )[0];
+    const foundQuestion = liveQuestions.find(
+      questionCard => questionCard.questionId === questionId
+    );
 
     if (foundQuestion) {
       const {
@@ -133,23 +133,35 @@ function openStream() {
       if (contains(userId, alreadyAnswered))
         return;
 
+      const following = await tryCatch(getFollowing(userId));
+      const newUser = {
+        userId,
+        name,
+        handle,
+        avatar,
+        profileBanner,
+        following,
+        allTimeStats: {
+          score: 0,
+          attempts: 0,
+          correct: []
+        },
+        monthlyStats: {
+          score: 0,
+          attempts: 0,
+          correct: 0
+        },
+        weeklyStats: {
+          score: 0,
+          attempts: 0,
+          correct: 0
+        }
+      };
+      DB.addOrUpdateUser(newUser);
+
       const userAnswer = extractAnswer(text);
       if (contains(userAnswer, acceptedAnswers)) {
         const points = calculateScore(answerPostedAt, foundQuestion);
-        const following = await tryCatch(getFollowing(userId));
-        const newUser = {
-          userId,
-          name,
-          handle,
-          avatar,
-          profileBanner,
-          following,
-          score: 0,
-          monthlyScore: 0,
-          weeklyScore: 0,
-          correctAnswers: []
-        };
-        DB.addOrUpdateUser(newUser);
         DB.updateLiveQuestion(questionId, { userId, points });
 
       } else {
@@ -166,9 +178,9 @@ function openStream() {
 
 function weeklyMonthlyReset() {
   const now = Date.now();
-  const resetWeeklyScore = now.getDay() === 0;
-  const resetMonthlyScore = now.getDate() === 1;
+  const resetWeeklyStats = now.getDay() === 0;
+  const resetMonthlyStats = now.getDate() === 1;
 
-  if (resetWeeklyScore || resetMonthlyScore)
-    DB.weeklyMonthlyReset(resetWeeklyScore, resetMonthlyScore);
+  if (resetWeeklyStats || resetMonthlyStats)
+    DB.weeklyMonthlyReset(resetWeeklyStats, resetMonthlyStats);
 }
