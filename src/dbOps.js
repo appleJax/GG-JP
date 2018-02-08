@@ -47,7 +47,12 @@ module.exports = {
         {cardId},
         {
           $set: { mediaUrls },
-          $unset: { questionImg: '', prevLineImg: '' }
+          $unset: {
+            questionImg: '',
+            questionAltText: '',
+            prevLineImg: '',
+            prevLineAltText: ''
+          }
         }
       )
     )
@@ -62,7 +67,7 @@ module.exports = {
         {cardId},
         {
           $push: { mediaUrls: mediaUrl },
-          $unset: { answerImg: '' }
+          $unset: { answerImg: '', answerAltText: '' }
         }
       )
     )
@@ -215,10 +220,23 @@ module.exports = {
     const collection = mongo.db(DB).collection('oldCards');
     const data = await tryCatch(
       collection.find({cardId: {$in: ids}})
-                .project({_id: 0, mediaUrls: 1})
+                .project({_id: 0, mediaUrls: 1, questionText: 1, answers: 1})
                 .toArray()
     );
-    res.json(data);
+
+    const cleanData = data.map(card => {
+      card.questionText = card.questionText.split('\n')[0];
+      const s = card.answers.length > 1 ? 's' : '';
+      card.answers = `Answer${s}: ${card.answers.join(', ')}`;
+      card.mediaUrl = (card.mediaUrls.length === 3)
+        ? card.mediaUrls[1]
+        : card.mediaUrls[0];
+
+      delete card.mediaUrls;
+      return card;
+    });
+
+    res.json(cleanData);
     mongo.close();
   }
 

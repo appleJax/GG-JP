@@ -19,7 +19,7 @@ let QUESTION_INTERVAL = 5000;
 module.exports = {
   start: () => {
     openStream();
-    setInterval(tweetRandomQuestion, QUESTION_INTERVAL)
+    setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
   }
   // start: () => {
   //   openStream();
