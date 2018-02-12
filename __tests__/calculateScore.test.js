@@ -1,4 +1,4 @@
-const { calculateScore } = require('Utils');
+const { calculateScore } = require('Utils/utils');
 
 const answerPostedAt = 'Fri Jan 26 06:54:01 +0000 2018';
 const foundQuestion1 = {

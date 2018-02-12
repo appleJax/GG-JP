@@ -5,7 +5,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
-    'babel-polyfill',
+    '@babel/polyfill',
     './src/server.js'
   ],
   target: 'node',

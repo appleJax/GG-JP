@@ -3,6 +3,7 @@ const url = process.env.MONGODB_URI;
 const DB = process.env.MONGO_DB;
 const { processUpload } = require('./processAnkiJson');
 const { tryCatch } = require('Utils');
+const PAGE_SIZE = 100;
 
 module.exports = {
   getRandomQuestion() {
@@ -142,13 +143,15 @@ module.exports = {
     // TODO adjust a score manually
   },
 
-  async getScores(req, res) {
+  async getScores({ params }, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const collection = mongo.db(DB).collection('scoreboard');
+    const page = params.page || 1;
+    const scoreView = (params.view || 'weeklyStats');
     const data = await tryCatch(
-      collection.find()
-                .sort('weeklyStats.score', -1)
-                .project({'_id': 0})
+      collection.find({`${scoreView}.score`: { $gt: 0 })
+                .sort({`${scoreView}.score`, -1, handle: 1})
+                .limit(PAGE_SIZE*page)
                 .toArray()
     );
     res.json(data);
@@ -259,6 +262,10 @@ function removeLiveQuestion(mongo, cardId) {
     const collection = mongo.db(DB).collection('liveQuestions');
     const currentQuestion = await tryCatch(collection.findOne({cardId}));
     await tryCatch(collection.remove(currentQuestion));
+
+    const oldCards = mongo.db(DB).collection('oldCards');
+    const answerPostedAt = new Date().getTime();
+    await tryCatch(oldCards.updateOne({cardId}, {$set: {answerPostedAt}}));
     await tryCatch(addPointsToScoreboard(mongo, currentQuestion));
     resolve();
   });
@@ -267,9 +274,6 @@ function removeLiveQuestion(mongo, cardId) {
 function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
   return new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
-    const oldCards = mongo.db(DB).collection('oldCards');
-    const answerPostedAt = new Date().getTime();
-    oldCards.updateOne({cardId}, {$set: {answerPostedAt}});
 
     const ops = [];
     for (let i = 0; i < cachedPoints.length; ++i) {
@@ -310,6 +314,109 @@ function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
     }
 
     await tryCatch(scoreboard.bulkWrite(ops));
+    await tryCatch(recalculateRank(scoreboard));
+    resolve();
+  });
+}
+
+function recalculateRank(scoreboard) {
+  return new Promise(async (resolve, reject) => {
+    const stats = await tryCatch(scoreboard.aggregate([
+      { $project: {
+          _id: 0,
+          orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'allTimeStats' ] },
+          userId: 1,
+          'allTimeStats.score': 1,
+          'allTimeStats.rank':  1,
+          'monthlyStats.score': 1,
+          'monthlyStats.rank':  1,
+          'weeklyStats.score':  1,
+          'weeklyStats.rank':   1
+        }
+      },
+      { $unwind: '$orderBy' },
+      { $group:
+        { _id:
+          { orderBy: '$orderBy',
+            score:
+            { $switch: {
+                branches: [
+                   { case: { $eq: ['$orderBy', 'weeklyStats' ] }, then: '$weeklyStats.score'  },
+                   { case: { $eq: ['$orderBy', 'monthlyStats'] }, then: '$monthlyStats.score' },
+                ],
+                default: '$allTimeStats.score'
+              }
+            }
+          },
+          users: { $push: '$$CURRENT' }
+        }
+      },
+      { $sort: { '_id.score': -1 } },
+      { $group:
+        { _id: '$_id.orderBy',
+          scores: {
+            $push: {
+              score: '$_id.score',
+              users: '$users'
+            }
+          }
+        }
+      }
+    ]).toArray());
+
+    const usersToUpdate = {};
+    const currentRanks = {
+      allTimeStats: 1,
+      monthlyStats: 1,
+      weeklyStats:  1
+    };
+    stats.forEach(({ _id: category, scores }) => {
+      const end = scores.length;
+      let i = 0;
+      for (; i < end; i++) {
+        const currentStat = scores[i];
+        if (currentStat.score === 0) continue;
+
+        currentStat.users.forEach(user => {
+          const previousRank = user[category].rank;
+          const currentRank = currentRanks[category];
+          if (previousRank !== currentRank) {
+            const cachedUpdate = usersToUpdate[user.userId] || {};
+            cachedUpdate[category] = currentRank;
+            usersToUpdate[user.userId] = cachedUpdate;
+          }
+        });
+        currentRanks[category] += currentStat.users.length;
+      }
+    });
+
+    const bulkUpdateOps = [];
+    const userIdsToUpdate = Object.keys(usersToUpdate);
+    const end = userIdsToUpdate.length;
+    let i = 0;
+    for (; i < end; i++) {
+      const currentUser = userIdsToUpdate[i];
+      const userId = Number(currentUser);
+      const op = {
+        updateOne: {
+          filter: { userId },
+          update: {
+            $set: {}
+          }
+        }
+      };
+      const userUpdates = usersToUpdate[currentUser];
+      Object.keys(currentRanks).forEach(category => {
+        const newRank = userUpdates[category];
+        if (newRank)
+          op.updateOne.update.$set[`${category}.rank`] = newRank;
+      });
+
+      bulkUpdateOps.push(op);
+
+    } // for loop
+
+    await tryCatch(scoreboard.bulkWrite(bulkUpdateOps));
     resolve();
   });
 }
