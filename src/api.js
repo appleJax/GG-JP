@@ -21,13 +21,8 @@ module.exports = (app) => {
     DB.getScores(req, res);
   });
 
-  app.get('/api/cards', (req, res) => {
-    DB.getCards(req, res);
-  });
-
-  // TODO - Delete this endpoint if not needed
-  app.get('/api/score/:handle', (req, res) => {
-    DB.getScore(req, res);
+  app.get('/api/userStats', (req, res) => {
+    DB.getUserStats(req, res);
   });
 
   app.get('/api/cards/old', (req, res) => {

@@ -143,19 +143,40 @@ module.exports = {
     // TODO adjust a score manually
   },
 
-  async getScores({ params }, res) {
+  async getScores({query: {page = 1, view = 'weeklyStats', search = ''}}, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const collection = mongo.db(DB).collection('scoreboard');
-    const page = params.page || 1;
-    const scoreView = (params.view || 'weeklyStats');
     const data = await tryCatch(
-      collection.find({[`${scoreView}.score`]: { $gt: 0 }})
-                .sort({[`${scoreView}.score`]: -1, handle: 1})
-                .limit(PAGE_SIZE*page)
-                .toArray()
+      collection.find({
+        handle: { $regex: search, $options: 'i' },
+        [`${view}.score`]: { $gt: 0 }
+      })
+      .sort({[`${view}.score`]: -1, handle: 1})
+      .limit(PAGE_SIZE*page)
+      .toArray()
     );
+    console.log('data:', data)
     res.json(data);
     mongo.close();
+  },
+
+  async getUserStats({ query: { handle } }, res) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+    const oldCards = mongo.db(DB).collection('oldCards');
+    const user = await tryCatch(scoreboard.findOne({handle}));
+
+    if (!user) {
+      res.json(null);
+      return;
+    }
+
+    const cardIds = user.allTimeStats.correct.map(record => record.cardId);
+    const earnedCards = await tryCatch(
+      getCards(cardIds, oldCards)
+    );
+    user.earnedCards = earnedCards;
+    res.json(user);
   },
 
   // TODO - delete this method if not needed
@@ -214,19 +235,19 @@ module.exports = {
     );
 
     mongo.close();
-  },
+  }
 
-  async getCards(req, res) {
-    const { ids } = req.query;
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const collection = mongo.db(DB).collection('oldCards');
+} // module.exports
+
+function getCards(ids, collection) {
+  return new Promise(async (resolve, reject) => {
     const data = await tryCatch(
       collection.find({cardId: {$in: ids}})
                 .project({_id: 0, mediaUrls: 1, questionText: 1, answers: 1})
                 .toArray()
     );
 
-    const cleanData = data.map(card => {
+    const cards = data.map(card => {
       card.questionText = card.questionText.split('\n')[0];
       const s = card.answers.length > 1 ? 's' : '';
       card.answers = `Answer${s}: ${card.answers.join(', ')}`;
@@ -238,12 +259,9 @@ module.exports = {
       return card;
     });
 
-    res.json(cleanData);
-    mongo.close();
-  }
-
-} // module.exports
-
+    resolve(cards);
+  });
+}
 
 async function getCollection(req, res, collectionName) {
   const mongo = await tryCatch(MongoClient.connect(url));
