@@ -149,8 +149,8 @@ module.exports = {
     const page = params.page || 1;
     const scoreView = (params.view || 'weeklyStats');
     const data = await tryCatch(
-      collection.find({`${scoreView}.score`: { $gt: 0 })
-                .sort({`${scoreView}.score`, -1, handle: 1})
+      collection.find({[`${scoreView}.score`]: { $gt: 0 }})
+                .sort({[`${scoreView}.score`]: -1, handle: 1})
                 .limit(PAGE_SIZE*page)
                 .toArray()
     );
@@ -262,10 +262,6 @@ function removeLiveQuestion(mongo, cardId) {
     const collection = mongo.db(DB).collection('liveQuestions');
     const currentQuestion = await tryCatch(collection.findOne({cardId}));
     await tryCatch(collection.remove(currentQuestion));
-
-    const oldCards = mongo.db(DB).collection('oldCards');
-    const answerPostedAt = new Date().getTime();
-    await tryCatch(oldCards.updateOne({cardId}, {$set: {answerPostedAt}}));
     await tryCatch(addPointsToScoreboard(mongo, currentQuestion));
     resolve();
   });
@@ -274,6 +270,9 @@ function removeLiveQuestion(mongo, cardId) {
 function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
   return new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
+    const oldCards = mongo.db(DB).collection('oldCards');
+    const answerPostedAt = new Date().getTime();
+    oldCards.updateOne({cardId}, {$set: {answerPostedAt}});
 
     const ops = [];
     for (let i = 0; i < cachedPoints.length; ++i) {

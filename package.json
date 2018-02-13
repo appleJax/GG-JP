@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.39",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.39",
     "@babel/preset-env": "^7.0.0-beta.39",
     "babel-core": "^7.0.0-0",
     "babel-jest": "^22.2.2",
@@ -43,6 +44,8 @@
       "^Utils(.*)$": "<rootDir>/src/utils$1"
     },
     "testEnvironment": "node",
-    "setupFiles": ["./testSetup.js"]
+    "setupFiles": [
+      "./testSetup.js"
+    ]
   }
 }
