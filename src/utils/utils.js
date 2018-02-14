@@ -73,6 +73,29 @@ module.exports = {
     return text.trim().slice(TWITTER_ACCOUNT.length + 2);
   },
 
+  calculateNewStats({
+    score,
+    average: {
+      n,
+      value: oldAverage
+    }
+  }) {
+
+    const newAverage = Math.floor(
+      (n*oldAverage + score) / (n + 1)
+    );
+
+    return {
+      score: 0,
+      attempts: 0,
+      correct: 0,
+      average: {
+        n: n + 1,
+        value: newAverage
+      }
+    };
+  },
+
   getTimeUntil(hour) {
     // https://stackoverflow.com/questions/4455282/call-a-javascript-function-at-a-specific-time-of-day
     const now = new Date();

@@ -36,7 +36,7 @@ function setStartTimes() {
   }, timeUntil7PM);
 
   setTimeout(() => {
-    setInterval(weeklyMonthlyReset, 24*HOURS);
+    setInterval(updateStats, 24*HOURS);
   }, timeUntilMidnight);
 }
 
@@ -142,19 +142,36 @@ function openStream() {
         profileBanner,
         following,
         allTimeStats: {
-          score: 0,
           attempts: 0,
-          correct: []
+          correct: [],
+          score: 0
         },
         monthlyStats: {
-          score: 0,
           attempts: 0,
-          correct: 0
+          correct: 0,
+          score: 0,
+          average: {
+            n: 0,
+            value: 0
+          }
         },
         weeklyStats: {
-          score: 0,
           attempts: 0,
-          correct: 0
+          correct: 0,
+          score: 0,
+          average: {
+            n: 0,
+            value: 0
+          }
+        },
+        dailyStats: {
+          attempts: 0,
+          correct: 0,
+          score: 0,
+          average: {
+            n: 0,
+            value: 0
+          }
         }
       };
       DB.addOrUpdateUser(newUser);
@@ -176,11 +193,11 @@ function openStream() {
   });
 }
 
-function weeklyMonthlyReset() {
+function updateStats() {
   const now = Date.now();
   const resetWeeklyStats = now.getDay() === 0;
   const resetMonthlyStats = now.getDate() === 1;
 
   if (resetWeeklyStats || resetMonthlyStats)
-    DB.weeklyMonthlyReset(resetWeeklyStats, resetMonthlyStats);
+    DB.updateStats(resetWeeklyStats, resetMonthlyStats);
 }

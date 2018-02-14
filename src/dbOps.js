@@ -2,7 +2,7 @@ const MongoClient = require('mongodb').MongoClient;
 const url = process.env.MONGODB_URI;
 const DB = process.env.MONGO_DB;
 const { processUpload } = require('./processAnkiJson');
-const { tryCatch } = require('Utils');
+const { calculateNewStats, tryCatch } = require('Utils');
 const PAGE_SIZE = 100;
 
 module.exports = {
@@ -214,26 +214,46 @@ module.exports = {
     getCollection(req, res, 'oldCards');
   },
 
-  async weeklyMonthlyReset(resetWeeklyStats, resetMonthlyStats) {
+  async updateStats(resetWeeklyStats, resetMonthlyStats) {
     const mongo = await tryCatch(MongoClient.connect(url));
-    const collection = mongo.db(DB).collection('scoreboard');
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+    const users = scoreboard.find().toArray();
+    const bulkUpdateOps = [];
 
-    const zero = {
-      score: 0,
-      attempts: 0,
-      correct: 0
-    };
-    const reset = { $set: {} };
-    if (resetWeeklyStats)
-      reset.$set.weeklyStats = zero;
+    let i = 0;
+    let end = users.length;
+    for (; i < end; i++) {
+      const user = users[i];
+      const { userId, dailyStats } = user;
+      const newDailyStats = calculateNewStats(dailyStats);
 
-    if (resetMonthlyStats)
-      reset.$set.monthlyStats = zero;
+      const op = {
+        updateOne: {
+          filter: { userId },
+          update: {
+            $set: {
+              'dailyStats': newDailyStats
+            }
+          }
+        }
+      };
 
-    collection.update(
-      {}, reset, { multi: true }
-    );
+      if (resetWeeklyStats) {
+        const { weeklyStats } = user;
+        const newWeeklyStats = calculateNewStats(weeklyStats);
+        op.updateOne.update.$set.weeklyStats = newWeeklyStats;
+      }
 
+      if (resetMonthlyStats) {
+        const { monthlyStats } = user;
+        const newMonthlyStats = calculateNewStats(monthlyStats);
+        op.updateOne.update.$set.monthlyStats = newMonthlyStats;
+      }
+
+      bulkUpdateOps.push(op);
+    }
+
+    await tryCatch(scoreboard.bulkWrite(bulkUpdateOps));
     mongo.close();
   }
 
@@ -303,9 +323,11 @@ function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
               'allTimeStats.score': points,
               'monthlyStats.score': points,
               'weeklyStats.score':  points,
+              'dailyStats.score':   points,
               'allTimeStats.attempts': 1,
               'monthlyStats.attempts': 1,
-              'weeklyStats.attempts':  1
+              'weeklyStats.attempts':  1,
+              'dailyStats.attempts':   1
             }
           }
         }
@@ -321,6 +343,7 @@ function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
 
         op.updateOne.update.$inc['monthlyStats.correct'] = 1;
         op.updateOne.update.$inc['weeklyStats.correct']  = 1;
+        op.updateOne.update.$inc['dailyStats.correct']  = 1;
       }
 
       ops.push(op);
