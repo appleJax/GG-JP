@@ -265,6 +265,11 @@ const dbOps = {
       bulkUpdateOps.push(op);
     }
 
+    if (bulkUpdateOps.length === 0) {
+      mongo.close();
+      return;
+    }
+
     await tryCatch(scoreboard.bulkWrite(bulkUpdateOps));
     mongo.close();
   }
@@ -469,6 +474,10 @@ function recalculateRank(scoreboard) {
 
     } // for loop
 
+    if (bulkUpdateOps.length === 0) {
+      resolve();
+      return;
+    }
     await tryCatch(scoreboard.bulkWrite(bulkUpdateOps));
     resolve();
   });

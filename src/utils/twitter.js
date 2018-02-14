@@ -46,23 +46,30 @@ export function retrieveAndCountMissedReplies(liveQuestions) {
       since_id: lastQuestionPosted
     };
 
+    let missedReplies = [];
     let nextResults;
     do {
       const {
-        data,
-        response,
         data: {
           statuses,
           search_metadata
         }
       } = await tryCatch(Twitter.get('search/tweets', params));
-      console.log('Twitter data:', data)
-      statuses.forEach(async (status) => {
-        await tryCatch(evaluateResponse(status, liveQuestions))
-      });
-      params.max_id_str = statuses[statuses.length - 1].id_str;
+
+      missedReplies = missedReplies.concat(statuses);
       nextResults = search_metadata.next_results;
+
+      if (nextResults)
+        params.max_id = nextResults.match(/max_id=(\d+)/)[1]
+
     } while (nextResults)
+
+    let reply;
+    let i = missedReplies.length - 1;
+    for (; i >= 0; i--) {
+      reply = missedReplies[i];
+      await tryCatch(evaluateResponse(reply, liveQuestions));
+    }
 
     resolve();
   });

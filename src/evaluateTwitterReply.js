@@ -20,13 +20,9 @@ export function evaluateResponse({
     profile_image_url_https: avatar,
     profile_banner_url: profileBanner
   }
-},
-liveQuestions
-) {
+}) {
   return new Promise(async (resolve, reject) => {
-    if (!liveQuestions)
-      liveQuestions = await tryCatch(DB.getLiveQuestions());
-
+    const liveQuestions = await tryCatch(DB.getLiveQuestions());
     const foundQuestion = liveQuestions.find(
       questionCard => questionCard.questionId === questionId
     );
@@ -36,8 +32,10 @@ liveQuestions
         alreadyAnswered,
         answers: acceptedAnswers
       } = foundQuestion;
-      if (contains(userId, alreadyAnswered))
+      if (contains(userId, alreadyAnswered)) {
+        resolve();
         return;
+      }
 
       const following = await tryCatch(getFollowing(userId));
       const newUser = {
