@@ -2,10 +2,11 @@ const MongoClient = require('mongodb').MongoClient;
 const url = process.env.MONGODB_URI;
 const DB = process.env.MONGO_DB;
 const { processUpload } = require('./processAnkiJson');
-const { calculateNewStats, tryCatch } = require('Utils');
+const { calculateNewStats, tryCatch } = require('Utils/utils');
 const PAGE_SIZE = 100;
 
 module.exports = {
+
   getRandomQuestion() {
     return new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
@@ -74,22 +75,25 @@ module.exports = {
     mongo.close();
   },
 
-  async updateLiveQuestion(questionId, userPoints) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const liveQuestions = mongo.db(DB).collection('liveQuestions');
-    const { userId } = userPoints;
+  updateLiveQuestion(questionId, userPoints) {
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const liveQuestions = mongo.db(DB).collection('liveQuestions');
+      const { userId } = userPoints;
 
-    await tryCatch(
-      liveQuestions.update(
-        { questionId }, {
-          $push: {
-            alreadyAnswered: userId,
-            cachedPoints: userPoints
+      await tryCatch(
+        liveQuestions.update(
+          { questionId }, {
+            $push: {
+              alreadyAnswered: userId,
+              cachedPoints: userPoints
+            }
           }
-        }
-      )
-    );
-    mongo.close();
+        )
+      );
+      mongo.close();
+      resolve();
+    });
   },
 
   getLiveQuestions() {
@@ -110,44 +114,47 @@ module.exports = {
     mongo.close();
   },
 
-  async addOrUpdateUser(newUser) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-    const { userId } = newUser;
-    const user = await tryCatch(scoreboard.findOne({userId}));
-    if (user) {
-      const {
-        name,
-        handle,
-        avatar,
-        profileBanner,
-        following
-      } = newUser;
+  addOrUpdateUser(newUser) {
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const scoreboard = mongo.db(DB).collection('scoreboard');
+      const { userId } = newUser;
+      const user = await tryCatch(scoreboard.findOne({userId}));
+      if (user) {
+        const {
+          name,
+          handle,
+          avatar,
+          profileBanner,
+          following
+        } = newUser;
 
-      await tryCatch(
-        scoreboard.updateOne({ userId }, {
-            $set: { name },
-            $set: { handle },
-            $set: { avatar },
-            $set: { profileBanner },
-            $set: { following }
-        })
-      );
-    } else {
-      await tryCatch(scoreboard.insert(newUser));
-    }
-    mongo.close();
+        await tryCatch(
+          scoreboard.updateOne({ userId }, {
+              $set: { name },
+              $set: { handle },
+              $set: { avatar },
+              $set: { profileBanner },
+              $set: { following }
+          })
+        );
+      } else {
+        await tryCatch(scoreboard.insert(newUser));
+      }
+      mongo.close();
+      resolve();
+    });
   },
 
   adjustScore(req, res) {
     // TODO adjust a score manually
   },
 
-  async getScores({query: {page = 1, view = 'weeklyStats', search = ''}}, res) {
+  async getScores({query: { page = 1, view = 'weeklyStats', search = ''} }, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
-    const collection = mongo.db(DB).collection('scoreboard');
-    const data = await tryCatch(
-      collection.find({
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+    const users = await tryCatch(
+      scoreboard.find({
         handle: { $regex: search, $options: 'i' },
         [`${view}.score`]: { $gt: 0 }
       })
@@ -155,8 +162,12 @@ module.exports = {
       .limit(PAGE_SIZE*page)
       .toArray()
     );
-    console.log('data:', data)
-    res.json(data);
+    if (users.length === 0) {
+      res.json(null);
+      mongo.close();
+      return;
+    }
+    res.json(users);
     mongo.close();
   },
 
@@ -168,6 +179,7 @@ module.exports = {
 
     if (!user) {
       res.json(null);
+      mongo.close();
       return;
     }
 
@@ -177,14 +189,15 @@ module.exports = {
     );
     user.earnedCards = earnedCards;
     res.json(user);
+    mongo.close();
   },
 
   // TODO - delete this method if not needed
   async getScore(req, res) {
     const { handle } = req.params;
     const mongo = await tryCatch(MongoClient.connect(url));
-    const collection = mongo.db(DB).collection('scoreboard');
-    const user = await tryCatch(collection.findOne({handle}));
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+    const user = await tryCatch(scoreboard.findOne({handle}));
     res.json(user);
     mongo.close();
   },

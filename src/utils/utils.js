@@ -99,7 +99,7 @@ module.exports = {
   getTimeUntil(hour) {
     // https://stackoverflow.com/questions/4455282/call-a-javascript-function-at-a-specific-time-of-day
     const now = new Date();
-    const millisUntilTime = new Date(
+    let millisUntilTime = new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate(),

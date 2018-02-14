@@ -3,41 +3,61 @@ const {
   HOURS,
   addQuestionLink,
   calculateScore,
-  contains,
-  extractAnswer,
-  getFollowing,
   getTimeUntil,
   postMedia,
+  retrieveAndCountMissedReplies,
   tryCatch
 } = require('Utils');
+const { evaluateResponse } = require('./evaluateTwitterReply');
 const Twitter = require('./twitterConfig');
 const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 40000;
-let QUESTION_INTERVAL = 10000;
+let QUESTION_INTERVAL = 120000;
 
 module.exports = {
-  start: () => {
-    openStream();
-    setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
-  }
   // start: () => {
   //   openStream();
-  //   setStartTimes();
+  //   setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
   // }
+  start: () => {
+    console.log('TwitterBot DB', DB);
+    openStream();
+    scheduleActions();
+  }
 };
 
-function setStartTimes() {
-  const timeUntil7PM = getTimeUntil(19);
+async function scheduleActions() {
+  const liveQuestions = await tryCatch(DB.getLiveQuestions());
+  if (liveQuestions.length > 0) {
+    await retrieveAndCountMissedReplies(liveQuestions);
+    tweetOrScheduleAnswers(liveQuestions);
+  }
+
+  const timeUntil8PM = getTimeUntil(20);
   const timeUntilMidnight = getTimeUntil(0);
 
   setTimeout(() => {
     setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
-  }, timeUntil7PM);
+  }, timeUntil8PM);
 
   setTimeout(() => {
     setInterval(updateStats, 24*HOURS);
   }, timeUntilMidnight);
+}
+
+function tweetOrScheduleAnswers(liveQuestions) {
+  liveQuestions.forEach(({ cardId, questionId, questionPostedAt }) => {
+    const scheduledAnswerTime = new Date(questionPostedAt).getTime() + 24*HOURS;
+    const now = new Date().getTime();
+
+    if (scheduledAnswerTime < now) {
+      tweetAnswer(cardId, questionId);
+    } else {
+      const after24Hours = scheduledAnswerTime - now;
+      setTimeout(() => tweetAnswer(cardId, questionId), after24Hours);
+    }
+  });
 }
 
 async function tweetRandomQuestion() {
@@ -106,86 +126,11 @@ async function tweetAnswer(cardId, questionId) {
 }
 
 function openStream() {
-  const stream = Twitter.stream('statuses/filter', { track: `@${TWITTER_ACCOUNT}` });
-
-  stream.on('tweet', async ({
-    in_reply_to_status_id_str: questionId,
-    created_at: answerPostedAt,
-    text,
-    user: {
-      id: userId,
-      name,
-      screen_name: handle,
-      profile_image_url_https: avatar,
-      profile_banner_url: profileBanner
-    }
-  }) => {
-    const liveQuestions = await tryCatch(DB.getLiveQuestions());
-    const foundQuestion = liveQuestions.find(
-      questionCard => questionCard.questionId === questionId
-    );
-
-    if (foundQuestion) {
-      const {
-        alreadyAnswered,
-        answers: acceptedAnswers
-      } = foundQuestion;
-      if (contains(userId, alreadyAnswered))
-        return;
-
-      const following = await tryCatch(getFollowing(userId));
-      const newUser = {
-        userId,
-        name,
-        handle,
-        avatar,
-        profileBanner,
-        following,
-        allTimeStats: {
-          attempts: 0,
-          correct: [],
-          score: 0
-        },
-        monthlyStats: {
-          attempts: 0,
-          correct: 0,
-          score: 0,
-          average: {
-            n: 0,
-            value: 0
-          }
-        },
-        weeklyStats: {
-          attempts: 0,
-          correct: 0,
-          score: 0,
-          average: {
-            n: 0,
-            value: 0
-          }
-        },
-        dailyStats: {
-          attempts: 0,
-          correct: 0,
-          score: 0,
-          average: {
-            n: 0,
-            value: 0
-          }
-        }
-      };
-      DB.addOrUpdateUser(newUser);
-
-      const userAnswer = extractAnswer(text);
-      if (contains(userAnswer, acceptedAnswers)) {
-        const points = calculateScore(answerPostedAt, foundQuestion);
-        DB.updateLiveQuestion(questionId, { userId, points });
-
-      } else {
-        DB.updateLiveQuestion(questionId, { userId, points: 0 });
-      }
-    }
-  });
+  const stream = Twitter.stream(
+    'statuses/filter',
+    { track: `@${TWITTER_ACCOUNT}` }
+  );
+  stream.on('tweet', evaluateResponse);
 
   stream.on('disconnect', (disconnectMsg) => {
     console.error('Tweet stream disconnected:', disconnectMsg);
