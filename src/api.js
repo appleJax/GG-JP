@@ -1,7 +1,8 @@
-const DB = require('./dbOps');
-const upload = require('multer')({ dest: 'uploads/' });
+import DB from './dbOps';
+import multer from 'multer';
+const upload = multer({ dest: 'uploads/' });
 
-module.exports = (app) => {
+export default (app) => {
 
   // CORS
   app.use((req, res, next) => {
@@ -44,4 +45,4 @@ module.exports = (app) => {
     DB.getNewCards(req, res);
   });
 
-} // module.exports
+}

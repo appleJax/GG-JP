@@ -1,16 +1,15 @@
-const DB = require('./dbOps');
+import DB from './dbOps';
 const { TWITTER_ACCOUNT } = process.env;
-const {
+import {
   calculateScore,
   contains,
   extractAnswer,
-  getFollowing,
   tryCatch
-} = require('Utils');
+} from 'Utils';
+import { getFollowing } from 'Utils/twitter'
 
 
-module.exports = {
-  evaluateResponse({
+export function evaluateResponse({
   in_reply_to_status_id_str: questionId,
   created_at: answerPostedAt,
   text,
@@ -25,7 +24,6 @@ module.exports = {
 liveQuestions
 ) {
   return new Promise(async (resolve, reject) => {
-    console.log('DB', DB);
     if (!liveQuestions)
       liveQuestions = await tryCatch(DB.getLiveQuestions());
 
@@ -95,5 +93,4 @@ liveQuestions
     }
     resolve();
   });
-}
 }

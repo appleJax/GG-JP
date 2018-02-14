@@ -1,4 +1,4 @@
-const twit = require('twit');
+import twit from 'twit';
 const {
   TWITTER_API_KEY,
   TWITTER_API_SECRET,
@@ -20,4 +20,6 @@ const userConfig = {
   access_token_secret: TWITTER_TOKEN_SECRET
 };
 
-module.exports = new twit(userConfig);
+const twitObject = new twit(userConfig);
+
+export default twitObject;

@@ -1,25 +1,19 @@
-const fs = require('fs');
-const PNG = require('pngjs2').PNG;
-const path = require('path');
-const unzip = require('unzip-stream');
-const UPLOADS_PATH = path.resolve(__dirname, '../uploads');
-const {
+import fs from 'fs';
+import { PNG } from 'pngjs2';
+import path from 'path';
+import unzip from 'unzip-stream';
+import {
   formatQuestionAltText,
   formatQuestionText,
   formatAnswerAltText,
   formatAnswerText,
   getAnswers,
   tryCatch
-} = require('Utils');
+} from 'Utils';
+const UPLOADS_PATH = path.resolve(__dirname, '../uploads');
 
 
-module.exports = {
-  processUpload,
-  parseAnkiJson,
-  optimizeImages
-}
-
-function processUpload(zipfilePath) {
+export function processUpload(zipfilePath) {
   return new Promise(async (resolve, reject) => {
     const stream = fs.createReadStream(zipfilePath)
       .pipe(unzip.Extract({ path: 'uploads' }));
@@ -36,7 +30,7 @@ function processUpload(zipfilePath) {
   });
 }
 
-function optimizeImages(dirPath) {
+export function optimizeImages(dirPath) {
   return new Promise((resolve, reject) => {
     const filesProcessing = [];
     fs.readdirSync(dirPath).forEach(file => {
@@ -62,21 +56,7 @@ function optimizeImages(dirPath) {
   });
 }
 
-function extractCardInfo(files) {
-  let allNewCards = [];
-  for (let file of files) {
-    const currentFile = `${UPLOADS_PATH}/${file}`;
-    const stats = fs.statSync(currentFile);
-
-    if (stats.isFile() && file.match(/.+\.json$/)) {
-      const newCards = parseAnkiJson(currentFile);
-      allNewCards = allNewCards.concat(newCards);
-    }
-  }
-  return allNewCards;
-}
-
-function parseAnkiJson(filePath) {
+export function parseAnkiJson(filePath) {
   const contents = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   return contents.notes.map(card => {
     let [
@@ -114,6 +94,23 @@ function parseAnkiJson(filePath) {
       mediaUrls: []
     };
   });
+}
+
+
+// private functions
+
+function extractCardInfo(files) {
+  let allNewCards = [];
+  for (let file of files) {
+    const currentFile = `${UPLOADS_PATH}/${file}`;
+    const stats = fs.statSync(currentFile);
+
+    if (stats.isFile() && file.match(/.+\.json$/)) {
+      const newCards = parseAnkiJson(currentFile);
+      allNewCards = allNewCards.concat(newCards);
+    }
+  }
+  return allNewCards;
 }
 
 function stripHtml(string) {

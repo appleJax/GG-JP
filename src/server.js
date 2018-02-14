@@ -1,17 +1,15 @@
-if (process.env.NODE_ENV == 'dev')
-  require('dotenv').config();
-
-const express = require('express');
+import express from 'express';
 const app = express();
-const path = require('path');
-const bodyParser = require('body-parser');
-const twitterBot = require('./twitterBot');
+import path from 'path';
+import bodyParser from 'body-parser';
+import twitterBot from './twitterBot';
+import route from './api';
 
 app.set('port', (process.env.PORT || 3000));
 app.use(express.static(path.resolve(__dirname, '../dist')));
 app.use(bodyParser.json());
 
-require('./api')(app);
+route(app);
 
 twitterBot.start();
 

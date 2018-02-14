@@ -1,12 +1,11 @@
-const MongoClient = require('mongodb').MongoClient;
+import { MongoClient } from 'mongodb';
 const url = process.env.MONGODB_URI;
 const DB = process.env.MONGO_DB;
-const { processUpload } = require('./processAnkiJson');
-const { calculateNewStats, tryCatch } = require('Utils/utils');
+import { processUpload } from './processAnkiJson';
+import { calculateNewStats, tryCatch } from 'Utils';
 const PAGE_SIZE = 100;
 
-module.exports = {
-
+const dbOps = {
   getRandomQuestion() {
     return new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
@@ -270,7 +269,8 @@ module.exports = {
     mongo.close();
   }
 
-} // module.exports
+} // dbOps
+
 
 function getCards(ids, collection) {
   return new Promise(async (resolve, reject) => {
@@ -473,3 +473,5 @@ function recalculateRank(scoreboard) {
     resolve();
   });
 }
+
+export default dbOps;

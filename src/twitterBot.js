@@ -1,27 +1,28 @@
-const DB = require('./dbOps');
-const {
+import DB from './dbOps';
+import {
   HOURS,
   addQuestionLink,
   calculateScore,
   getTimeUntil,
-  postMedia,
-  retrieveAndCountMissedReplies,
   tryCatch
-} = require('Utils');
-const { evaluateResponse } = require('./evaluateTwitterReply');
-const Twitter = require('./twitterConfig');
+} from 'Utils';
+import {
+  postMedia,
+  retrieveAndCountMissedReplies
+} from 'Utils/twitter';
+import { evaluateResponse } from './evaluateTwitterReply';
+import Twitter from './twitterConfig';
 const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 40000;
 let QUESTION_INTERVAL = 120000;
 
-module.exports = {
+const twitterBot = {
   // start: () => {
   //   openStream();
   //   setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
   // }
   start: () => {
-    console.log('TwitterBot DB', DB);
     openStream();
     scheduleActions();
   }
@@ -146,3 +147,5 @@ function updateStats() {
   if (resetWeeklyStats || resetMonthlyStats)
     DB.updateStats(resetWeeklyStats, resetMonthlyStats);
 }
+
+export default twitterBot;
