@@ -191,6 +191,16 @@ const dbOps = {
     mongo.close();
   },
 
+  async getEarnedCards({ query: { ids } }, res) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const oldCards = mongo.db(DB).collection('oldCards');
+    const earnedCards = await tryCatch(
+      getCards(ids, oldCards)
+    );
+    res.json(earnedCards);
+    mongo.close();
+  },
+
   // TODO - delete this method if not needed
   async getScore(req, res) {
     const { handle } = req.params;
@@ -276,6 +286,8 @@ const dbOps = {
 
 } // dbOps
 
+
+// private functions
 
 function getCards(ids, collection) {
   return new Promise(async (resolve, reject) => {

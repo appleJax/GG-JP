@@ -26,6 +26,10 @@ export default (app) => {
     DB.getUserStats(req, res);
   });
 
+  app.get('/api/cards/earned', (req, res) => {
+    DB.getEarnedCards(req, res);
+  });
+
   app.get('/api/cards/old', (req, res) => {
     DB.getOldCards(req, res);
   });
