@@ -15,9 +15,9 @@ import Twitter from './twitterConfig';
 const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;
-let QUESTION_INTERVAL = 6*HOURS;
+const QUESTION_INTERVAL = 6*HOURS;
 
-const twitterBot = {
+export default ({
   // start: () => {
   //   openStream();
   //   setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
@@ -26,18 +26,22 @@ const twitterBot = {
     openStream();
     scheduleActions();
   }
-};
+});
 
 async function scheduleActions() {
+  console.log('Scheduling Actions...');
   const liveQuestions = await tryCatch(DB.getLiveQuestions());
   if (liveQuestions.length > 0) {
     await retrieveAndCountMissedReplies(liveQuestions);
     tweetOrScheduleAnswers(liveQuestions);
   }
 
-  const timeUntil8PM = getTimeUntil(20);
+  // TODO - Change this to 20
+  const timeUntil8PM = getTimeUntil(15);
   const timeUntilMidnight = getTimeUntil(0);
 
+  console.log('TimeUntil8PM:', timeUntil8PM);
+  console.log('timeUntilMidnight:', timeUntilMidnight);
   setTimeout(() => {
     tweetRandomQuestion();
     setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
@@ -149,5 +153,3 @@ function updateStats() {
   if (resetWeeklyStats || resetMonthlyStats)
     DB.updateStats(resetWeeklyStats, resetMonthlyStats);
 }
-
-export default twitterBot;

@@ -109,7 +109,11 @@ const dbOps = {
     const mongo = await tryCatch(MongoClient.connect(url));
     const collection = mongo.db(DB).collection('liveQuestions');
     const liveQuestions = await tryCatch(collection.find().toArray());
-    res.json(liveQuestions);
+    if (liveQuestions.length === 0)
+      res.json(null)
+    else
+      res.json(liveQuestions);
+
     mongo.close();
   },
 
