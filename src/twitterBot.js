@@ -39,10 +39,12 @@ async function scheduleActions() {
   const timeUntilMidnight = getTimeUntil(0);
 
   setTimeout(() => {
+    tweetRandomQuestion();
     setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
   }, timeUntil8PM);
 
   setTimeout(() => {
+    updateStats();
     setInterval(updateStats, 24*HOURS);
   }, timeUntilMidnight);
 }

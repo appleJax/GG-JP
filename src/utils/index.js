@@ -93,7 +93,6 @@ export function calculateNewStats({
 }
 
 export function getTimeUntil(hour) {
-  // https://stackoverflow.com/questions/4455282/call-a-javascript-function-at-a-specific-time-of-day
   hour = (hour + 6) % 24;
   const now = new Date();
   const utcNow = now.getTime();
