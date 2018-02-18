@@ -14,18 +14,18 @@ import { evaluateResponse } from './evaluateTwitterReply';
 import Twitter from './twitterConfig';
 const { TWITTER_ACCOUNT } = process.env;
 
-const ANSWER_INTERVAL = 40000;
-let QUESTION_INTERVAL = 10000;
+const ANSWER_INTERVAL = 24*HOURS;
+let QUESTION_INTERVAL = 6*HOURS;
 
 const twitterBot = {
-  start: () => {
-    openStream();
-    setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
-  }
   // start: () => {
   //   openStream();
-  //   scheduleActions();
+  //   setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
   // }
+  start: () => {
+    openStream();
+    scheduleActions();
+  }
 };
 
 async function scheduleActions() {

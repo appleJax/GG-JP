@@ -94,12 +94,14 @@ export function calculateNewStats({
 
 export function getTimeUntil(hour) {
   // https://stackoverflow.com/questions/4455282/call-a-javascript-function-at-a-specific-time-of-day
+  hour = (hour + 6) % 24;
   const now = new Date();
-  let millisUntilTime = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    hour, 0, 0, 0) - now;
+  const utcNow = now.getTime();
+  let millisUntilTime = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    hour, 0, 0, 0) - utcNow;
 
   if (millisUntilTime < 0) // already passed for today, wait until tomorrow
     millisUntilTime += 24*HOURS;
@@ -171,8 +173,8 @@ function formatHint(expression) {
       return '(' + result.join(' ') + ')'
     }
 
-    if (/≠/.test(group)) {
-      const negatedChars = group.replace(/≠/g, '');
+    if (/[≠x]/.test(group)) {
+      const negatedChars = group.replace(/[≠x]/g, '');
       return `[≠${negatedChars}]`
     }
     // else (character gimme)
@@ -185,17 +187,17 @@ function groupQuestionMarks(string) {
 }
 
 function groupXs(string) {
-  return string.replace(/≠[^(]/g, '($&)');
+  return string.replace(/[≠x][^(]/g, '($&)');
 }
 
 function groupMultiXs(string) {
-  return string.replace(/≠\((.*)\)/g, '(≠$1)')
+  return string.replace(/[≠x]\((.*)\)/g, '(≠$1)')
 }
 
 function split(str) {
   return str.split(/[\(\)]/)
             .map(group =>
-              /\?|≠/.test(group)
+              /\?|≠|x/.test(group)
               ? group
               : group.split('')
             );

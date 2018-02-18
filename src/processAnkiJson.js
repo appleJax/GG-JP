@@ -131,7 +131,8 @@ function getBase64(string) {
       { encoding: 'base64' }
     );
   } catch (e) {
-    // returning undefined...
+    console.error(e);
+    // return undefined...
   }
   return base64;
 }

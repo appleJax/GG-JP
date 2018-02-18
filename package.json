@@ -2,7 +2,6 @@
   "name": "GameGogakuenJP",
   "version": "1.0.0",
   "description": "Videogame Translation Contest - Twitter Bot",
-  "main": "src/server.js",
   "scripts": {
     "build": "webpack --config webpack.dev.js",
     "deploy": "webpack --config webpack.prod.js",
