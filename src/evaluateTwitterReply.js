@@ -22,6 +22,7 @@ export function evaluateResponse({
   }
 }) {
   return new Promise(async (resolve, reject) => {
+    console.log('Received a reply!!!');
     const liveQuestions = await tryCatch(DB.getLiveQuestions());
     const foundQuestion = liveQuestions.find(
       questionCard => questionCard.questionId === questionId
