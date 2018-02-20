@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 route(app);
 
-//twitterBot.start();
+twitterBot.start();
 
 app.listen(app.get('port'), () =>
   console.log('Listening on port', app.get('port'))

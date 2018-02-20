@@ -29,7 +29,6 @@ export default ({
 });
 
 async function scheduleActions() {
-  console.log('Scheduling Actions...');
   const liveQuestions = await tryCatch(DB.getLiveQuestions());
   if (liveQuestions.length > 0) {
     await retrieveAndCountMissedReplies(liveQuestions);
@@ -37,7 +36,7 @@ async function scheduleActions() {
   }
 
   // TODO - Change this to 20
-  const timeUntil8PM = getTimeUntil(15);
+  const timeUntil8PM = getTimeUntil(8);
   const timeUntilMidnight = getTimeUntil(0);
 
   console.log('TimeUntil8PM:', timeUntil8PM);
@@ -146,9 +145,9 @@ function openStream() {
 }
 
 function updateStats() {
-  const now = Date.now();
-  const resetWeeklyStats = now.getDay() === 0;
-  const resetMonthlyStats = now.getDate() === 1;
+  const now = new Date();
+  const resetWeeklyStats = now.getUTCDay() === 0;
+  const resetMonthlyStats = now.getUTCDate() === 1;
 
   if (resetWeeklyStats || resetMonthlyStats)
     DB.updateStats(resetWeeklyStats, resetMonthlyStats);
