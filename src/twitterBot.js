@@ -75,9 +75,9 @@ async function tweetRandomQuestion() {
   if (!cardId) return;
 
   const {
-    questionId,
-    questionPostedAt,
-    mediaUrls
+    mediaUrls,
+    postedAt: questionPostedAt,
+    tweetId:  questionId
   } = await tryCatch(
     postMedia(
       questionText,
@@ -116,7 +116,11 @@ async function tweetAnswer(cardId, questionId) {
     DB.revealAnswerWorkflow(cardId)
   );
 
-  const { mediaUrls } = await tryCatch(
+  const {
+    mediaUrls,
+    postedAt: answerPostedAt,
+    tweetId:  answerId
+  } = await tryCatch(
     // Tweet the answer
     postMedia(
       addLinks(answerText, questionId),
@@ -129,7 +133,7 @@ async function tweetAnswer(cardId, questionId) {
   // - adds mediaUrl to card
   // - removes base64 image from card
   // - adds answerCard to recentAnswers collection
-  DB.processAnswerCard(cardId, mediaUrls);
+  DB.processAnswerCard(answerId, answerPostedAt, cardId, mediaUrls[0]);
 }
 
 function openStream() {

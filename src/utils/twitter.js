@@ -38,8 +38,8 @@ export function postMedia(status, b64Image1, altText1, b64Image2, altText2) {
         })
       );
       const result = {
-        questionId:       data.id_str,
-        questionPostedAt: data.created_at,
+        tweetId:  data.id_str,
+        postedAt: data.created_at,
         mediaUrls
       };
       resolve(result);

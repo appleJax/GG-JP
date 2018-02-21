@@ -198,13 +198,14 @@ export default ({
     mongo.close();
   },
 
-  async processAnswerCard(cardId, [mediaUrl]) {
+  async processAnswerCard(answerId, answerPostedAt, cardId, mediaUrl) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const oldCards = mongo.db(DB).collection('oldCards');
     const cardReference = await tryCatch(
       oldCards.findOneAndUpdate(
         { cardId },
-        { $push: { mediaUrls: mediaUrl },
+        { $push:  { mediaUrls: mediaUrl },
+          $set:   { answerId, answerPostedAt },
           $unset: { answerImg: '', answerAltText: '' }
         },
         { projection: {
@@ -339,7 +340,13 @@ function getCards(ids, collection) {
   return new Promise(async (resolve, reject) => {
     const data = await tryCatch(
       collection.find({cardId: {$in: ids}})
-                .project({_id: 0, mediaUrls: 1, questionText: 1, answers: 1})
+                .project({
+                  _id: 0,
+                  answerId: 1,
+                  answers: 1,
+                  mediaUrls: 1,
+                  questionText: 1,
+                })
                 .toArray()
     );
 
@@ -384,9 +391,6 @@ function removeLiveQuestion(mongo, cardId) {
 function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
   return new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
-    const oldCards = mongo.db(DB).collection('oldCards');
-    const answerPostedAt = new Date().getTime();
-    oldCards.updateOne({cardId}, {$set: {answerPostedAt}});
 
     const ops = [];
     for (let i = 0; i < cachedPoints.length; ++i) {
