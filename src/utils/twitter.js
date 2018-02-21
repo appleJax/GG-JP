@@ -3,6 +3,16 @@ import Twitter from '../twitterConfig';
 import { tryCatch } from 'Utils';
 import { evaluateResponse } from '../evaluateTwitterReply';
 
+
+export function getFollowing(userId) {
+  return new Promise((resolve, reject) => {
+    Twitter.get('friends/ids', { userId }, (err, data, response) => {
+      if (err) console.error(err);
+      resolve(data.ids);
+    });
+  });
+}
+
   //
   // post a tweet with media
   //
@@ -75,17 +85,16 @@ export function retrieveAndCountMissedReplies(liveQuestions) {
   });
 }
 
-export function getFollowing(userId) {
-  return new Promise((resolve, reject) => {
-    Twitter.get('friends/ids', { userId }, (err, data, response) => {
-      if (err) console.error(err);
-      resolve(data.ids);
-    });
-  });
-}
-
 
 // private functions
+
+function getLastQuestionPosted(liveQuestions) {
+  return liveQuestions.reduce((maxId, card) =>
+    (card.questionId > maxId)
+      ? card.questionId
+      : maxId
+  , 0);
+}
 
 // EFFECTS:
 // uploads a single image with altText to Twitter
@@ -118,12 +127,4 @@ function uploadMedia(b64Image, altText) {
       });
     });
   });
-}
-
-function getLastQuestionPosted(liveQuestions) {
-  return liveQuestions.reduce((maxId, card) =>
-    (card.questionId > maxId)
-      ? card.questionId
-      : maxId
-  , 0);
 }

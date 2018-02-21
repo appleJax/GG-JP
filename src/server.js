@@ -9,7 +9,7 @@ app.use(express.static(path.resolve(__dirname, '../dist')));
 
 route(app);
 
-//twitterBot.start();
+twitterBot.start();
 
 const PORT = app.get('port');
 app.listen(PORT, () =>
