@@ -134,8 +134,13 @@ export default ({
   async getRecentAnswers(req, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const recentAnswers = mongo.db(DB).collection('recentAnswers');
-    const cardIds = recentAnswers.find().toArray().map(card => card.cardId);
-    const answerCards = await tryCatch(getCards(cardIds));
+    const oldCards = mongo.db(DB).collection('oldCards');
+    const cardIds = await tryCatch(
+      recentAnswers.find()
+                   .toArray()
+                   .then(cards => cards.map(card => card.cardId))
+    );
+    const answerCards = await tryCatch(getCards(cardIds, oldCards));
     answerCards.sort((a, b) => b.answerPostedAt - a.answerPostedAt);
     res.json(answerCards);
     mongo.close();
@@ -262,7 +267,7 @@ export default ({
   async updateStats(resetWeeklyStats, resetMonthlyStats) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
-    const users = scoreboard.find().toArray();
+    const users = await tryCatch(scoreboard.find().toArray());
     const bulkUpdateOps = [];
 
     let i = 0;

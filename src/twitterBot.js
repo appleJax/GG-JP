@@ -147,9 +147,7 @@ function openStream() {
 
 function updateStats() {
   const now = new Date();
-  const resetWeeklyStats = now.getUTCDay() === 0;
+  const resetWeeklyStats  = now.getUTCDay()  === 0;
   const resetMonthlyStats = now.getUTCDate() === 1;
-
-  if (resetWeeklyStats || resetMonthlyStats)
-    DB.updateStats(resetWeeklyStats, resetMonthlyStats);
+  DB.updateStats(resetWeeklyStats, resetMonthlyStats);
 }

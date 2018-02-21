@@ -4,70 +4,12 @@ const { TWITTER_ACCOUNT, LEADERBOARD } = process.env;
 
 export const HOURS = 3600000;
 
-export function formatQuestionAltText(expression) {
-  const hint = formatHint(expression);
-  const [min, max] = minMaxChars(hint);
-  const minMax = min === max ? min : `${min} to ${max}`;
-  const s = max > 1 ? 's' : '';
-  const screenReaderHint = `(${minMax} character${s})`;
-  return expression.replace(/\{\{.+?\}\}/g, screenReaderHint);
-}
-
-export function formatQuestionText(expression, engMeaning, notes, cardID) {
-  const hint = formatHint(expression);
-  const [min, max] = minMaxChars(hint);
-  const minMax = min === max ? min : `${min}-${max}`;
-  let tweetText = `What ${minMax} character answer means "${engMeaning}"?`;
-  if (needsHint(hint))
-    tweetText += `\nHint: ${hint}`;
-
-  if (notes) tweetText += `\nNotes: ${notes}`;
-
-  tweetText += `\nQID${cardID}`;
-  return tweetText;
-}
-
-export function formatAnswerAltText(expression) {
-  return expression.replace(/\{\{.*?\:\:(.+?)\:\:.*?\}\}/g, '$1');
-}
-
-export function formatAnswerText(answers, engMeaning, webLookup, cardId) {
-  const s = answers.length > 1 ? 's' : '';
-  let answerText = `Answer${s}: ${answers.join(', ')}`;
-  answerText += `\nEnglish Meaning: "${engMeaning}"`;
-  answerText += '\nDefinition: ' + WEBLOOKUP_URL + urlencode(webLookup);
-  answerText += `\nQID${cardId}`;
-  return answerText;
-}
-
 export function addLinks(answerText, questionId) {
   const questionLink = `Question: twitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
   const lines = answerText.split('\n');
   lines.splice(-1, 0, questionLink);
   lines.splice(-1, 0, `Leaderboard: ${LEADERBOARD}`);
   return lines.join('\n');
-}
-
-export function getAnswers(expression, altAnswers) {
-  const acceptedAnswer = expression.match(/\:\:(.+?)\:\:/)[1];
-  let otherAnswers = [];
-  if (altAnswers && altAnswers.length > 0)
-    otherAnswers = altAnswers.split(',');
-
-  return [acceptedAnswer].concat(otherAnswers);
-}
-
-export function calculateScore(answerPostedAt, {questionPostedAt, alreadyAnswered}) {
-  const timeToAnswer = Math.floor(
-    (new Date(answerPostedAt) - new Date(questionPostedAt)) / HOURS
-  );
-  const score = 24 - timeToAnswer;
-
-  return Math.max(score, 0);
-}
-
-export function extractAnswer(text) {
-  return text.trim().slice(TWITTER_ACCOUNT.length + 2);
 }
 
 export function calculateNewStats({
@@ -91,6 +33,68 @@ export function calculateNewStats({
       value: newAverage
     }
   };
+}
+
+export function calculateScore(answerPostedAt, {questionPostedAt, alreadyAnswered}) {
+  const timeToAnswer = Math.floor(
+    (new Date(answerPostedAt) - new Date(questionPostedAt)) / HOURS
+  );
+  const score = 24 - timeToAnswer;
+
+  return Math.max(score, 0);
+}
+
+export function contains(item, list) {
+  return valid(list.indexOf(item));
+}
+
+export function extractAnswer(text) {
+  return text.trim().slice(TWITTER_ACCOUNT.length + 2);
+}
+
+export function formatAnswerAltText(expression) {
+  return expression.replace(/\{\{.*?\:\:(.+?)\:\:.*?\}\}/g, '$1');
+}
+
+export function formatAnswerText(answers, engMeaning, webLookup, cardId) {
+  const s = answers.length > 1 ? 's' : '';
+  let answerText = `Answer${s}: ${answers.join(', ')}`;
+  answerText += `\nEnglish Meaning: "${engMeaning}"`;
+  answerText += '\nDefinition: ' + WEBLOOKUP_URL + urlencode(webLookup);
+  answerText += `\nQID${cardId}`;
+  return answerText;
+}
+
+export function formatQuestionAltText(expression) {
+  const hint = formatHint(expression);
+  const [min, max] = minMaxChars(hint);
+  const minMax = min === max ? min : `${min} to ${max}`;
+  const s = max > 1 ? 's' : '';
+  const screenReaderHint = `(${minMax} character${s})`;
+  return expression.replace(/\{\{.+?\}\}/g, screenReaderHint);
+}
+
+export function formatQuestionText(expression, engMeaning, notes, cardID) {
+  const hint = formatHint(expression);
+  const [min, max] = minMaxChars(hint);
+  const minMax = min === max ? min : `${min}-${max}`;
+  let tweetText = `What ${minMax} character answer means "${engMeaning}"?`;
+  if (needsHint(hint))
+    tweetText += `\nHint: ${hint}`;
+
+  if (notes) tweetText += `\nNotes: ${notes}`;
+
+  tweetText += `\nQID${cardID}`;
+  return tweetText;
+}
+
+export function getAnswers(expression, altAnswers) {
+  const acceptedAnswer = expression.match(/\:\:(.+?)\:\:/)[1];
+  let otherAnswers = [];
+  if (altAnswers && altAnswers.length > 0)
+    otherAnswers = altAnswers.split(',');
+
+  return [acceptedAnswer].concat(otherAnswers);
 }
 
 export function getTimeUntil(hour) {
@@ -118,36 +122,17 @@ export function tryCatch(promise) {
    });
 }
 
-export function contains(item, list) {
-  return valid(list.indexOf(item));
-}
-
 
 // private functions
 
-function valid(index) {
-  return index !== -1;
-}
+function flatten(deep, flat = []) {
+  if (deep.length === 0)
+    return flat;
 
-function needsHint(hint) {
-  return hint.replace(/\[\]/g, '').trim().length !== 0;
-}
-
-function maxChars(hint) {
-  const missingCharRegex = /\[.*?\]/g;
-  const missingChars = (hint.match(missingCharRegex) || []).length
-  const gimmeChars = hint.replace(missingCharRegex, '').replace(/[\s+\(\)]/g, '').length;
-
-  return missingChars + gimmeChars;
-}
-
-function minChars(hint) {
-  const optionalChars = (hint.match(/\?/g) || []).length
-  return maxChars(hint) - optionalChars;
-}
-
-function minMaxChars(hint) {
-  return [minChars(hint), maxChars(hint)];
+  let [head, ...tail] = deep;
+  return scalar(head)
+    ? flatten(tail, flat.concat(head))
+    : flatten(tail, flat.concat(flatten(head)));
 }
 
 function formatHint(expression) {
@@ -182,6 +167,10 @@ function formatHint(expression) {
   }).join(' ');
 }
 
+function groupMultiXs(string) {
+  return string.replace(/[≠x]\((.*)\)/g, '(≠$1)')
+}
+
 function groupQuestionMarks(string) {
   return string.replace(/(\?+)/g, (match, p1) => `(${p1.length}?)`);
 }
@@ -190,8 +179,25 @@ function groupXs(string) {
   return string.replace(/[≠x][^(]/g, '($&)');
 }
 
-function groupMultiXs(string) {
-  return string.replace(/[≠x]\((.*)\)/g, '(≠$1)')
+function maxChars(hint) {
+  const missingCharRegex = /\[.*?\]/g;
+  const missingChars = (hint.match(missingCharRegex) || []).length
+  const gimmeChars = hint.replace(missingCharRegex, '').replace(/[\s+\(\)]/g, '').length;
+
+  return missingChars + gimmeChars;
+}
+
+function minChars(hint) {
+  const optionalChars = (hint.match(/\?/g) || []).length
+  return maxChars(hint) - optionalChars;
+}
+
+function minMaxChars(hint) {
+  return [minChars(hint), maxChars(hint)];
+}
+
+function needsHint(hint) {
+  return hint.replace(/\[\]/g, '').trim().length !== 0;
 }
 
 function split(str) {
@@ -207,12 +213,6 @@ function scalar(v) {
   return !Array.isArray(v);
 }
 
-function flatten(deep, flat = []) {
-  if (deep.length === 0)
-    return flat;
-
-  let [head, ...tail] = deep;
-  return scalar(head)
-    ? flatten(tail, flat.concat(head))
-    : flatten(tail, flat.concat(flatten(head)));
+function valid(index) {
+  return index !== -1;
 }
