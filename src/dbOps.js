@@ -216,7 +216,7 @@ export default ({
         }
       )
     );
-    await tryCatch(addToRecentAnswers(cardReference, mongo));
+    await tryCatch(addToRecentAnswers(cardReference.value, mongo));
     mongo.close();
   },
 
