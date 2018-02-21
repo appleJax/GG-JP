@@ -5,33 +5,23 @@ import { processUpload } from './processAnkiJson';
 import { calculateNewStats, tryCatch } from 'Utils';
 const PAGE_SIZE = 100;
 
-const dbOps = {
-  getRandomQuestion() {
-    return new Promise(async (resolve, reject) => {
-      const mongo = await tryCatch(MongoClient.connect(url));
-      const newCards = mongo.db(DB).collection('newCards');
-      const oldCards = mongo.db(DB).collection('oldCards');
-      const randomCard = await tryCatch(newCards.findOne());
-      if (randomCard == null) {
-        reject(new Error("Empty deck. Please Add More Cards to DB."));
-        return;
-      }
-      await tryCatch(oldCards.insert(randomCard));
-      await tryCatch(newCards.remove(randomCard));
-      resolve(randomCard);
-      mongo.close();
-    });
-  },
+export default ({
 
-  revealAnswerWorkflow(cardId) {
-    return new Promise(async (resolve, reject) => {
-      const mongo = await tryCatch(MongoClient.connect(url));
-      const oldCards = mongo.db(DB).collection('oldCards');
-      const answerCard = await tryCatch(oldCards.findOne({ cardId }));
-      resolve(answerCard);
-      await tryCatch(removeLiveQuestion(mongo, cardId));
-      mongo.close();
-    });
+  async addDeck(req, res) {
+    const filePath = req.file.path;
+    const newCards = await tryCatch(processUpload(filePath));
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const collection = mongo.db(DB).collection('newCards');
+    const batch = collection.initializeUnorderedBulkOp();
+
+    for (let i = 0; i < newCards.length; ++i) {
+      batch.insert(newCards[i]);
+    }
+
+    await tryCatch(batch.execute());
+    mongo.close();
+
+    res.redirect('/');
   },
 
   async addLiveQuestion(record, mediaUrls) {
@@ -57,63 +47,6 @@ const dbOps = {
         }
       )
     )
-    mongo.close();
-  },
-
-  async addMediaUrlsToCard(cardId, [mediaUrl]) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const oldCards = mongo.db(DB).collection('oldCards');
-    await tryCatch(
-      oldCards.updateOne(
-        { cardId }, {
-          $push: { mediaUrls: mediaUrl },
-          $unset: { answerImg: '', answerAltText: '' }
-        }
-      )
-    )
-    mongo.close();
-  },
-
-  updateLiveQuestion(questionId, userPoints) {
-    return new Promise(async (resolve, reject) => {
-      const mongo = await tryCatch(MongoClient.connect(url));
-      const liveQuestions = mongo.db(DB).collection('liveQuestions');
-      const { userId } = userPoints;
-
-      await tryCatch(
-        liveQuestions.update(
-          { questionId }, {
-            $push: {
-              alreadyAnswered: userId,
-              cachedPoints: userPoints
-            }
-          }
-        )
-      );
-      mongo.close();
-      resolve();
-    });
-  },
-
-  getLiveQuestions() {
-    return new Promise(async (resolve, reject) => {
-      const mongo = await tryCatch(MongoClient.connect(url));
-      const collection = mongo.db(DB).collection('liveQuestions');
-      const liveQuestions = await tryCatch(collection.find().toArray());
-      resolve(liveQuestions);
-      mongo.close();
-    });
-  },
-
-  async serveLiveQuestions(req, res) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const collection = mongo.db(DB).collection('liveQuestions');
-    const liveQuestions = await tryCatch(collection.find().toArray());
-    if (liveQuestions.length === 0)
-      res.json(null)
-    else
-      res.json(liveQuestions);
-
     mongo.close();
   },
 
@@ -151,6 +84,71 @@ const dbOps = {
 
   adjustScore(req, res) {
     // TODO adjust a score manually
+  },
+
+  async getEarnedCards({ query: { ids } }, res) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const oldCards = mongo.db(DB).collection('oldCards');
+    const earnedCards = await tryCatch(
+      getCards(ids, oldCards)
+    );
+    res.json(earnedCards);
+    mongo.close();
+  },
+
+  getLiveQuestions() {
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const collection = mongo.db(DB).collection('liveQuestions');
+      const liveQuestions = await tryCatch(collection.find().toArray());
+      resolve(liveQuestions);
+      mongo.close();
+    });
+  },
+
+  getNewCards(req, res) {
+    getCollection(req, res, 'newCards');
+  },
+
+  getOldCards(req, res) {
+    getCollection(req, res, 'oldCards');
+  },
+
+  getRandomQuestion() {
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const newCards = mongo.db(DB).collection('newCards');
+      const oldCards = mongo.db(DB).collection('oldCards');
+      const randomCard = await tryCatch(newCards.findOne());
+      if (randomCard == null) {
+        reject(new Error("Empty deck. Please Add More Cards to DB."));
+        return;
+      }
+      await tryCatch(oldCards.insert(randomCard));
+      await tryCatch(newCards.remove(randomCard));
+      resolve(randomCard);
+      mongo.close();
+    });
+  },
+
+  async getRecentAnswers(req, res) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const recentAnswers = mongo.db(DB).collection('recentAnswers');
+    const cardIds = recentAnswers.find().toArray().map(card => card.cardId);
+    const answerCards = await tryCatch(getCards(cardIds));
+    answerCards.sort((a, b) => b.answerPostedAt - a.answerPostedAt);
+    res.json(answerCards);
+    mongo.close();
+  },
+
+  // TODO - delete this method if not needed
+  async getScore(req, res) {
+    const { handle } = req.params;
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+    const user = await tryCatch(scoreboard.findOne({handle}));
+    res.json(user);
+    mongo.close();
   },
 
   async getScores({query: { page = 1, view = 'weeklyStats', search = ''} }, res) {
@@ -195,49 +193,70 @@ const dbOps = {
     mongo.close();
   },
 
-  async getEarnedCards({ query: { ids } }, res) {
+  async processAnswerCard(cardId, [mediaUrl]) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const oldCards = mongo.db(DB).collection('oldCards');
-    const earnedCards = await tryCatch(
-      getCards(ids, oldCards)
+    const cardReference = await tryCatch(
+      oldCards.findOneAndUpdate(
+        { cardId },
+        { $push: { mediaUrls: mediaUrl },
+          $unset: { answerImg: '', answerAltText: '' }
+        },
+        { projection: {
+            _id: 0,
+            answerPostedAt: 1,
+            cardId: 1
+          },
+          returnNewDocument: true
+        }
+      )
     );
-    res.json(earnedCards);
+    await tryCatch(addToRecentAnswers(cardReference, mongo));
     mongo.close();
   },
 
-  // TODO - delete this method if not needed
-  async getScore(req, res) {
-    const { handle } = req.params;
+  revealAnswerWorkflow(cardId) {
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const oldCards = mongo.db(DB).collection('oldCards');
+      const answerCard = await tryCatch(oldCards.findOne({ cardId }));
+      resolve(answerCard);
+      await tryCatch(removeLiveQuestion(mongo, cardId));
+      mongo.close();
+    });
+  },
+
+  async serveLiveQuestions(req, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-    const user = await tryCatch(scoreboard.findOne({handle}));
-    res.json(user);
+    const collection = mongo.db(DB).collection('liveQuestions');
+    const liveQuestions = await tryCatch(collection.find().toArray());
+    if (liveQuestions.length === 0)
+      res.json(null)
+    else
+      res.json(liveQuestions);
+
     mongo.close();
   },
 
-  async addDeck(req, res) {
-    const filePath = req.file.path;
-    const newCards = await tryCatch(processUpload(filePath));
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const collection = mongo.db(DB).collection('newCards');
-    const batch = collection.initializeUnorderedBulkOp();
+  updateLiveQuestion(questionId, userPoints) {
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const liveQuestions = mongo.db(DB).collection('liveQuestions');
+      const { userId } = userPoints;
 
-    for (let i = 0; i < newCards.length; ++i) {
-      batch.insert(newCards[i]);
-    }
-
-    await tryCatch(batch.execute());
-    mongo.close();
-
-    res.redirect('/');
-  },
-
-  getNewCards(req, res) {
-    getCollection(req, res, 'newCards');
-  },
-
-  getOldCards(req, res) {
-    getCollection(req, res, 'oldCards');
+      await tryCatch(
+        liveQuestions.update(
+          { questionId }, {
+            $push: {
+              alreadyAnswered: userId,
+              cachedPoints: userPoints
+            }
+          }
+        )
+      );
+      mongo.close();
+      resolve();
+    });
   },
 
   async updateStats(resetWeeklyStats, resetMonthlyStats) {
@@ -288,10 +307,28 @@ const dbOps = {
     mongo.close();
   }
 
-} // dbOps
+}) // dbOps export
 
 
 // private functions
+
+
+function addToRecentAnswers(recentAnswer, mongo) {
+  return new Promise(async (resolve, reject) => {
+    const collection = mongo.db(DB).collection('recentAnswers');
+    const recentAnswers = await tryCatch(
+      collection.find().sort({answerPostedAt: 1}).toArray()
+    );
+    if (recentAnswers.length > 9) {
+      const id = recentAnswers[0].cardId;
+      await tryCatch(collection.remove({ cardId }));
+    }
+    await tryCatch(
+      collection.insert(recentAnswer)
+    );
+    resolve();
+  });
+}
 
 function getCards(ids, collection) {
   return new Promise(async (resolve, reject) => {
@@ -377,7 +414,7 @@ function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
 
         op.updateOne.update.$inc['monthlyStats.correct'] = 1;
         op.updateOne.update.$inc['weeklyStats.correct']  = 1;
-        op.updateOne.update.$inc['dailyStats.correct']  = 1;
+        op.updateOne.update.$inc['dailyStats.correct']   = 1;
       }
 
       ops.push(op);
@@ -498,5 +535,3 @@ function recalculateRank(scoreboard) {
     resolve();
   });
 }
-
-export default dbOps;

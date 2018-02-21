@@ -14,39 +14,28 @@ export default (app) => {
     next();
   });
 
-  app.get('/api/live', (req, res) => {
-    DB.serveLiveQuestions(req, res);
-  });
+  app.get('/api/live',         DB.serveLiveQuestions);
 
-  app.get('/api/scores', (req, res) => {
-    DB.getScores(req, res);
-  });
+  app.get('/api/recent',       DB.getRecentAnswers);
 
-  app.get('/api/userStats', (req, res) => {
-    DB.getUserStats(req, res);
-  });
+  app.get('/api/scores',       DB.getScores);
 
-  app.get('/api/cards/earned', (req, res) => {
-    DB.getEarnedCards(req, res);
-  });
+  app.get('/api/userStats',    DB.getUserStats);
 
-  app.get('/api/cards/old', (req, res) => {
-    DB.getOldCards(req, res);
-  });
+  app.get('/api/cards/earned', DB.getEarnedCards);
+
+  app.get('/api/cards/old',    DB.getOldCards);
 
 
   // TODO - add authentication to following endpoints
 
-  app.post('/deck/new', upload.single('zipfile'), (req, res) => {
-    DB.addDeck(req, res);
-  });
+  app.post('/deck/new',
+    upload.single('zipfile'),
+    DB.addDeck
+  );
 
-  app.post('/scores/edit', (req, res) => {
-    DB.adjustScore(req, res);
-  });
+  app.post('/scores/edit', DB.adjustScore);
 
-  app.get('/cards/new', (req, res) => {
-    DB.getNewCards(req, res);
-  });
+  app.get('/cards/new',    DB.getNewCards);
 
 }

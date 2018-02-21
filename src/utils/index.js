@@ -1,6 +1,6 @@
 import urlencode from 'urlencode';
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
-const { TWITTER_ACCOUNT } = process.env;
+const { TWITTER_ACCOUNT, LEADERBOARD } = process.env;
 
 export const HOURS = 3600000;
 
@@ -40,10 +40,11 @@ export function formatAnswerText(answers, engMeaning, webLookup, cardId) {
   return answerText;
 }
 
-export function addQuestionLink(answerText, questionId) {
+export function addLinks(answerText, questionId) {
   const questionLink = `Question: twitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
   const lines = answerText.split('\n');
   lines.splice(-1, 0, questionLink);
+  lines.splice(-1, 0, `Leaderboard: ${LEADERBOARD}`);
   return lines.join('\n');
 }
 

@@ -1,7 +1,7 @@
 import DB from './dbOps';
 import {
   HOURS,
-  addQuestionLink,
+  addLinks,
   calculateScore,
   getTimeUntil,
   tryCatch
@@ -18,14 +18,12 @@ const ANSWER_INTERVAL = 24*HOURS;
 const QUESTION_INTERVAL = 6*HOURS;
 
 export default ({
-  // start: () => {
-  //   openStream();
-  //   setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
-  // }
-  start: () => {
+
+  start() {
     openStream();
     scheduleActions();
   }
+
 });
 
 async function scheduleActions() {
@@ -35,16 +33,14 @@ async function scheduleActions() {
     tweetOrScheduleAnswers(liveQuestions);
   }
 
-  // TODO - Change this to 20
-  const timeUntil8PM = getTimeUntil(8);
+  const startTimes = [ 2, 8, 14, 20 ].map(getTimeUntil);
+  const timeUntilTweet = Math.min(...startTimes);
   const timeUntilMidnight = getTimeUntil(0);
 
-  console.log('TimeUntil8PM:', timeUntil8PM);
-  console.log('timeUntilMidnight:', timeUntilMidnight);
   setTimeout(() => {
     tweetRandomQuestion();
     setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
-  }, timeUntil8PM);
+  }, timeUntilTweet);
 
   setTimeout(() => {
     updateStats();
@@ -121,14 +117,19 @@ async function tweetAnswer(cardId, questionId) {
   );
 
   const { mediaUrls } = await tryCatch(
+    // Tweet the answer
     postMedia(
-      addQuestionLink(answerText, questionId),
+      addLinks(answerText, questionId),
       answerImg,
       answerAltText
     )
   );
 
-  DB.addMediaUrlsToCard(cardId, mediaUrls);
+  // EFFECTS:
+  // - adds mediaUrl to card
+  // - removes base64 image from card
+  // - adds answerCard to recentAnswers collection
+  DB.processAnswerCard(cardId, mediaUrls);
 }
 
 function openStream() {
