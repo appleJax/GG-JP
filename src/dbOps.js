@@ -340,6 +340,7 @@ function getCards(ids, collection) {
   return new Promise(async (resolve, reject) => {
     const data = await tryCatch(
       collection.find({cardId: {$in: ids}})
+                .sort({answerPostedAt: -1})
                 .project({
                   _id: 0,
                   answerId: 1,
