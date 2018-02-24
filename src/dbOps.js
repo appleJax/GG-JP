@@ -141,7 +141,6 @@ export default ({
                    .then(cards => cards.map(card => card.cardId))
     );
     const answerCards = await tryCatch(getCards(cardIds, oldCards));
-    answerCards.sort((a, b) => b.answerPostedAt - a.answerPostedAt);
     res.json(answerCards);
     mongo.close();
   },
