@@ -319,6 +319,56 @@ export default ({
 // private functions
 
 
+function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
+  return new Promise(async (resolve, reject) => {
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+
+    const ops = [];
+    for (let i = 0; i < cachedPoints.length; ++i) {
+      const { userId, points } = cachedPoints[i];
+      const op = {
+        updateOne: {
+          filter: { userId },
+          update: {
+            $inc: {
+              'allTimeStats.score': points,
+              'monthlyStats.score': points,
+              'weeklyStats.score':  points,
+              'dailyStats.score':   points,
+              'allTimeStats.attempts': 1,
+              'monthlyStats.attempts': 1,
+              'weeklyStats.attempts':  1,
+              'dailyStats.attempts':   1
+            }
+          }
+        }
+      };
+      if (points > 0) {
+        op.updateOne.update.$push = {
+          'allTimeStats.correct': {
+            cardId,
+            points
+          }
+        };
+
+        op.updateOne.update.$inc['monthlyStats.correct'] = 1;
+        op.updateOne.update.$inc['weeklyStats.correct']  = 1;
+        op.updateOne.update.$inc['dailyStats.correct']   = 1;
+      }
+
+      ops.push(op);
+    }
+    if (ops.length === 0) {
+      resolve();
+      return;
+    }
+
+    await tryCatch(scoreboard.bulkWrite(ops));
+    await tryCatch(recalculateRank(scoreboard));
+    resolve();
+  });
+}
+
 function addToRecentAnswers(recentAnswer, mongo) {
   return new Promise(async (resolve, reject) => {
     const collection = mongo.db(DB).collection('recentAnswers');
@@ -377,67 +427,6 @@ async function getCollection(req, res, collectionName) {
   );
   res.json(data);
   mongo.close();
-}
-
-function removeLiveQuestion(mongo, cardId) {
-  return new Promise(async (resolve, reject) => {
-    const collection = mongo.db(DB).collection('liveQuestions');
-    const currentQuestion = await tryCatch(collection.findOne({cardId}));
-    await tryCatch(collection.remove(currentQuestion));
-    await tryCatch(addPointsToScoreboard(mongo, currentQuestion));
-    resolve();
-  });
-}
-
-function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
-  return new Promise(async (resolve, reject) => {
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-
-    const ops = [];
-    for (let i = 0; i < cachedPoints.length; ++i) {
-      const { userId, points } = cachedPoints[i];
-      const op = {
-        updateOne: {
-          filter: { userId },
-          update: {
-            $inc: {
-              'allTimeStats.score': points,
-              'monthlyStats.score': points,
-              'weeklyStats.score':  points,
-              'dailyStats.score':   points,
-              'allTimeStats.attempts': 1,
-              'monthlyStats.attempts': 1,
-              'weeklyStats.attempts':  1,
-              'dailyStats.attempts':   1
-            }
-          }
-        }
-      };
-      if (points > 0) {
-        op.updateOne.update.$push = {
-          'allTimeStats.correct': {
-            answerPostedAt,
-            cardId,
-            points
-          }
-        };
-
-        op.updateOne.update.$inc['monthlyStats.correct'] = 1;
-        op.updateOne.update.$inc['weeklyStats.correct']  = 1;
-        op.updateOne.update.$inc['dailyStats.correct']   = 1;
-      }
-
-      ops.push(op);
-    }
-    if (ops.length === 0) {
-      resolve();
-      return;
-    }
-
-    await tryCatch(scoreboard.bulkWrite(ops));
-    await tryCatch(recalculateRank(scoreboard));
-    resolve();
-  });
 }
 
 function recalculateRank(scoreboard) {
@@ -542,6 +531,16 @@ function recalculateRank(scoreboard) {
       return;
     }
     await tryCatch(scoreboard.bulkWrite(bulkUpdateOps));
+    resolve();
+  });
+}
+
+function removeLiveQuestion(mongo, cardId) {
+  return new Promise(async (resolve, reject) => {
+    const collection = mongo.db(DB).collection('liveQuestions');
+    const currentQuestion = await tryCatch(collection.findOne({cardId}));
+    await tryCatch(collection.remove(currentQuestion));
+    await tryCatch(addPointsToScoreboard(mongo, currentQuestion));
     resolve();
   });
 }
