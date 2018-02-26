@@ -97,6 +97,30 @@ export function getAnswers(expression, altAnswers) {
   return [acceptedAnswer].concat(otherAnswers);
 }
 
+export const getLiveAnswers = (cards) =>
+  cards.reduce(
+    (allAnswers, card) =>
+      allAnswers.concat(card.answers)
+  , []);
+
+export const getQuestionSpoilerText = (cards) =>
+  cards.reduce(
+    (allText, card) =>
+      allText + ' ' + [
+        card.answers.join(' '),
+        card.prevLineAltText || '',
+        card.questionAltText
+      ].join(' ')
+  , '');
+
+export const getSpoilerText = (cards) =>
+  cards.reduce(
+    (allText, card) =>
+      allText + ' ' +
+      card.answers.join(' ') + ' ' +
+      card.mediaUrls.map(obj => obj.altText).join(' ')
+  , '');
+
 export function getTimeUntil(hour) {
   hour = (hour + 6) % 24;
   const now = new Date();
@@ -111,6 +135,18 @@ export function getTimeUntil(hour) {
     millisUntilTime += 24*HOURS;
 
   return millisUntilTime;
+}
+
+export function isSpoiled(randomCard, spoilerText, liveAnswers) {
+  const randomCardSpoilerText = getQuestionSpoilerText([ randomCard ]);
+  const existingSpoilers = randomCard.answers.some(
+    answer => spoilerText.includes(answer)
+  );
+  const willSpoil = liveAnswers.some(
+    answer => randomCardSpoilerText.includes(answer)
+  );
+
+  return existingSpoilers || willSpoil;
 }
 
 export function tryCatch(promise) {

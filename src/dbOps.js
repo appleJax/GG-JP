@@ -2,7 +2,13 @@ import { MongoClient } from 'mongodb';
 const url = process.env.MONGODB_URI;
 const DB = process.env.MONGO_DB;
 import { processUpload } from './processAnkiJson';
-import { calculateNewStats, tryCatch } from 'Utils';
+import {
+  calculateNewStats,
+  getSpoilerText,
+  getLiveAnswers,
+  isSpoiled,
+  tryCatch
+} from 'Utils';
 const PAGE_SIZE = 100;
 
 export default ({
@@ -11,14 +17,36 @@ export default ({
     const filePath = req.file.path;
     const newCards = await tryCatch(processUpload(filePath));
     const mongo = await tryCatch(MongoClient.connect(url));
-    const collection = mongo.db(DB).collection('newCards');
-    const batch = collection.initializeUnorderedBulkOp();
+    const newCardCollection = mongo.db(DB).collection('newCards');
+    const oldCardCollection = mongo.db(DB).collection('oldCards');
+    const oldCards = await tryCatch(
+      oldCardCollection.find()
+                       .project({_id: 0, cardId: 1})
+                       .toArray()
+                       .then(cards => cards.map(card => card.cardId))
+    );
 
+    const ops = [];
     for (let i = 0; i < newCards.length; ++i) {
-      batch.insert(newCards[i]);
+      const newCard = newCards[i];
+      const { cardId } = newCard;
+      if (oldCards.indexOf(cardId) === -1)
+        ops.push({
+          replaceOne: {
+             filter: { cardId },
+             replacement: newCard,
+             upsert: true
+          }
+        });
     }
 
-    await tryCatch(batch.execute());
+    if (ops.length === 0) {
+      mongo.close();
+      res.redirect('/');
+      return;
+    }
+
+    await tryCatch(newCardCollection.bulkWrite(ops));
     mongo.close();
 
     res.redirect('/');
@@ -119,11 +147,47 @@ export default ({
       const mongo = await tryCatch(MongoClient.connect(url));
       const newCards = mongo.db(DB).collection('newCards');
       const oldCards = mongo.db(DB).collection('oldCards');
-      const randomCard = await tryCatch(newCards.findOne());
+      let randomCard = await tryCatch(
+        newCards.aggregate({ $sample: { size: 1 }})
+      );
       if (randomCard == null) {
-        reject(new Error("Empty deck. Please Add More Cards to DB."));
+        reject(new Error(
+          'Empty deck. Please Add More Cards to DB.'
+        ));
+        mongo.close();
         return;
       }
+
+      const [
+        liveCards,
+        recentCards
+      ] = await tryCatch(
+        Promise.all([
+          getSpoilerCards('liveQuestions', mongo),
+          getSpoilerCards('recentAnswers', mongo)
+        ])
+      );
+
+      const spoilerText = getSpoilerText(liveCards.concat(recentCards));
+      const liveAnswers = getLiveAnswers(liveCards);
+
+      let spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
+      let tries = 0;
+      while(spoiled) {
+        if (tries > 10) {
+          reject(new Error(
+            "All new cards contain spoilers. Please try again later."
+          ));
+          mongo.close();
+          return;
+        }
+        randomCard = await tryCatch(
+          newCards.aggregate({ $sample: { size: 1 }})
+        );
+        spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
+        tries++;
+      }
+
       await tryCatch(oldCards.insert(randomCard));
       await tryCatch(newCards.remove(randomCard));
       resolve(randomCard);
@@ -372,10 +436,16 @@ function addToRecentAnswers(recentAnswer, mongo) {
   return new Promise(async (resolve, reject) => {
     const collection = mongo.db(DB).collection('recentAnswers');
     const recentAnswers = await tryCatch(
-      collection.find().sort({answerPostedAt: 1}).toArray()
+      collection.find()
+                .toArray()
+                .map(card => {
+                  card.answerPostedAt = new Date(card.answerPostedAt);
+                  return card;
+                })
+                .sort((a, b) => b.answerPostedAt - a.answerPostedAt)
     );
     if (recentAnswers.length > 9) {
-      const id = recentAnswers[0].cardId;
+      const cardId = recentAnswers[0].cardId;
       await tryCatch(collection.remove({ cardId }));
     }
     await tryCatch(
@@ -388,16 +458,21 @@ function addToRecentAnswers(recentAnswer, mongo) {
 function getCards(ids, collection) {
   return new Promise(async (resolve, reject) => {
     const data = await tryCatch(
-      collection.find({cardId: {$in: ids}})
-                .sort({answerPostedAt: -1})
+      collection.find({ cardId: { $in: ids }})
                 .project({
-                  _id: 0,
-                  answerId: 1,
-                  answers: 1,
-                  mediaUrls: 1,
-                  questionText: 1,
+                  _id:            0,
+                  answerId:       1,
+                  answers:        1,
+                  answerPostedAt: 1,
+                  mediaUrls:      1,
+                  questionText:   1,
                 })
                 .toArray()
+                .map(card => {
+                  card.answerPostedAt = new Date(card.answerPostedAt);
+                  return card;
+                })
+                .sort((a, b) => b.answerPostedAt - a.answerPostedAt)
     );
 
     const cards = data.map(card => {
@@ -426,6 +501,29 @@ async function getCollection(req, res, collectionName) {
   );
   res.json(data);
   mongo.close();
+}
+
+function getSpoilerCards(collectionName, mongo) {
+  return new Promise(async (resolve, reject) => {
+    const oldCards = mongo.db(DB).collection('oldCards');
+    const collection = mongo.db(DB).collection(collectionName);
+    const ids = await tryCatch(
+      collection.find()
+                .toArray()
+                .then(cards => cards.map(card => card.cardId))
+    );
+    const spoilerCards = await tryCatch(
+      collection.find({ cardId: { $in: ids }})
+                .project({
+                  _id: 0,
+                  answers: 1,
+                  prevLineText: 1,
+                  questionAltText: 1
+                })
+                .toArray()
+    );
+    resolve(spoilerCards);
+  });
 }
 
 function recalculateRank(scoreboard) {

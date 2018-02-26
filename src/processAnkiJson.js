@@ -62,7 +62,7 @@ export function parseAnkiJson(filePath) {
     let [
       expression,
       , // reading,
-      ,// japMeaning,
+      , // jpMeaning,
       engMeaning,
       , // officialEng,
       questionImg,
@@ -82,6 +82,7 @@ export function parseAnkiJson(filePath) {
 
     return {
       cardId,
+      game:            contents.name,
       questionText:    formatQuestionText(expression, engMeaning, notes, cardId),
       questionImg:     getBase64(questionImg),
       questionAltText: formatQuestionAltText(expression),
@@ -114,7 +115,7 @@ function extractCardInfo(files) {
 }
 
 function stripHtml(string) {
-  return string.replace(/<.*?>|&.*;/g, '');
+  return string.replace(/<.*?>|&.*?;/g, '');
 }
 
 function getSrc(string) {
