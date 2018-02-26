@@ -35,9 +35,9 @@ export function calculateNewStats({
   };
 }
 
-export function calculateScore(answerPostedAt, {questionPostedAt, alreadyAnswered}) {
+export function calculateScore(replyPostedAt, { questionPostedAt }) {
   const timeToAnswer = Math.floor(
-    (answerPostedAt - questionPostedAt) / HOURS
+    (replyPostedAt - questionPostedAt) / HOURS
   );
   const score = 24 - timeToAnswer;
 
@@ -107,8 +107,7 @@ export const getQuestionSpoilerText = (cards) =>
   cards.reduce(
     (allText, card) =>
       allText + ' ' + [
-        card.answers.join(' '),
-        card.prevLineAltText || '',
+        card.prevLineAltText,
         card.questionAltText
       ].join(' ')
   , '');

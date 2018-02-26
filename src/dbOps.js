@@ -23,7 +23,10 @@ export default ({
       oldCardCollection.find()
                        .project({_id: 0, cardId: 1})
                        .toArray()
-                       .then(cards => cards.map(card => card.cardId))
+                       .then(cards =>
+                         Promise.resolve(
+                           cards.map(card => card.cardId)
+                         ))
     );
 
     const ops = [];
@@ -148,7 +151,9 @@ export default ({
       const newCards = mongo.db(DB).collection('newCards');
       const oldCards = mongo.db(DB).collection('oldCards');
       let randomCard = await tryCatch(
-        newCards.aggregate({ $sample: { size: 1 }})
+        newCards.aggregate([{ $sample: { size: 1 }}])
+                .toArray()
+                .then(cards => Promise.resolve(cards[0]))
       );
       if (randomCard == null) {
         reject(new Error(
@@ -174,7 +179,7 @@ export default ({
       let spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
       let tries = 0;
       while(spoiled) {
-        if (tries > 10) {
+        if (tries > 20) {
           reject(new Error(
             "All new cards contain spoilers. Please try again later."
           ));
@@ -182,7 +187,9 @@ export default ({
           return;
         }
         randomCard = await tryCatch(
-          newCards.aggregate({ $sample: { size: 1 }})
+          newCards.aggregate([{ $sample: { size: 1 }}])
+                  .toArray()
+                  .then(cards => Promise.resolve(cards[0]))
         );
         spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
         tries++;
@@ -202,10 +209,17 @@ export default ({
     const cardIds = await tryCatch(
       recentAnswers.find()
                    .toArray()
-                   .then(cards => cards.map(card => card.cardId))
+                   .then(cards =>
+                     Promise.resolve(
+                       cards.map(card => card.cardId)
+                     ))
     );
     const answerCards = await tryCatch(getCards(cardIds, oldCards));
-    res.json(answerCards);
+    if (answerCards.length === 0)
+      res.json(null);
+    else
+      res.json(answerCards);
+
     mongo.close();
   },
 
@@ -300,10 +314,8 @@ export default ({
     const collection = mongo.db(DB).collection('liveQuestions');
     const liveQuestions = await tryCatch(
       collection.find()
+                .sort({ questionPostedAt: -1 })
                 .toArray()
-                .then(cards =>
-                  cards.forEach
-                )
     );
     if (liveQuestions.length === 0)
       res.json(null)
@@ -494,7 +506,7 @@ async function getCollection(req, res, collectionName) {
   const collection = mongo.db(DB).collection(collectionName);
   const data = await tryCatch(
     collection.find()
-              .project({_id: 0})
+              .project({ _id: 0 })
               .toArray()
   );
   res.json(data);
@@ -508,17 +520,19 @@ function getSpoilerCards(collectionName, mongo) {
     const ids = await tryCatch(
       collection.find()
                 .toArray()
-                .then(cards => cards.map(card => card.cardId))
+                .then(cards =>
+                  Promise.resolve(
+                    cards.map(card => card.cardId)
+                  ))
     );
     const spoilerCards = await tryCatch(
-      collection.find({ cardId: { $in: ids }})
-                .project({
-                  _id: 0,
-                  answers: 1,
-                  prevLineText: 1,
-                  questionAltText: 1
-                })
-                .toArray()
+      oldCards.find({ cardId: { $in: ids }})
+              .project({
+                _id:             0,
+                answers:         1,
+                mediaUrls:       1
+              })
+              .toArray()
     );
     resolve(spoilerCards);
   });

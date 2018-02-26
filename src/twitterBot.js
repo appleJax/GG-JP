@@ -2,7 +2,6 @@ import DB from './dbOps';
 import {
   HOURS,
   addLinks,
-  calculateScore,
   getTimeUntil,
   tryCatch
 } from 'Utils';

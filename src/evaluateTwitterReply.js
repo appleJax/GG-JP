@@ -11,7 +11,7 @@ import { getFollowing } from 'Utils/twitter'
 
 export function evaluateResponse({
   in_reply_to_status_id_str: questionId,
-  created_at: answerPostedAt,
+  created_at: replyPostedAt,
   text,
   user: {
     id: userId,
@@ -82,9 +82,13 @@ export function evaluateResponse({
 
       const userAnswer = extractAnswer(text);
       if (contains(userAnswer, acceptedAnswers)) {
-        const points = calculateScore(answerPostedAt, foundQuestion);
-        await tryCatch(DB.updateLiveQuestion(questionId, { userId, points }));
-
+        replyPostedAt = new Date(replyPostedAt).getTime();
+        const points = calculateScore(replyPostedAt, foundQuestion);
+        if (points >= 0) {
+          await tryCatch(
+            DB.updateLiveQuestion(questionId, { userId, points })
+          );
+        }
       } else {
         await tryCatch(DB.updateLiveQuestion(questionId, { userId, points: 0 }));
       }
