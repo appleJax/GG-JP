@@ -60,13 +60,15 @@ export default ({
     const mongo = await tryCatch(MongoClient.connect(url));
     const liveQuestions = mongo.db(DB).collection('liveQuestions');
     const oldCards = mongo.db(DB).collection('oldCards');
-    await tryCatch(liveQuestions.insert({
-      ...record,
-      mediaUrls
-    }));
+    await tryCatch(
+      liveQuestions.insert({
+        ...record,
+        mediaUrls
+      })
+    );
     await tryCatch(
       oldCards.updateOne(
-        {cardId},
+        { cardId },
         {
           $set: { mediaUrls },
           $unset: {
@@ -214,7 +216,9 @@ export default ({
                        cards.map(card => card.cardId)
                      ))
     );
-    const answerCards = await tryCatch(getCards(cardIds, oldCards));
+    const answerCards = await tryCatch(
+      getCards(cardIds, oldCards)
+    );
     if (answerCards.length === 0)
       res.json(null);
     else
@@ -286,11 +290,11 @@ export default ({
           $unset: { answerImg: '', answerAltText: '' }
         },
         { projection: {
-            _id: 0,
+            _id:            0,
             answerPostedAt: 1,
-            cardId: 1
+            cardId:         1
           },
-          returnNewDocument: true
+          returnOriginal: false
         }
       )
     );
@@ -302,9 +306,11 @@ export default ({
     return new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
       const oldCards = mongo.db(DB).collection('oldCards');
-      const answerCard = await tryCatch(oldCards.findOne({ cardId }));
+      const answerCard = await tryCatch(
+        oldCards.findOne({ cardId })
+      );
       resolve(answerCard);
-      await tryCatch(removeLiveQuestion(mongo, cardId));
+      await tryCatch(removeLiveQuestion(cardId, mongo));
       mongo.close();
     });
   },
@@ -400,7 +406,7 @@ export default ({
 // private functions
 
 
-function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
+function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
   return new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
 
@@ -452,10 +458,11 @@ function addPointsToScoreboard(mongo, { cachedPoints, cardId }) {
 
 function addToRecentAnswers(recentAnswer, mongo) {
   return new Promise(async (resolve, reject) => {
+    console.log('Recent Answer Record:', recentAnswer);
     const collection = mongo.db(DB).collection('recentAnswers');
     const recentAnswers = await tryCatch(
       collection.find()
-                .sort({ answerPostedAt: -1 })
+                .sort({ answerPostedAt: 1 })
                 .toArray()
     );
     if (recentAnswers.length > 9) {
@@ -644,12 +651,14 @@ function recalculateRank(scoreboard) {
   });
 }
 
-function removeLiveQuestion(mongo, cardId) {
+function removeLiveQuestion(cardId, mongo) {
   return new Promise(async (resolve, reject) => {
     const collection = mongo.db(DB).collection('liveQuestions');
-    const currentQuestion = await tryCatch(collection.findOne({cardId}));
+    const currentQuestion = await tryCatch(
+      collection.findOne({cardId})
+    );
     await tryCatch(collection.remove(currentQuestion));
-    await tryCatch(addPointsToScoreboard(mongo, currentQuestion));
+    await tryCatch(addPointsToScoreboard(currentQuestion, mongo));
     resolve();
   });
 }
