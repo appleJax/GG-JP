@@ -39,7 +39,7 @@ export function postMedia(status, b64Image1, altText1, b64Image2, altText2) {
       );
       const result = {
         tweetId:  data.id_str,
-        postedAt: data.created_at,
+        postedAt: new Date(data.created_at).getTime(),
         mediaUrls
       };
       resolve(result);

@@ -50,7 +50,7 @@ async function scheduleActions() {
 
 function tweetOrScheduleAnswers(liveQuestions) {
   liveQuestions.forEach(({ cardId, questionId, questionPostedAt }) => {
-    const scheduledAnswerTime = new Date(questionPostedAt).getTime() + 24*HOURS;
+    const scheduledAnswerTime = questionPostedAt + 24*HOURS;
     const now = new Date().getTime();
 
     if (scheduledAnswerTime < now) {

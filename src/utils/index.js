@@ -37,7 +37,7 @@ export function calculateNewStats({
 
 export function calculateScore(answerPostedAt, {questionPostedAt, alreadyAnswered}) {
   const timeToAnswer = Math.floor(
-    (new Date(answerPostedAt) - new Date(questionPostedAt)) / HOURS
+    (answerPostedAt - questionPostedAt) / HOURS
   );
   const score = 24 - timeToAnswer;
 

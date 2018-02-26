@@ -298,7 +298,13 @@ export default ({
   async serveLiveQuestions(req, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const collection = mongo.db(DB).collection('liveQuestions');
-    const liveQuestions = await tryCatch(collection.find().toArray());
+    const liveQuestions = await tryCatch(
+      collection.find()
+                .toArray()
+                .then(cards =>
+                  cards.forEach
+                )
+    );
     if (liveQuestions.length === 0)
       res.json(null)
     else
@@ -437,12 +443,8 @@ function addToRecentAnswers(recentAnswer, mongo) {
     const collection = mongo.db(DB).collection('recentAnswers');
     const recentAnswers = await tryCatch(
       collection.find()
+                .sort({ answerPostedAt: -1 })
                 .toArray()
-                .map(card => {
-                  card.answerPostedAt = new Date(card.answerPostedAt);
-                  return card;
-                })
-                .sort((a, b) => b.answerPostedAt - a.answerPostedAt)
     );
     if (recentAnswers.length > 9) {
       const cardId = recentAnswers[0].cardId;
@@ -467,12 +469,8 @@ function getCards(ids, collection) {
                   mediaUrls:      1,
                   questionText:   1,
                 })
+                .sort({ answerPostedAt: -1 })
                 .toArray()
-                .map(card => {
-                  card.answerPostedAt = new Date(card.answerPostedAt);
-                  return card;
-                })
-                .sort((a, b) => b.answerPostedAt - a.answerPostedAt)
     );
 
     const cards = data.map(card => {
