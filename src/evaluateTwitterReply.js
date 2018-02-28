@@ -48,6 +48,7 @@ export function evaluateResponse({
         allTimeStats: {
           attempts: 0,
           correct: [],
+          incorrect: [],
           score: 0
         },
         monthlyStats: {

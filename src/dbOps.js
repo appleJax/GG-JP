@@ -499,6 +499,10 @@ function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
         op.updateOne.update.$inc['monthlyStats.correct'] = 1;
         op.updateOne.update.$inc['weeklyStats.correct']  = 1;
         op.updateOne.update.$inc['dailyStats.correct']   = 1;
+      } else {
+        op.updateOne.update.$push = {
+          'allTimeStats.incorrect': cardId
+        }
       }
 
       ops.push(op);
