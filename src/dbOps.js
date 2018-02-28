@@ -4,6 +4,7 @@ const DB = process.env.MONGO_DB;
 import { processUpload } from './processAnkiJson';
 import {
   calculateNewStats,
+  formatFlashCards,
   getSpoilerText,
   getLiveAnswers,
   isSpoiled,
@@ -117,6 +118,63 @@ export default ({
 
   adjustScore(req, res) {
     // TODO adjust a score manually
+  },
+
+  async getDeck({ params: { slug }}, res) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const deckTitles    = mongo.db(DB).collection('deckTitles');
+    const liveQuestions = mongo.db(DB).collection('liveQuestions');
+    const oldCards      = mongo.db(DB).collection('oldCards');
+
+    const deck = await tryCatch(
+      deckTitles.findOne({ slug })
+    );
+
+    if (!deck) {
+      res.json(null);
+      mongo.close();
+      return;
+    }
+
+    const liveCards = await tryCatch(
+      liveQuestions.find()
+                   .project({
+                     _id:    0,
+                     cardId: 1
+                   })
+                   .toArray()
+                   .then(cards =>
+                     Promise.resolve(
+                       cards.map(card => card.cardId)
+                     ))
+    );
+
+    const rawCards = await tryCatch(
+      oldCards.find({
+        game: deck.fullTitle,
+        cardId: {
+          $not: { $in: liveCards }
+        }
+      })
+      .project({
+        _id:            0,
+        answerId:       1,
+        answerPostedAt: 1,
+        answers:        1,
+        mediaUrls:      1,
+        questionText:   1,
+      })
+      .sort({ answerPostedAt: -1 })
+      .toArray()
+    );
+
+    const cards = formatFlashCards(rawCards);
+    res.json(cards);
+    mongo.close();
+  },
+
+  getDeckTitles(req, res) {
+    getCollection(req, res, 'deckTitles');
   },
 
   async getEarnedCards({ query: { ids } }, res) {
@@ -483,8 +541,8 @@ function getCards(ids, collection) {
                 .project({
                   _id:            0,
                   answerId:       1,
-                  answers:        1,
                   answerPostedAt: 1,
+                  answers:        1,
                   mediaUrls:      1,
                   questionText:   1,
                 })
@@ -492,18 +550,7 @@ function getCards(ids, collection) {
                 .toArray()
     );
 
-    const cards = data.map(card => {
-      card.questionText = card.questionText.split('\n')[0];
-      const s = card.answers.length > 1 ? 's' : '';
-      card.answers = `Answer${s}: ${card.answers.join(', ')}`;
-      card.mediaUrl = (card.mediaUrls.length === 3)
-        ? card.mediaUrls[1]
-        : card.mediaUrls[0];
-
-      delete card.mediaUrls;
-      return card;
-    });
-
+    const cards = formatFlashCards(data);
     resolve(cards);
   });
 }

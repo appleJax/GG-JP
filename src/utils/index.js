@@ -88,6 +88,20 @@ export function formatQuestionText(expression, engMeaning, notes, cardID) {
   return tweetText;
 }
 
+export function formatFlashCards(cards) {
+  return cards.map(card => {
+    card.questionText = card.questionText.split('\n')[0];
+    const s = card.answers.length > 1 ? 's' : '';
+    card.answers = `Answer${s}: ${card.answers.join(', ')}`;
+    card.mediaUrl = (card.mediaUrls.length === 3)
+      ? card.mediaUrls[1]
+      : card.mediaUrls[0];
+
+    delete card.mediaUrls;
+    return card;
+  });
+}
+
 export function getAnswers(expression, altAnswers) {
   const acceptedAnswer = expression.match(/\:\:(.+?)\:\:/)[1];
   let otherAnswers = [];

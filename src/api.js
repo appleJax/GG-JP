@@ -14,6 +14,10 @@ export default (app) => {
     next();
   });
 
+  app.get('/api/decks',        DB.getDeckTitles);
+
+  app.get('/api/deck/:slug',   DB.getDeck);
+
   app.get('/api/live',         DB.serveLiveQuestions);
 
   app.get('/api/recent',       DB.getRecentAnswers);
