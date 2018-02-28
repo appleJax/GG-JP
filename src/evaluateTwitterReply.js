@@ -14,7 +14,7 @@ export function evaluateResponse({
   created_at: replyPostedAt,
   text,
   user: {
-    id: userId,
+    id_str: userId,
     name,
     screen_name: handle,
     profile_image_url_https: avatar,

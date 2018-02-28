@@ -14,9 +14,9 @@ const {
 // }
 
 const userConfig = {
-  consumer_key: TWITTER_API_KEY,
-  consumer_secret: TWITTER_API_SECRET,
-  access_token: TWITTER_TOKEN,
+  consumer_key:        TWITTER_API_KEY,
+  consumer_secret:     TWITTER_API_SECRET,
+  access_token:        TWITTER_TOKEN,
   access_token_secret: TWITTER_TOKEN_SECRET
 };
 

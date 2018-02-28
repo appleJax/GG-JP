@@ -35,7 +35,8 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      Utils: __dirname + '/src/utils'
+      Config: __dirname + '/src/config',
+      Utils:  __dirname + '/src/utils'
     }
   },
   output: {

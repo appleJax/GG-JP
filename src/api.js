@@ -1,5 +1,6 @@
-import DB from './dbOps';
-import multer from 'multer';
+import DB       from './dbOps';
+import multer   from 'multer';
+
 const upload = multer({ dest: 'uploads/' });
 
 export default (app) => {

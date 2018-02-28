@@ -10,7 +10,7 @@ import {
   retrieveAndCountMissedReplies
 } from 'Utils/twitter';
 import { evaluateResponse } from './evaluateTwitterReply';
-import Twitter from './twitterConfig';
+import Twitter from 'Config/twitterBot';
 const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;

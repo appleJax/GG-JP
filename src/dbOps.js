@@ -1,6 +1,4 @@
 import { MongoClient } from 'mongodb';
-const url = process.env.MONGODB_URI;
-const DB = process.env.MONGO_DB;
 import { processUpload } from './processAnkiJson';
 import {
   calculateNewStats,
@@ -10,6 +8,12 @@ import {
   isSpoiled,
   tryCatch
 } from 'Utils';
+
+const {
+  MONGODB_URI: url,
+  MONGO_DB:    DB
+} = process.env;
+
 const PAGE_SIZE = 100;
 
 export default ({
@@ -314,6 +318,17 @@ export default ({
     }
     res.json(users);
     mongo.close();
+  },
+
+  async getUser(userId) {
+    console.log('userId:', userId)
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+    const user = await tryCatch(
+      scoreboard.findOne({ userId })
+    );
+    console.log('User:', user);
+    return user;
   },
 
   async getUserStats({ query: { handle } }, res) {

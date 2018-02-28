@@ -1,5 +1,5 @@
 const { TWITTER_ACCOUNT } = process.env;
-import Twitter from '../twitterConfig';
+import Twitter from 'Config/twitterBot';
 import { tryCatch } from 'Utils';
 import { evaluateResponse } from '../evaluateTwitterReply';
 
