@@ -49,7 +49,8 @@ export function evaluateResponse({
           attempts: 0,
           correct: [],
           incorrect: [],
-          score: 0
+          score: 0,
+          rank: 0
         },
         monthlyStats: {
           attempts: 0,
@@ -58,7 +59,8 @@ export function evaluateResponse({
           average: {
             n: 0,
             value: 0
-          }
+          },
+          rank: 0
         },
         weeklyStats: {
           attempts: 0,
@@ -67,7 +69,8 @@ export function evaluateResponse({
           average: {
             n: 0,
             value: 0
-          }
+          },
+          rank: 0
         },
         dailyStats: {
           attempts: 0,

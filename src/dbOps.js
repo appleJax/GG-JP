@@ -472,13 +472,13 @@ export default ({
 
       if (resetWeeklyStats) {
         const { weeklyStats } = user;
-        const newWeeklyStats = calculateNewStats(weeklyStats);
+        const newWeeklyStats = calculateNewStats(weeklyStats, true);
         op.updateOne.update.$set.weeklyStats = newWeeklyStats;
       }
 
       if (resetMonthlyStats) {
         const { monthlyStats } = user;
-        const newMonthlyStats = calculateNewStats(monthlyStats);
+        const newMonthlyStats = calculateNewStats(monthlyStats, true);
         op.updateOne.update.$set.monthlyStats = newMonthlyStats;
       }
 
@@ -674,7 +674,7 @@ function recalculateRank(scoreboard) {
           }
         }
       }
-    ]).toArray());
+    ], { allowDiskUse: true }).toArray());
 
     const usersToUpdate = {};
     const currentRanks = {

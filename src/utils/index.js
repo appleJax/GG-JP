@@ -12,19 +12,21 @@ export function addLinks(answerText, questionId) {
   return lines.join('\n');
 }
 
-export function calculateNewStats({
-  score,
-  average: {
-    n,
-    value: oldAverage
-  }
-}) {
+export function calculateNewStats(
+  { score,
+    average: {
+      n,
+      value: oldAverage
+    }
+  },
+  addRank
+) {
 
   const newAverage = Math.floor(
     (n*oldAverage + score) / (n + 1)
   );
 
-  return {
+  const newStats = {
     score: 0,
     attempts: 0,
     correct: 0,
@@ -33,6 +35,10 @@ export function calculateNewStats({
       value: newAverage
     }
   };
+
+  if (addRank) newStats.rank = 0;
+
+  return newStats;
 }
 
 export function calculateScore(replyPostedAt, { questionPostedAt }) {
