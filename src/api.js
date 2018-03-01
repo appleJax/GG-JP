@@ -25,7 +25,7 @@ export default (app) => {
 
   app.get('/api/scores',       DB.getScores);
 
-  app.post('/users/new',       DB.createUser);
+  app.post('/api/users/new',   DB.createUser);
 
   app.get('/api/user/:userId', DB.getUser);
 

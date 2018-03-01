@@ -124,8 +124,7 @@ export default ({
     // TODO adjust a score manually
   },
 
-  async createUser({ query: { user } }, res) {
-    console.log('Creating user:', user);
+  async createUser({ body: user }, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
     await tryCatch(
@@ -181,6 +180,12 @@ export default ({
       .sort({ answerPostedAt: -1 })
       .toArray()
     );
+
+    if (rawCards.length === 0) {
+      res.json(null);
+      mongo.close();
+      return;
+    }
 
     const cards = formatFlashCards(rawCards);
     res.json(cards);
@@ -331,14 +336,13 @@ export default ({
   },
 
   async getUser({ params: { userId } }, res) {
-    console.log('userId:', userId)
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
     const user = await tryCatch(
       scoreboard.findOne({ userId })
     );
-    console.log('User:', user);
-    if (!user || user.length === 0) {
+
+    if (!user) {
       res.json(null);
       mongo.close();
       return;
@@ -552,7 +556,6 @@ function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
 
 function addToRecentAnswers(recentAnswer, mongo) {
   return new Promise(async (resolve, reject) => {
-    console.log('Recent Answer Record:', recentAnswer);
     const collection = mongo.db(DB).collection('recentAnswers');
     const recentAnswers = await tryCatch(
       collection.find()
@@ -705,7 +708,7 @@ function recalculateRank(scoreboard) {
     let i = 0;
     for (; i < end; i++) {
       const currentUser = userIdsToUpdate[i];
-      const userId = Number(currentUser);
+      const userId = currentUser;
       const op = {
         updateOne: {
           filter: { userId },
