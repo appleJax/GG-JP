@@ -124,6 +124,16 @@ export default ({
     // TODO adjust a score manually
   },
 
+  async createUser({ query: { user } }, res) {
+    console.log('Creating user:', user);
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+    await tryCatch(
+      scoreboard.insert(user)
+    );
+    mongo.close();
+  },
+
   async getDeck({ params: { slug }}, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const deckTitles    = mongo.db(DB).collection('deckTitles');
@@ -320,7 +330,7 @@ export default ({
     mongo.close();
   },
 
-  async getUser(userId) {
+  async getUser({ params: { userId } }, res) {
     console.log('userId:', userId)
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
@@ -328,7 +338,14 @@ export default ({
       scoreboard.findOne({ userId })
     );
     console.log('User:', user);
-    return user;
+    if (!user || user.length === 0) {
+      res.json(null);
+      mongo.close();
+      return;
+    }
+
+    res.json(user);
+    mongo.close();
   },
 
   async getUserStats({ query: { handle } }, res) {
