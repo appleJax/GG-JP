@@ -197,6 +197,10 @@ export default ({
   },
 
   async getEarnedCards({ query: { ids } }, res) {
+    if (!ids || ids.length === 0) {
+      res.json(null);
+      return;
+    }
     const mongo = await tryCatch(MongoClient.connect(url));
     const oldCards = mongo.db(DB).collection('oldCards');
     const earnedCards = await tryCatch(
