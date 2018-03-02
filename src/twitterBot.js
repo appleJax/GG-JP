@@ -21,10 +21,6 @@ export default ({
   start() {
     openStream();
     scheduleActions();
-
-    // For testing...
-    // tweetRandomQuestion();
-    // setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
   }
 
 });

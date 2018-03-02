@@ -174,6 +174,7 @@ export default ({
         answerId:       1,
         answerPostedAt: 1,
         answers:        1,
+        cardId:         1,
         mediaUrls:      1,
         questionText:   1,
       })
@@ -586,6 +587,7 @@ function getCards(ids, collection) {
                   answerId:       1,
                   answerPostedAt: 1,
                   answers:        1,
+                  cardId:         1,
                   mediaUrls:      1,
                   questionText:   1,
                 })
