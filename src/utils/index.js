@@ -12,6 +12,12 @@ export function addLinks(answerText, questionId) {
   return lines.join('\n');
 }
 
+export function average(newValue, oldAverage, n) {
+  return Math.floor(
+    (n*oldAverage + newValue) / (n + 1)
+  )
+}
+
 export function calculateNewStats(
   { score,
     average: {
@@ -22,17 +28,14 @@ export function calculateNewStats(
   addRank
 ) {
 
-  const newAverage = Math.floor(
-    (n*oldAverage + score) / (n + 1)
-  );
-
   const newStats = {
-    score: 0,
     attempts: 0,
     correct: 0,
+    totalPossible: 0,
+    score: 0,
     average: {
       n: n + 1,
-      value: newAverage
+      value: average(score, oldAverage, n)
     }
   };
 
@@ -48,6 +51,12 @@ export function calculateScore(replyPostedAt, { questionPostedAt }) {
   const score = 24 - timeToAnswer;
 
   return Math.max(score, 0);
+}
+
+export function calculateTimeToAnswer(replyPostedAt, { questionPostedAt }) {
+  return Math.floor(
+    (replyPostedAt - questionPostedAt) / 1000
+  )
 }
 
 export function contains(item, list) {

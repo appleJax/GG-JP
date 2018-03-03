@@ -116,7 +116,7 @@ export default ({
         await tryCatch(scoreboard.insert(newUser));
       }
       mongo.close();
-      resolve();
+      resolve(user || newUser);
     });
   },
 
@@ -504,14 +504,15 @@ export default ({
 
 // private functions
 
-
 function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
   return new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
 
-    const ops = [];
-    for (let i = 0; i < cachedPoints.length; ++i) {
-      const { userId, points } = cachedPoints[i];
+    const cachedUpdates = {};
+    let i = 0;
+    let end = cachedPoints.length
+    for (; i < end; ++i) {
+      const { userId, points, timeToAnswer } = cachedPoints[i];
       const op = {
         updateOne: {
           filter: { userId },
@@ -524,7 +525,22 @@ function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
               'allTimeStats.attempts': 1,
               'monthlyStats.attempts': 1,
               'weeklyStats.attempts':  1,
-              'dailyStats.attempts':   1
+              'dailyStats.attempts':   1,
+              'allTimeStats.totalPossible': 1,
+              'monthlyStats.totalPossible': 1,
+              'weeklyStats.totalPossible':  1,
+              'dailyStats.totalPossible':   1
+            },
+            $set: {
+              // NOTE
+              // - timeToAnswer is the seconds it took the user to answer the CURRENT QUESTION
+              // - this value is being stored here for reference
+              // - it will later be overwritten by a new calculated average
+              //
+              // - missing info needed for calculation:
+              //   - current DB value of allTimeStats.attempts
+              //   - current DB value of allTimeStats.avgTimeToAnswer
+              'allTimeStats.avgTimeToAnswer': timeToAnswer
             }
           }
         }
@@ -533,21 +549,60 @@ function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
         op.updateOne.update.$push = {
           'allTimeStats.correct': {
             cardId,
-            points
+            points,
+            timeToAnswer
           }
         };
-
         op.updateOne.update.$inc['monthlyStats.correct'] = 1;
         op.updateOne.update.$inc['weeklyStats.correct']  = 1;
         op.updateOne.update.$inc['dailyStats.correct']   = 1;
+
       } else {
         op.updateOne.update.$push = {
           'allTimeStats.incorrect': cardId
         }
       }
 
-      ops.push(op);
+      cachedUpdates[userId] = op;
     }
+
+    const allUsers = await tryCatch(scoreboard.find().toArray());
+    const ops = [];
+
+    i = 0;
+    end = allUsers.length;
+    for (; i < end; ++i) {
+      const currentUser = allUsers[i];
+      let update = cachedUpdates[currentUser.userId];
+
+      if (!update) { // user did not attempt to answer the current question
+        update = {
+          updateOne: {
+            filter: { userId: currentUser.userId },
+            update: {
+              $inc: {
+                'allTimeStats.totalPossible': 1,
+                'monthlyStats.totalPossible': 1,
+                'weeklyStats.totalPossible':  1,
+                'dailyStats.totalPossible':   1
+              }
+            }
+          }
+        };
+
+      } else { // User attempted to answer the current question
+
+        const newTimeToAnswer = update.updateOne.update.$set['allTimeStats.avgTimeToAnswer'];
+        update.updateOne.update.$set['allTimeStats.avgTimeToAnswer'] = average(
+          newTimeToAnswer,
+          currentUser.allTimeStats.avgTimeToAnswer,
+          currentUser.allTimeStats.attempts
+        );
+      }
+
+      ops.push(update);
+    }
+
     if (ops.length === 0) {
       resolve();
       return;

@@ -2,6 +2,7 @@ import DB from './dbOps';
 const { TWITTER_ACCOUNT } = process.env;
 import {
   calculateScore,
+  calculateTimeToAnswer,
   contains,
   extractAnswer,
   tryCatch
@@ -49,33 +50,37 @@ export function evaluateResponse({
           attempts: 0,
           correct: [],
           incorrect: [],
-          total: 0,
+          totalPossible: 0,
+          rank: 0,
           score: 0,
-          rank: 0
+          avgTimeToAnswer: 0
         },
         monthlyStats: {
           attempts: 0,
           correct: 0,
+          totalPossible: 0,
+          rank: 0,
           score: 0,
           average: {
             n: 0,
             value: 0
-          },
-          rank: 0
+          }
         },
         weeklyStats: {
           attempts: 0,
           correct: 0,
+          totalPossible: 0,
+          rank: 0,
           score: 0,
           average: {
             n: 0,
             value: 0
-          },
-          rank: 0
+          }
         },
         dailyStats: {
           attempts: 0,
           correct: 0,
+          totalPossible: 0,
           score: 0,
           average: {
             n: 0,
@@ -85,17 +90,24 @@ export function evaluateResponse({
       };
       await tryCatch(DB.addOrUpdateUser(newUser));
 
+      replyPostedAt = new Date(replyPostedAt).getTime();
+      const timeToAnswer = calculateTimeToAnswer(replyPostedAt, foundQuestion);
+
       const userAnswer = extractAnswer(text);
       if (contains(userAnswer, acceptedAnswers)) {
-        replyPostedAt = new Date(replyPostedAt).getTime();
         const points = calculateScore(replyPostedAt, foundQuestion);
         if (points >= 0) {
           await tryCatch(
-            DB.updateLiveQuestion(questionId, { userId, points })
+            DB.updateLiveQuestion(questionId, { userId, points, timeToAnswer })
           );
         }
       } else {
-        await tryCatch(DB.updateLiveQuestion(questionId, { userId, points: 0 }));
+        await tryCatch(
+          DB.updateLiveQuestion(
+            questionId,
+            { userId, points: 0, timeToAnswer }
+          )
+        );
       }
     }
     resolve();
