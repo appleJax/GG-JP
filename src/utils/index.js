@@ -196,10 +196,10 @@ function formatHint(expression) {
 
   return flatten(split(normalized)).map(group => {
     if (group === '.')
-      return '[]';
+      return '_';
 
     if (group === '-')
-      return '[] [] [] [] []'
+      return '_ _ _ _ _'
 
     if (/\?/.test(group)) {
       const result = [];
@@ -235,15 +235,11 @@ function groupXs(string) {
 }
 
 function maxChars(hint) {
-  const missingCharRegex = /\[.*?\]/g;
-  const missingChars = (hint.match(missingCharRegex) || []).length
-  const gimmeChars = hint.replace(missingCharRegex, '').replace(/[\s+\(\)]/g, '').length;
-
-  return missingChars + gimmeChars;
+  return hint.match(/([^\s]+)/g).length;
 }
 
 function minChars(hint) {
-  const optionalChars = (hint.match(/\?/g) || []).length
+  const optionalChars = (hint.match(/\?/g) || []).length;
   return maxChars(hint) - optionalChars;
 }
 
@@ -252,7 +248,7 @@ function minMaxChars(hint) {
 }
 
 function needsHint(hint) {
-  return hint.replace(/\[\]/g, '').trim().length !== 0;
+  return hint.replace(/_/g, '').trim().length !== 0;
 }
 
 function split(str) {
