@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 route(app);
 
-//twitterBot.start();
+twitterBot.start();
 
 const PORT = app.get('port');
 app.listen(PORT, () =>

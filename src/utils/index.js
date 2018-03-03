@@ -107,7 +107,7 @@ export function formatQuestionText(
 
   if (notes) tweetText += `\nNotes: ${notes}`;
 
-  tweetText += `\nGame: ${game}`;
+  tweetText += `\nGame: ${game.replace(/\s(ENG|JP)$/, '')}`;
   tweetText += `\nQID${cardID}`;
   return tweetText;
 }
