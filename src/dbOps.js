@@ -538,8 +538,8 @@ function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
               // - it will later be overwritten by a new calculated average
               //
               // - missing info needed for calculation:
-              //   - current DB value of allTimeStats.attempts
-              //   - current DB value of allTimeStats.avgTimeToAnswer
+              //   - current DB value of stats.attempts
+              //   - current DB value of stats.avgTimeToAnswer
               'allTimeStats.avgTimeToAnswer': timeToAnswer
             }
           }
@@ -597,6 +597,21 @@ function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
           newTimeToAnswer,
           currentUser.allTimeStats.avgTimeToAnswer,
           currentUser.allTimeStats.attempts
+        );
+        update.updateOne.update.$set['monthlyStats.avgTimeToAnswer'] = average(
+          newTimeToAnswer,
+          currentUser.monthlyStats.avgTimeToAnswer,
+          currentUser.monthlyStats.attempts
+        );
+        update.updateOne.update.$set['weeklyStats.avgTimeToAnswer'] = average(
+          newTimeToAnswer,
+          currentUser.weeklyStats.avgTimeToAnswer,
+          currentUser.weeklyStats.attempts
+        );
+        update.updateOne.update.$set['dailyStats.avgTimeToAnswer'] = average(
+          newTimeToAnswer,
+          currentUser.dailyStats.avgTimeToAnswer,
+          currentUser.dailyStats.attempts
         );
       }
 

@@ -61,6 +61,7 @@ export function evaluateResponse({
           totalPossible: 0,
           rank: 0,
           score: 0,
+          avgTimeToAnswer: 0,
           average: {
             n: 0,
             value: 0
@@ -72,6 +73,7 @@ export function evaluateResponse({
           totalPossible: 0,
           rank: 0,
           score: 0,
+          avgTimeToAnswer: 0,
           average: {
             n: 0,
             value: 0
@@ -82,6 +84,7 @@ export function evaluateResponse({
           correct: 0,
           totalPossible: 0,
           score: 0,
+          avgTimeToAnswer: 0,
           average: {
             n: 0,
             value: 0

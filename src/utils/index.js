@@ -33,6 +33,7 @@ export function calculateNewStats(
     correct: 0,
     totalPossible: 0,
     score: 0,
+    avgTimeToAnswer: 0,
     average: {
       n: n + 1,
       value: average(score, oldAverage, n)
