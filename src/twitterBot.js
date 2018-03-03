@@ -64,6 +64,7 @@ function tweetOrScheduleAnswers(liveQuestions) {
 async function tweetRandomQuestion() {
   const {
     cardId,
+    game,
     questionText,
     questionImg,
     questionAltText,
@@ -88,15 +89,17 @@ async function tweetRandomQuestion() {
   );
 
   const liveQuestion = {
+    answers,
     cardId,
+    game,
+    mediaUrls,
     questionId,
     questionText,
-    answers,
     questionPostedAt,
     cachedPoints: [],
     alreadyAnswered: []
   };
-  DB.addLiveQuestion(liveQuestion, mediaUrls);
+  DB.addLiveQuestion(liveQuestion);
   setTimeout(() => tweetAnswer(cardId, questionId), ANSWER_INTERVAL);
 }
 

@@ -58,6 +58,7 @@ export function optimizeImages(dirPath) {
 
 export function parseAnkiJson(filePath) {
   const contents = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  const game = contents.name;
   return contents.notes.map(card => {
     let [
       expression,
@@ -77,18 +78,18 @@ export function parseAnkiJson(filePath) {
       cardId
     ] = card.fields;
 
-    [expression, engMeaning, notes] = [expression, engMeaning, notes].map(stripHtml);
+    [ engMeaning, expression, notes ] = [ engMeaning, expression, notes ].map(stripHtml);
     const answers = getAnswers(expression, altAnswers);
 
     return {
       cardId,
-      game:            contents.name,
-      questionText:    formatQuestionText(expression, engMeaning, notes, cardId),
+      game,
+      questionText:    formatQuestionText(cardId, engMeaning, expression, game, notes),
       questionImg:     getBase64(questionImg),
       questionAltText: formatQuestionAltText(expression),
       prevLineImg:     getBase64(prevLineImg),
       prevLineAltText,
-      answerText:      formatAnswerText(answers, engMeaning, webLookup, cardId),
+      answerText:      formatAnswerText(answers, cardId, engMeaning, webLookup),
       answerImg:       getBase64(answerImg),
       answerAltText:   formatAnswerAltText(expression),
       answers,

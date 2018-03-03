@@ -72,7 +72,7 @@ export function formatAnswerAltText(expression) {
   return expression.replace(/\{\{.*?\:\:(.+?)\:\:.*?\}\}/g, '$1');
 }
 
-export function formatAnswerText(answers, engMeaning, webLookup, cardId) {
+export function formatAnswerText(answers, cardId, engMeaning, webLookup) {
   const s = answers.length > 1 ? 's' : '';
   let answerText = `Answer${s}: ${answers.join(', ')}`;
   answerText += `\nEnglish: "${engMeaning}"`;
@@ -90,7 +90,14 @@ export function formatQuestionAltText(expression) {
   return expression.replace(/\{\{.+?\}\}/g, screenReaderHint);
 }
 
-export function formatQuestionText(expression, engMeaning, notes, cardID) {
+export function formatQuestionText(
+  cardID,
+  engMeaning,
+  expression,
+  game,
+  notes
+) {
+
   const hint = formatHint(expression);
   const [min, max] = minMaxChars(hint);
   const minMax = min === max ? min : `${min}-${max}`;
@@ -100,6 +107,7 @@ export function formatQuestionText(expression, engMeaning, notes, cardID) {
 
   if (notes) tweetText += `\nNotes: ${notes}`;
 
+  tweetText += `\nGame: ${game}`;
   tweetText += `\nQID${cardID}`;
   return tweetText;
 }

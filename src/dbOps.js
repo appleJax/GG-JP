@@ -60,16 +60,13 @@ export default ({
     res.redirect('/');
   },
 
-  async addLiveQuestion(record, mediaUrls) {
-    const { cardId } = record;
+  async addLiveQuestion(liveQuestion) {
+    const { cardId, mediaUrls } = liveQuestion;
     const mongo = await tryCatch(MongoClient.connect(url));
     const liveQuestions = mongo.db(DB).collection('liveQuestions');
     const oldCards = mongo.db(DB).collection('oldCards');
     await tryCatch(
-      liveQuestions.insert({
-        ...record,
-        mediaUrls
-      })
+      liveQuestions.insert(liveQuestion)
     );
     await tryCatch(
       oldCards.updateOne(
@@ -658,6 +655,7 @@ function getCards(ids, collection) {
                   answerPostedAt: 1,
                   answers:        1,
                   cardId:         1,
+                  game:           1,
                   mediaUrls:      1,
                   questionText:   1,
                 })
