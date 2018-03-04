@@ -214,10 +214,10 @@ function formatHint(expression) {
 
   return flatten(split(normalized)).map(group => {
     if (group === '.')
-      return '_';
+      return '[_]';
 
     if (group === '-')
-      return '_ _ _ _ _'
+      return '[_] [_] [_] [_] [_]'
 
     if (/\?/.test(group)) {
       const result = [];
@@ -266,7 +266,7 @@ function minMaxChars(hint) {
 }
 
 function needsHint(hint) {
-  return hint.replace(/_/g, '').trim().length !== 0;
+  return hint.replace(/\[_\]/g, '').trim().length !== 0;
 }
 
 function split(str) {
