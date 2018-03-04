@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { processUpload } from './processAnkiJson';
 import {
+  average,
   calculateNewStats,
   formatFlashCards,
   getSpoilerText,
@@ -172,6 +173,7 @@ export default ({
         answerPostedAt: 1,
         answers:        1,
         cardId:         1,
+        game:           1,
         mediaUrls:      1,
         questionText:   1,
       })
