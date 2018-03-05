@@ -146,7 +146,8 @@ export const getQuestionSpoilerText = (cards) =>
     (allText, card) =>
       allText + ' ' + [
         card.prevLineAltText,
-        card.questionAltText
+        card.questionAltText,
+        card.answerAltText
       ].join(' ')
   , '');
 
@@ -174,13 +175,13 @@ export function getTimeUntil(hour) {
   return millisUntilTime;
 }
 
-export function isSpoiled(randomCard, spoilerText, liveAnswers) {
-  const randomCardSpoilerText = getQuestionSpoilerText([ randomCard ]);
-  const existingSpoilers = randomCard.answers.some(
+export function isSpoiled(questionCard, spoilerText, liveAnswers) {
+  const questionSpoilerText = getQuestionSpoilerText([ questionCard ]);
+  const existingSpoilers = questionCard.answers.some(
     answer => spoilerText.includes(answer)
   );
   const willSpoil = liveAnswers.some(
-    answer => randomCardSpoilerText.includes(answer)
+    answer => questionSpoilerText.includes(answer)
   );
 
   return existingSpoilers || willSpoil;

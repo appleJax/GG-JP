@@ -182,12 +182,12 @@ export default ({
     mongo.close();
   },
 
-  getDeckTitles(req, res) {
+  async getDeckTitles(req, res) {
     const titles = await tryCatch(
       getCollection('deckTitles')
     );
     res.json(titles);
-  }
+  },
 
   async getEarnedCards({ query: { ids } }, res) {
     if (!ids || ids.length === 0) {
@@ -207,14 +207,14 @@ export default ({
     return getCollection('liveQuestions');
   },
 
-  getNewCards(req, res) {
+  async getNewCards(req, res) {
     const newCards = await tryCatch(
       getCollection('newCards')
     );
     res.json(newCards);
   },
 
-  getOldCards(req, res) {
+  async getOldCards(req, res) {
     const newCards = await tryCatch(
       getCollection('oldCards')
     );
