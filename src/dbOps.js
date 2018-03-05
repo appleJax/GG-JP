@@ -240,16 +240,6 @@ export default ({
         return;
       }
 
-      const [
-        liveCards,
-        recentCards
-      ] = await tryCatch(
-        Promise.all([
-          getSpoilerCards('liveQuestions', mongo),
-          getSpoilerCards('recentAnswers', mongo)
-        ])
-      );
-
       const liveCards = await tryCatch(liveQuestions.find().toArray());
       const recentCards = await tryCatch(getRecentAnswers());
       const spoilerText = getSpoilerText(liveCards.concat(recentCards));
@@ -388,33 +378,15 @@ export default ({
   },
 
   async serveRecentAnswers(req, res) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const oldCards = mongo.db(DB).collection('oldCards');
     const recentAnswers = await tryCatch(
-      oldCards.find()
-              .sort({ answerPostedAt: -1 })
-              .limit(12)
-              .project({
-                _id:            0,
-                answerId:       1,
-                answerPostedAt: 1,
-                answers:        1,
-                cardId:         1,
-                game:           1,
-                mediaUrls:      1,
-                questionText:   1,
-              })
-              .toArray()
+      getRecentAnswers()
     );
-
     if (recentAnswers.length === 0)
       res.json(null);
     else {
       const answerCards = formatFlashCards(recentAnswers);
       res.json(answerCards);
     }
-
-    mongo.close();
   },
 
   async updateLiveQuestion({
@@ -658,6 +630,32 @@ function getCollection(collectionName) {
                 .toArray()
     );
     resolve(data);
+    mongo.close();
+  });
+}
+
+function getRecentAnswers() {
+  return new Promise(async (resolve, reject) => {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const oldCards = mongo.db(DB).collection('oldCards');
+    const recentAnswers = await tryCatch(
+      oldCards.find()
+              .sort({ answerPostedAt: -1 })
+              .limit(12)
+              .project({
+                _id:            0,
+                answerId:       1,
+                answerPostedAt: 1,
+                answers:        1,
+                cardId:         1,
+                game:           1,
+                mediaUrls:      1,
+                questionText:   1,
+              })
+              .toArray()
+    );
+
+    resolve(recentAnswers);
     mongo.close();
   });
 }
