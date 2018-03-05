@@ -1,6 +1,6 @@
 **/.DS_Store
 .env
-__DBTestingScripts
+__DBScripts
 app.yaml
 node_modules
 dist

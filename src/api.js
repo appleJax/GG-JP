@@ -21,7 +21,7 @@ export default (app) => {
 
   app.get('/api/live',         DB.serveLiveQuestions);
 
-  app.get('/api/recent',       DB.getRecentAnswers);
+  app.get('/api/recent',       DB.serveRecentAnswers);
 
   app.get('/api/scores',       DB.getScores);
 

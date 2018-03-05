@@ -88,18 +88,13 @@ async function tweetRandomQuestion() {
     )
   );
 
-  const liveQuestion = {
-    answers,
+  const update = {
     cardId,
-    game,
     mediaUrls,
     questionId,
-    questionText,
-    questionPostedAt,
-    cachedPoints: [],
-    alreadyAnswered: []
+    questionPostedAt
   };
-  DB.addLiveQuestion(liveQuestion);
+  DB.updateLiveQuestion(update);
   setTimeout(() => tweetAnswer(cardId, questionId), ANSWER_INTERVAL);
 }
 
@@ -128,9 +123,8 @@ async function tweetAnswer(cardId, questionId) {
   // EFFECTS:
   // - adds mediaUrl to card
   // - removes base64 image from card
-  // - adds liveQuestion cachedPoints to scoreboard
-  // - adds answerCard with cachedPoints to recentAnswers as backup
-  // - removes card from liveQuestions
+  // - adds userPoints to scoreboard
+  // - moves card from liveQuestions to oldCards
   DB.processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls[0]);
 }
 

@@ -61,31 +61,6 @@ export default ({
     res.redirect('/');
   },
 
-  async addLiveQuestion(liveQuestion) {
-    const { cardId, mediaUrls } = liveQuestion;
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const liveQuestions = mongo.db(DB).collection('liveQuestions');
-    const oldCards = mongo.db(DB).collection('oldCards');
-    await tryCatch(
-      liveQuestions.insert(liveQuestion)
-    );
-    await tryCatch(
-      oldCards.updateOne(
-        { cardId },
-        {
-          $set: { mediaUrls },
-          $unset: {
-            questionImg: '',
-            questionAltText: '',
-            prevLineImg: '',
-            prevLineAltText: ''
-          }
-        }
-      )
-    )
-    mongo.close();
-  },
-
   addOrUpdateUser(newUser) {
     return new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
@@ -122,6 +97,26 @@ export default ({
     // TODO adjust a score manually
   },
 
+  cachePoints(questionId, userPoints) {
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const liveQuestions = mongo.db(DB).collection('liveQuestions');
+      const { userId } = userPoints;
+
+      await tryCatch(
+        liveQuestions.updateOne({ questionId },
+          { $push: {
+              alreadyAnswered: userId,
+              userPoints
+            }
+          }
+        )
+      );
+      mongo.close();
+      resolve();
+    });
+  },
+
   async createUser({ body: user }, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
@@ -131,10 +126,21 @@ export default ({
     mongo.close();
   },
 
+  getAnswerCard(cardId) {
+    return new Promise(async (resolve, reject) => {
+      const mongo = await tryCatch(MongoClient.connect(url));
+      const liveQuestions = mongo.db(DB).collection('liveQuestions');
+      const answerCard = await tryCatch(
+        liveQuestions.findOne({ cardId })
+      );
+      resolve(answerCard);
+      mongo.close();
+    });
+  },
+
   async getDeck({ params: { slug }}, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const deckTitles    = mongo.db(DB).collection('deckTitles');
-    const liveQuestions = mongo.db(DB).collection('liveQuestions');
     const oldCards      = mongo.db(DB).collection('oldCards');
 
     const deck = await tryCatch(
@@ -147,25 +153,9 @@ export default ({
       return;
     }
 
-    const liveCards = await tryCatch(
-      liveQuestions.find()
-                   .project({
-                     _id:    0,
-                     cardId: 1
-                   })
-                   .toArray()
-                   .then(cards =>
-                     Promise.resolve(
-                       cards.map(card => card.cardId)
-                     ))
-    );
-
     const rawCards = await tryCatch(
       oldCards.find({
         game: deck.fullTitle,
-        cardId: {
-          $not: { $in: liveCards }
-        }
       })
       .project({
         _id:            0,
@@ -193,8 +183,11 @@ export default ({
   },
 
   getDeckTitles(req, res) {
-    getCollection(req, res, 'deckTitles');
-  },
+    const titles = await tryCatch(
+      getCollection('deckTitles')
+    );
+    res.json(titles);
+  }
 
   async getEarnedCards({ query: { ids } }, res) {
     if (!ids || ids.length === 0) {
@@ -211,28 +204,29 @@ export default ({
   },
 
   getLiveQuestions() {
-    return new Promise(async (resolve, reject) => {
-      const mongo = await tryCatch(MongoClient.connect(url));
-      const collection = mongo.db(DB).collection('liveQuestions');
-      const liveQuestions = await tryCatch(collection.find().toArray());
-      resolve(liveQuestions);
-      mongo.close();
-    });
+    return getCollection('liveQuestions');
   },
 
   getNewCards(req, res) {
-    getCollection(req, res, 'newCards');
+    const newCards = await tryCatch(
+      getCollection('newCards')
+    );
+    res.json(newCards);
   },
 
   getOldCards(req, res) {
-    getCollection(req, res, 'oldCards');
+    const newCards = await tryCatch(
+      getCollection('oldCards')
+    );
+    res.json(newCards);
   },
 
   getRandomQuestion() {
     return new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
-      const newCards = mongo.db(DB).collection('newCards');
-      const oldCards = mongo.db(DB).collection('oldCards');
+      const newCards      = mongo.db(DB).collection('newCards');
+      const liveQuestions = mongo.db(DB).collection('liveQuestions');
+
       let randomCard = await tryCatch(
         newCards.aggregate([{ $sample: { size: 1 }}])
                 .toArray()
@@ -256,6 +250,8 @@ export default ({
         ])
       );
 
+      const liveCards = await tryCatch(liveQuestions.find().toArray());
+      const recentCards = await tryCatch(getRecentAnswers());
       const spoilerText = getSpoilerText(liveCards.concat(recentCards));
       const liveAnswers = getLiveAnswers(liveCards);
 
@@ -278,34 +274,11 @@ export default ({
         tries++;
       }
 
-      await tryCatch(oldCards.insert(randomCard));
+      await tryCatch(liveQuestions.insert(randomCard));
       await tryCatch(newCards.remove(randomCard));
       resolve(randomCard);
       mongo.close();
     });
-  },
-
-  async getRecentAnswers(req, res) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const recentAnswers = mongo.db(DB).collection('recentAnswers');
-    const oldCards = mongo.db(DB).collection('oldCards');
-    const cardIds = await tryCatch(
-      recentAnswers.find()
-                   .toArray()
-                   .then(cards =>
-                     Promise.resolve(
-                       cards.map(card => card.cardId)
-                     ))
-    );
-    const answerCards = await tryCatch(
-      getCards(cardIds, oldCards)
-    );
-    if (answerCards.length === 0)
-      res.json(null);
-    else
-      res.json(answerCards);
-
-    mongo.close();
   },
 
   // TODO - delete this method if not needed
@@ -381,38 +354,21 @@ export default ({
     const mongo = await tryCatch(MongoClient.connect(url));
     const oldCards      = mongo.db(DB).collection('oldCards');
     const liveQuestions = mongo.db(DB).collection('liveQuestions');
-    await tryCatch(
-      oldCards.updateOne({ cardId },
+
+    const currentQuestion = await tryCatch(
+      liveQuestions.findOneAndUpdate({ cardId },
         { $push:  { mediaUrls: mediaUrl },
           $set:   { answerId, answerPostedAt },
           $unset: { answerImg: '', answerAltText: '' }
-        }
+        },
+        { returnOriginal: false }
       )
+      .then(doc => Promise.resolve(doc.value))
     );
-    const currentQuestion = await tryCatch(
-      liveQuestions.findOne({ cardId })
-    );
-    const recentAnswerCard = {
-      cardId,
-      answerPostedAt,
-      ...currentQuestion.cachedPoints
-    };
-    await tryCatch(addToRecentAnswers(recentAnswerCard, mongo));
     await tryCatch(addPointsToScoreboard(currentQuestion, mongo));
+    await tryCatch(oldCards.insert(currentQuestion))
     await tryCatch(liveQuestions.remove(currentQuestion));
     mongo.close();
-  },
-
-  getAnswerCard(cardId) {
-    return new Promise(async (resolve, reject) => {
-      const mongo = await tryCatch(MongoClient.connect(url));
-      const oldCards = mongo.db(DB).collection('oldCards');
-      const answerCard = await tryCatch(
-        oldCards.findOne({ cardId })
-      );
-      resolve(answerCard);
-      mongo.close();
-    });
   },
 
   async serveLiveQuestions(req, res) {
@@ -431,25 +387,64 @@ export default ({
     mongo.close();
   },
 
-  updateLiveQuestion(questionId, userPoints) {
-    return new Promise(async (resolve, reject) => {
-      const mongo = await tryCatch(MongoClient.connect(url));
-      const liveQuestions = mongo.db(DB).collection('liveQuestions');
-      const { userId } = userPoints;
+  async serveRecentAnswers(req, res) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const oldCards = mongo.db(DB).collection('oldCards');
+    const recentAnswers = await tryCatch(
+      oldCards.find()
+              .sort({ answerPostedAt: -1 })
+              .limit(12)
+              .project({
+                _id:            0,
+                answerId:       1,
+                answerPostedAt: 1,
+                answers:        1,
+                cardId:         1,
+                game:           1,
+                mediaUrls:      1,
+                questionText:   1,
+              })
+              .toArray()
+    );
 
-      await tryCatch(
-        liveQuestions.updateOne(
-          { questionId }, {
-            $push: {
-              alreadyAnswered: userId,
-              cachedPoints: userPoints
-            }
+    if (recentAnswers.length === 0)
+      res.json(null);
+    else {
+      const answerCards = formatFlashCards(recentAnswers);
+      res.json(answerCards);
+    }
+
+    mongo.close();
+  },
+
+  async updateLiveQuestion({
+    cardId,
+    mediaUrls,
+    questionId,
+    questionPostedAt
+  }) {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const liveQuestions = mongo.db(DB).collection('liveQuestions');
+
+    await tryCatch(
+      liveQuestions.updateOne({ cardId },
+        { $set: {
+            alreadyAnswered: [],
+            mediaUrls,
+            questionId,
+            questionPostedAt,
+            userPoints: []
+          },
+          $unset: {
+            questionImg: '',
+            questionAltText: '',
+            prevLineImg: '',
+            prevLineAltText: ''
           }
-        )
-      );
-      mongo.close();
-      resolve();
-    });
+        }
+      )
+    )
+    mongo.close();
   },
 
   async updateStats(resetWeeklyStats, resetMonthlyStats) {
@@ -505,15 +500,15 @@ export default ({
 
 // private functions
 
-function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
+function addPointsToScoreboard({ userPoints, cardId }, mongo) {
   return new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
 
     const cachedUpdates = {};
     let i = 0;
-    let end = cachedPoints.length
+    let end = userPoints.length
     for (; i < end; ++i) {
-      const { userId, points, timeToAnswer } = cachedPoints[i];
+      const { userId, points, timeToAnswer } = userPoints[i];
       const op = {
         updateOne: {
           filter: { userId },
@@ -630,25 +625,6 @@ function addPointsToScoreboard({ cachedPoints, cardId }, mongo) {
   });
 }
 
-function addToRecentAnswers(recentAnswer, mongo) {
-  return new Promise(async (resolve, reject) => {
-    const collection = mongo.db(DB).collection('recentAnswers');
-    const recentAnswers = await tryCatch(
-      collection.find()
-                .sort({ answerPostedAt: 1 })
-                .toArray()
-    );
-    if (recentAnswers.length >= 12) {
-      const cardId = recentAnswers[0].cardId;
-      await tryCatch(collection.remove({ cardId }));
-    }
-    await tryCatch(
-      collection.insert(recentAnswer)
-    );
-    resolve();
-  });
-}
-
 function getCards(ids, collection) {
   return new Promise(async (resolve, reject) => {
     const data = await tryCatch(
@@ -672,40 +648,17 @@ function getCards(ids, collection) {
   });
 }
 
-async function getCollection(req, res, collectionName) {
-  const mongo = await tryCatch(MongoClient.connect(url));
-  const collection = mongo.db(DB).collection(collectionName);
-  const data = await tryCatch(
-    collection.find()
-              .project({ _id: 0 })
-              .toArray()
-  );
-  res.json(data);
-  mongo.close();
-}
-
-function getSpoilerCards(collectionName, mongo) {
+function getCollection(collectionName) {
   return new Promise(async (resolve, reject) => {
-    const oldCards = mongo.db(DB).collection('oldCards');
+    const mongo = await tryCatch(MongoClient.connect(url));
     const collection = mongo.db(DB).collection(collectionName);
-    const ids = await tryCatch(
+    const data = await tryCatch(
       collection.find()
+                .project({ _id: 0 })
                 .toArray()
-                .then(cards =>
-                  Promise.resolve(
-                    cards.map(card => card.cardId)
-                  ))
     );
-    const spoilerCards = await tryCatch(
-      oldCards.find({ cardId: { $in: ids }})
-              .project({
-                _id:             0,
-                answers:         1,
-                mediaUrls:       1
-              })
-              .toArray()
-    );
-    resolve(spoilerCards);
+    resolve(data);
+    mongo.close();
   });
 }
 

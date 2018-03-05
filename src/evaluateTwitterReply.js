@@ -101,12 +101,16 @@ export function evaluateResponse({
         const points = calculateScore(replyPostedAt, foundQuestion);
         if (points >= 0) {
           await tryCatch(
-            DB.updateLiveQuestion(questionId, { userId, points, timeToAnswer })
+            DB.cachePoints(
+              questionId,
+              { userId, points, timeToAnswer }
+            )
           );
         }
+
       } else {
         await tryCatch(
-          DB.updateLiveQuestion(
+          DB.cachePoints(
             questionId,
             { userId, points: 0, timeToAnswer }
           )
