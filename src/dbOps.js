@@ -377,30 +377,33 @@ export default ({
     mongo.close();
   },
 
-  async processAnswerCard(answerId, answerPostedAt, cardId, mediaUrl) {
+  async processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrl) {
     const mongo = await tryCatch(MongoClient.connect(url));
-    const oldCards = mongo.db(DB).collection('oldCards');
-    const cardReference = await tryCatch(
-      oldCards.findOneAndUpdate(
-        { cardId },
+    const oldCards      = mongo.db(DB).collection('oldCards');
+    const liveQuestions = mongo.db(DB).collection('liveQuestions');
+    await tryCatch(
+      oldCards.updateOne({ cardId },
         { $push:  { mediaUrls: mediaUrl },
           $set:   { answerId, answerPostedAt },
           $unset: { answerImg: '', answerAltText: '' }
-        },
-        { projection: {
-            _id:            0,
-            answerPostedAt: 1,
-            cardId:         1
-          },
-          returnOriginal: false
         }
       )
     );
-    await tryCatch(addToRecentAnswers(cardReference.value, mongo));
+    const currentQuestion = await tryCatch(
+      liveQuestions.findOne({ cardId })
+    );
+    const recentAnswerCard = {
+      cardId,
+      answerPostedAt,
+      ...currentQuestion.cachedPoints
+    };
+    await tryCatch(addToRecentAnswers(recentAnswerCard, mongo));
+    await tryCatch(addPointsToScoreboard(currentQuestion, mongo));
+    await tryCatch(liveQuestions.remove(currentQuestion));
     mongo.close();
   },
 
-  revealAnswerWorkflow(cardId) {
+  getAnswerCard(cardId) {
     return new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
       const oldCards = mongo.db(DB).collection('oldCards');
@@ -408,7 +411,6 @@ export default ({
         oldCards.findOne({ cardId })
       );
       resolve(answerCard);
-      await tryCatch(removeLiveQuestion(cardId, mongo));
       mongo.close();
     });
   },
@@ -436,7 +438,7 @@ export default ({
       const { userId } = userPoints;
 
       await tryCatch(
-        liveQuestions.update(
+        liveQuestions.updateOne(
           { questionId }, {
             $push: {
               alreadyAnswered: userId,
@@ -636,7 +638,7 @@ function addToRecentAnswers(recentAnswer, mongo) {
                 .sort({ answerPostedAt: 1 })
                 .toArray()
     );
-    if (recentAnswers.length > 9) {
+    if (recentAnswers.length >= 12) {
       const cardId = recentAnswers[0].cardId;
       await tryCatch(collection.remove({ cardId }));
     }
@@ -809,18 +811,6 @@ function recalculateRank(scoreboard) {
       return;
     }
     await tryCatch(scoreboard.bulkWrite(bulkUpdateOps));
-    resolve();
-  });
-}
-
-function removeLiveQuestion(cardId, mongo) {
-  return new Promise(async (resolve, reject) => {
-    const collection = mongo.db(DB).collection('liveQuestions');
-    const currentQuestion = await tryCatch(
-      collection.findOne({cardId})
-    );
-    await tryCatch(collection.remove(currentQuestion));
-    await tryCatch(addPointsToScoreboard(currentQuestion, mongo));
     resolve();
   });
 }
