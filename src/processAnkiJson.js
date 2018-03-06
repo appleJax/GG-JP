@@ -80,6 +80,7 @@ export function parseAnkiJson(filePath) {
     ] = card.fields;
 
     [ engMeaning, expression, notes ] = [ engMeaning, expression, notes ].map(stripHtml);
+    engMeaning = engMeaning.replace(/"/g, "'");
     const answers = getAnswers(expression, altAnswers);
 
     return {
