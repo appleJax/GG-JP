@@ -1,7 +1,10 @@
-import DB from './dbOps';
+import DB                   from './dbOps';
+import Twitter              from 'Config/twitterBot';
+import { evaluateResponse } from './evaluateTwitterReply';
 import {
   HOURS,
   addLinks,
+  getTimeTilNextTweet,
   getTimeUntil,
   tryCatch
 } from 'Utils';
@@ -9,8 +12,7 @@ import {
   postMedia,
   retrieveAndCountMissedReplies
 } from 'Utils/twitter';
-import { evaluateResponse } from './evaluateTwitterReply';
-import Twitter from 'Config/twitterBot';
+
 const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;
@@ -32,8 +34,7 @@ async function scheduleActions() {
     tweetOrScheduleAnswers(liveQuestions);
   }
 
-  const startTimes = [ 2, 8, 14, 20 ].map(getTimeUntil);
-  const timeUntilTweet = Math.min(...startTimes);
+  const timeUntilTweet = getTimeTilNextTweet();
   const timeUntilMidnight = getTimeUntil(0);
 
   setTimeout(() => {

@@ -162,21 +162,12 @@ export const getSpoilerText = (cards) =>
     ].join(' ')
   , '');
 
-export function getTimeUntil(hour) {
-  hour = (hour + 6) % 24;
-  const now = new Date();
-  const utcNow = now.getTime();
-  let millisUntilTime = Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate(),
-    hour, 0, 0, 0) - utcNow;
-
-  if (millisUntilTime < 0) // already passed for today, wait until tomorrow
-    millisUntilTime += 24*HOURS;
-
-  return millisUntilTime;
+export function getTimeTilNextTweet() {
+  const startTimes = [ 2, 8, 14, 20 ].map(_getTimeUntil);
+  return Math.min(...startTimes);
 }
+
+export const getTimeUntil = (hour) => _getTimeUntil(hour)
 
 export function isSpoiled(questionCard, spoilerText, liveAnswers) {
   const questionSpoilerText = getQuestionSpoilerText([ questionCard ]);
@@ -242,6 +233,22 @@ function formatHint(expression) {
     // else (character gimme)
     return group;
   }).join(' ');
+}
+
+function _getTimeUntil(hour) {
+  hour = (hour + 6) % 24;
+  const now = new Date();
+  const utcNow = now.getTime();
+  let millisUntilTime = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    hour, 0, 0, 0) - utcNow;
+
+  if (millisUntilTime < 0) // already passed for today, wait until tomorrow
+    millisUntilTime += 24*HOURS;
+
+  return millisUntilTime;
 }
 
 function groupMultiXs(string) {

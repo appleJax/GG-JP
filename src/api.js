@@ -1,5 +1,6 @@
-import DB       from './dbOps';
-import multer   from 'multer';
+import DB                      from './dbOps';
+import multer                  from 'multer';
+import { getTimeTilNextTweet } from 'Utils';
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -14,6 +15,15 @@ export default (app) => {
                'Origin, X-Requested-With, Content-Type, Accept');
     next();
   });
+
+
+  app.get('/api/cards/earned', DB.getEarnedCards);
+
+  app.get('/api/cards/old',    DB.getOldCards);
+
+  app.get('/api/countdown',    (req, res) =>
+    res.json({ millis: getTimeTilNextTweet() })
+  );
 
   app.get('/api/decks',        DB.getDeckTitles);
 
@@ -30,10 +40,6 @@ export default (app) => {
   app.get('/api/user/:userId', DB.getUser);
 
   app.get('/api/userStats',    DB.getUserStats);
-
-  app.get('/api/cards/earned', DB.getEarnedCards);
-
-  app.get('/api/cards/old',    DB.getOldCards);
 
 
   // TODO - add authentication to following endpoints
