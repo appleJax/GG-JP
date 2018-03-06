@@ -147,16 +147,19 @@ export const getQuestionSpoilerText = (cards) =>
       allText + ' ' + [
         card.prevLineAltText,
         card.questionAltText,
-        card.answerAltText
+        card.answerAltText,
+        card.otherVisibleContext
       ].join(' ')
   , '');
 
 export const getSpoilerText = (cards) =>
   cards.reduce(
     (allText, card) =>
-      allText + ' ' +
-      card.answers.join(' ') + ' ' +
-      card.mediaUrls.map(obj => obj.altText).join(' ')
+      allText + ' ' + [
+      card.answers,
+      card.mediaUrls.map(obj => obj.altText),
+      card.otherVisibleContext
+    ].join(' ')
   , '');
 
 export function getTimeUntil(hour) {

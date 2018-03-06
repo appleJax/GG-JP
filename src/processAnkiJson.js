@@ -71,6 +71,7 @@ export function parseAnkiJson(filePath) {
       , // audio
       prevLineImg,
       prevLineAltText,
+      otherVisibleContext,
       altAnswers,
       webLookup, // use for every answer so people can look up pronunciation
                  // https://ejje.weblio.jp/content/[webLookup (e.g. 切り換える)]
@@ -93,6 +94,7 @@ export function parseAnkiJson(filePath) {
       answerImg:       getBase64(answerImg),
       answerAltText:   formatAnswerAltText(expression),
       answers,
+      otherVisibleContext,
       mediaUrls: []
     };
   });
