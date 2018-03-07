@@ -8,6 +8,7 @@ export function buildUpdatesForRank(stats) {
     weeklyStats:  0
   };
 
+  let skip = 1;
   stats.forEach(({ _id: category, scores }) => {
     const end = scores.length;
     let i = 0;
@@ -17,7 +18,6 @@ export function buildUpdatesForRank(stats) {
 
       currentStat.users.sort((a, b) => a[category].avgTimeToAnswer - b[category].avgTimeToAnswer);
       let currentAvgTime = -1;
-      let skip = 1;
 
       currentStat.users.forEach(user => {
         if (user[category].avgTimeToAnswer > currentAvgTime) {
@@ -34,8 +34,6 @@ export function buildUpdatesForRank(stats) {
           usersToUpdate[user.userId] = cachedUpdate;
         }
       }); // users.forEach
-
-      if (skip > 1) currentRanks[category] += skip;
 
     } // next score
   });

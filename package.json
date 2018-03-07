@@ -6,9 +6,10 @@
     "build": "webpack --config webpack.dev.js",
     "deploy": "webpack --config webpack.prod.js",
     "server": "node --require dotenv/config ./dist/server.js",
-    "dev-start": "npm run build && npm run server",
+    "devStart": "npm run build && npm run server",
     "start": "node ./dist/server.js",
-    "test": "jest"
+    "test": "jest --watch",
+    "testOnce": "jest"
   },
   "author": "appleJax <appleJax@users.noreply.github.com>",
   "license": "MIT",

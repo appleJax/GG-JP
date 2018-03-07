@@ -1,45 +1,47 @@
 const { calculateScore } = require('Utils');
 
-const answerPostedAt = 'Fri Jan 26 06:54:01 +0000 2018';
-const foundQuestion1 = {
-  questionPostedAt: 'Fri Jan 26 03:54:01 +0000 2018',
-  alreadyAnswered: ['212093209', '3238998230', '120392093']
-};
+const answerPostedAt = millis('Fri Jan 26 06:54:01 +0000 2018');
 
 describe('calculates scores correctly', () => {
+
   test('answer after 3 hours', () => {
+    const question = {
+      questionPostedAt: millis('Fri Jan 26 03:54:01 +0000 2018')
+    };
     expect(
-      calculateScore(answerPostedAt, foundQuestion1)
+      calculateScore(answerPostedAt, question)
     ).toBe(21);
   });
 
   test('max score', () => {
-    const foundQuestion2 = {
-      ...foundQuestion1,
-      questionPostedAt: 'Fri Jan 26 05:55:01 +0000 2018'
+    const question = {
+      questionPostedAt: millis('Fri Jan 26 05:55:01 +0000 2018')
     };
     expect(
-      calculateScore(answerPostedAt, foundQuestion2)
+      calculateScore(answerPostedAt, question)
     ).toBe(24);
   });
 
   test('min score', () => {
-    const foundQuestion3 = {
-      ...foundQuestion1,
-      questionPostedAt: 'Thu Jan 25 06:55:01 +0000 2018'
+    const question = {
+      questionPostedAt: millis('Thu Jan 25 06:55:01 +0000 2018')
     };
     expect(
-      calculateScore(answerPostedAt, foundQuestion3)
+      calculateScore(answerPostedAt, question)
     ).toBe(1);
   });
 
   test('zero score', () => {
-    const foundQuestion3 = {
-      ...foundQuestion1,
-      questionPostedAt: 'Thu Jan 22 06:55:01 +0000 2018'
+    const question = {
+      questionPostedAt: millis('Thu Jan 25 06:54:01 +0000 2018')
     };
     expect(
-      calculateScore(answerPostedAt, foundQuestion3)
+      calculateScore(answerPostedAt, question)
     ).toBe(0);
   });
-});
+
+}); // describe
+
+function millis(dateString) {
+  return new Date(dateString).getTime();
+}
