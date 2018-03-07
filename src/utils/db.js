@@ -8,8 +8,8 @@ export function buildUpdatesForRank(stats) {
     weeklyStats:  0
   };
 
-  let skip = 1;
   stats.forEach(({ _id: category, scores }) => {
+    let skip = 1;
     const end = scores.length;
     let i = 0;
     for (; i < end; i++) {
@@ -34,7 +34,6 @@ export function buildUpdatesForRank(stats) {
           usersToUpdate[user.userId] = cachedUpdate;
         }
       }); // users.forEach
-
     } // next score
   });
 
