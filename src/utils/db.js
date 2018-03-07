@@ -15,7 +15,7 @@ export function buildUpdatesForRank(stats) {
       const currentStat = scores[i];
       if (currentStat.score === 0) continue;
 
-      currentStat.users.sort((a, b) => a.avgTimeToAnswer - b.avgTimeToAnswer);
+      currentStat.users.sort((a, b) => a[category].avgTimeToAnswer - b[category].avgTimeToAnswer);
       let currentAvgTime = -1;
       let skip = 1;
 
@@ -63,7 +63,8 @@ export function buildUpdatesForRank(stats) {
         op.updateOne.update.$set[`${category}.rank`] = newRank;
     });
 
-    bulkUpdateOps.push(op);
+    if (Object.keys(op.updateOne.update.$set).length > 0)
+      bulkUpdateOps.push(op);
 
   } // for loop
 
