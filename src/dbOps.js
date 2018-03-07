@@ -1,5 +1,6 @@
-import { MongoClient } from 'mongodb';
-import { processUpload } from './processAnkiJson';
+import { MongoClient }         from 'mongodb';
+import { processUpload }       from './processAnkiJson';
+import { buildUpdatesForRank } from 'Utils/db'
 import {
   average,
   calculateNewStats,
@@ -706,57 +707,7 @@ function recalculateRank(scoreboard) {
       }
     ], { allowDiskUse: true }).toArray());
 
-    const usersToUpdate = {};
-    const currentRanks = {
-      allTimeStats: 1,
-      monthlyStats: 1,
-      weeklyStats:  1
-    };
-    stats.forEach(({ _id: category, scores }) => {
-      const end = scores.length;
-      let i = 0;
-      for (; i < end; i++) {
-        const currentStat = scores[i];
-        if (currentStat.score === 0) continue;
-
-        currentStat.users.forEach(user => {
-          const previousRank = user[category].rank;
-          const currentRank = currentRanks[category];
-          if (previousRank !== currentRank) {
-            const cachedUpdate = usersToUpdate[user.userId] || {};
-            cachedUpdate[category] = currentRank;
-            usersToUpdate[user.userId] = cachedUpdate;
-          }
-        });
-        currentRanks[category] += currentStat.users.length;
-      }
-    });
-
-    const bulkUpdateOps = [];
-    const userIdsToUpdate = Object.keys(usersToUpdate);
-    const end = userIdsToUpdate.length;
-    let i = 0;
-    for (; i < end; i++) {
-      const currentUser = userIdsToUpdate[i];
-      const userId = currentUser;
-      const op = {
-        updateOne: {
-          filter: { userId },
-          update: {
-            $set: {}
-          }
-        }
-      };
-      const userUpdates = usersToUpdate[currentUser];
-      Object.keys(currentRanks).forEach(category => {
-        const newRank = userUpdates[category];
-        if (newRank)
-          op.updateOne.update.$set[`${category}.rank`] = newRank;
-      });
-
-      bulkUpdateOps.push(op);
-
-    } // for loop
+    const bulkUpdateOps = buildUpdatesForRank(stats);
 
     if (bulkUpdateOps.length === 0) {
       resolve();
