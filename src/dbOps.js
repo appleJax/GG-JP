@@ -290,7 +290,7 @@ export default ({
         handle: { $regex: search, $options: 'i' },
         [`${view}.score`]: { $gt: 0 }
       })
-      .sort({[`${view}.score`]: -1, handle: 1})
+      .sort({[`${view}.rank`]: -1, handle: 1})
       .limit(PAGE_SIZE*page)
       .toArray()
     );
@@ -502,7 +502,7 @@ function addPointsToScoreboard({ userPoints, cardId }, mongo) {
             },
             $set: {
               // NOTE
-              // - timeToAnswer is the seconds it took the user to answer the CURRENT QUESTION
+              // - timeToAnswer is the seconds it took the user to answer the CURRENT question
               // - this value is being stored here for reference
               // - it will later be overwritten by a new calculated average
               //
@@ -668,13 +668,16 @@ function recalculateRank(scoreboard) {
       { $project: {
           _id: 0,
           orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'allTimeStats' ] },
-          userId: 1,
-          'allTimeStats.score': 1,
-          'allTimeStats.rank':  1,
-          'monthlyStats.score': 1,
-          'monthlyStats.rank':  1,
-          'weeklyStats.score':  1,
-          'weeklyStats.rank':   1
+          userId:                         1,
+          'allTimeStats.avgTimeToAnswer': 1,
+          'allTimeStats.score':           1,
+          'allTimeStats.rank':            1,
+          'monthlyStats.avgTimeToAnswer': 1,
+          'monthlyStats.score':           1,
+          'monthlyStats.rank':            1,
+          'weeklyStats.avgTimeToAnswer':  1,
+          'weeklyStats.score':            1,
+          'weeklyStats.rank':             1
         }
       },
       { $unwind: '$orderBy' },
