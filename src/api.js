@@ -17,29 +17,29 @@ export default (app) => {
   });
 
 
-  app.get('/api/cards/earned', DB.getEarnedCards);
+  app.get('/api/cards/earned',    DB.getEarnedCards);
 
-  app.get('/api/cards/old',    DB.getOldCards);
+  app.get('/api/cards/old',       DB.getOldCards);
 
-  app.get('/api/countdown',    (req, res) =>
+  app.get('/api/decks',           DB.getDeckTitles);
+
+  app.get('/api/deck/:slug',      DB.getDeck);
+
+  app.get('/api/live',            DB.serveLiveQuestions);
+
+  app.get('/api/recent',          DB.serveRecentAnswers);
+
+  app.get('/api/signin/:userId',  DB.findOrCreateUser);
+
+  app.get('/api/scores',          DB.getScores);
+
+  app.get('/api/user/:userId',    DB.getUser);
+
+  app.get('/api/userStats',       DB.getUserStats);
+
+  app.get('/api/countdown', (req, res) =>
     res.json({ millis: getTimeTilNextTweet() })
   );
-
-  app.get('/api/decks',        DB.getDeckTitles);
-
-  app.get('/api/deck/:slug',   DB.getDeck);
-
-  app.get('/api/live',         DB.serveLiveQuestions);
-
-  app.get('/api/recent',       DB.serveRecentAnswers);
-
-  app.get('/api/scores',       DB.getScores);
-
-  app.post('/api/users/new',   DB.createUser);
-
-  app.get('/api/user/:userId', DB.getUser);
-
-  app.get('/api/userStats',    DB.getUserStats);
 
 
   // TODO - add authentication to following endpoints

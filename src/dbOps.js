@@ -1,6 +1,9 @@
 import { MongoClient }         from 'mongodb';
 import { processUpload }       from './processAnkiJson';
-import { buildUpdatesForRank } from 'Utils/db'
+import {
+  buildUpdatesForRank,
+  createUserObject
+} from 'Utils/db';
 import {
   average,
   calculateNewStats,
@@ -67,7 +70,9 @@ export default ({
       const mongo = await tryCatch(MongoClient.connect(url));
       const scoreboard = mongo.db(DB).collection('scoreboard');
       const { userId } = newUser;
-      const user = await tryCatch(scoreboard.findOne({userId}));
+      const user = await tryCatch(
+        scoreboard.findOne({ userId })
+      );
       if (user) {
         const {
           name,
@@ -87,10 +92,13 @@ export default ({
           })
         );
       } else {
-        await tryCatch(scoreboard.insert(newUser));
+        await tryCatch(
+          scoreboard.insert(newUser)
+        );
       }
-      mongo.close();
+
       resolve(user || newUser);
+      mongo.close();
     });
   },
 
@@ -124,6 +132,31 @@ export default ({
     await tryCatch(
       scoreboard.insert(user)
     );
+    mongo.close();
+  },
+
+  async findOrCreateUser(req, res) {
+    const {
+      params: { userId },
+      query:  { twitterUser }
+    } = req;
+    const newUser = JSON.parse(twitterUser);
+
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+
+    let user = await tryCatch(
+      scoreboard.findOne({ userId })
+    );
+
+    if (!user) {
+      user = await tryCatch(
+        createUserObject(newUser)
+      );
+      scoreboard.insert(user);
+    }
+
+    res.json(user);
     mongo.close();
   },
 
@@ -282,7 +315,14 @@ export default ({
     mongo.close();
   },
 
-  async getScores({query: { page = 1, view = 'weeklyStats', search = ''} }, res) {
+  async getScores(req, res ) {
+    const {
+      query: {
+        page = 1,
+        view = 'weeklyStats',
+        search = ''
+      }
+    } = req;
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
     const users = await tryCatch(
@@ -290,7 +330,7 @@ export default ({
         handle: { $regex: search, $options: 'i' },
         [`${view}.score`]: { $gt: 0 }
       })
-      .sort({[`${view}.rank`]: -1, handle: 1})
+      .sort({[`${view}.rank`]: 1, handle: 1})
       .limit(PAGE_SIZE*page)
       .toArray()
     );

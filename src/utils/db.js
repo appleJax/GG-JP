@@ -1,3 +1,6 @@
+import { tryCatch }     from 'Utils'
+import { getFollowing } from 'Utils/twitter'
+
 
 export function buildUpdatesForRank(stats) {
 
@@ -16,7 +19,9 @@ export function buildUpdatesForRank(stats) {
       const currentStat = scores[i];
       if (currentStat.score === 0) continue;
 
-      currentStat.users.sort((a, b) => a[category].avgTimeToAnswer - b[category].avgTimeToAnswer);
+      currentStat.users.sort(
+        (a, b) => a[category].avgTimeToAnswer - b[category].avgTimeToAnswer
+      );
       let currentAvgTime = -1;
 
       currentStat.users.forEach(user => {
@@ -66,4 +71,73 @@ export function buildUpdatesForRank(stats) {
   } // for loop
 
   return bulkUpdateOps;
+}
+
+export function createUserObject(profile) {
+  return new Promise(async (resolve, reject) => {
+    const {
+      id_str: userId,
+      name,
+      screen_name: handle,
+      profile_image_url_https: avatar,
+      profile_banner_url: profileBanner
+    } = profile;
+    const following = await tryCatch(
+      getFollowing(userId)
+    );
+
+    resolve({
+      userId,
+      name,
+      handle,
+      avatar,
+      profileBanner,
+      following,
+      allTimeStats: {
+        attempts: 0,
+        correct: [],
+        incorrect: [],
+        unanswered: [],
+        totalPossible: 0,
+        rank: 0,
+        score: 0,
+        avgTimeToAnswer: 0
+      },
+      monthlyStats: {
+        attempts: 0,
+        correct: 0,
+        totalPossible: 0,
+        rank: 0,
+        score: 0,
+        avgTimeToAnswer: 0,
+        average: {
+          n: 0,
+          value: 0
+        }
+      },
+      weeklyStats: {
+        attempts: 0,
+        correct: 0,
+        totalPossible: 0,
+        rank: 0,
+        score: 0,
+        avgTimeToAnswer: 0,
+        average: {
+          n: 0,
+          value: 0
+        }
+      },
+      dailyStats: {
+        attempts: 0,
+        correct: 0,
+        totalPossible: 0,
+        score: 0,
+        avgTimeToAnswer: 0,
+        average: {
+          n: 0,
+          value: 0
+        }
+      }
+    });
+  });
 }
