@@ -1,7 +1,5 @@
 import passport from 'Config/passport';
 
-const { UI_URL } = process.env
-
 
 export default (app) => {
 
@@ -18,7 +16,7 @@ export default (app) => {
     }
   );
 
-  app.get('/api/user', (req, res) => {
+  app.get('/api/session/user', (req, res) => {
     res.json(req.session.user || null);
     req.session.destroy(console.error);
   });

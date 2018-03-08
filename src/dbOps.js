@@ -2,7 +2,8 @@ import { MongoClient }   from 'mongodb';
 import { processUpload } from './processAnkiJson';
 import {
   buildUpdatesForRank,
-  createUserObject
+  createUserObject,
+  getUser
 } from 'Utils/db';
 import {
   average,
@@ -316,6 +317,13 @@ export default ({
     }
     res.json(users);
     mongo.close();
+  },
+
+  async getUser({ params: { userId }}, res) {
+    const user = await tryCatch(
+      getUser(userId)
+    );
+    res.json(user);
   },
 
   async getUserStats({ query: { handle } }, res) {

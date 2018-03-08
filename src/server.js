@@ -25,6 +25,7 @@ app.use(bodyParser.json());
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', UI_URL);
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Max-Age', '86400'); // 24 hours
   res.header('Access-Control-Allow-Headers',
              'Origin, X-Requested-With, Content-Type, Accept');
@@ -34,7 +35,7 @@ app.use((req, res, next) => {
 auth(app);
 route(app);
 
-twitterBot.start();
+//twitterBot.start();
 
 const PORT = app.get('port');
 app.listen(PORT, () =>

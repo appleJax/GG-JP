@@ -170,13 +170,15 @@ export async function findOrCreateUser(userId, twitterUser) {
 }
 
 
-export async function getUser(userId) {
-  const mongo = await tryCatch(MongoClient.connect(url));
-  const scoreboard = mongo.db(DB).collection('scoreboard');
-  const user = await tryCatch(
-    scoreboard.findOne({ userId })
-  );
+export function getUser(userId) {
+  return new Promise(async (resolve, reject) => {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const scoreboard = mongo.db(DB).collection('scoreboard');
+    const user = await tryCatch(
+      scoreboard.findOne({ userId })
+    );
 
-  mongo.close();
-  return user;
+    resolve(user);
+    mongo.close();
+  });
 }
