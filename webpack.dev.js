@@ -1,6 +1,7 @@
 const merge = require('webpack-merge');
 const common = require('./webpack.common');
 const webpack = require('webpack');
+const { BOT_URL } = require('./.env.js').dev;
 
 module.exports = merge(common, {
   devtool: 'inline-source-map',
@@ -11,7 +12,8 @@ module.exports = merge(common, {
       entryOnly: false
     }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('dev')
+      'process.env.NODE_ENV': JSON.stringify('dev'),
+      'BOT_URL':              JSON.stringify(BOT_URL)
     })
   ]
 });

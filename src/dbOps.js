@@ -1,5 +1,5 @@
-import { MongoClient }         from 'mongodb';
-import { processUpload }       from './processAnkiJson';
+import { MongoClient }   from 'mongodb';
+import { processUpload } from './processAnkiJson';
 import {
   buildUpdatesForRank,
   createUserObject
@@ -132,31 +132,6 @@ export default ({
     await tryCatch(
       scoreboard.insert(user)
     );
-    mongo.close();
-  },
-
-  async findOrCreateUser(req, res) {
-    const {
-      params: { userId },
-      query:  { twitterUser }
-    } = req;
-    const newUser = JSON.parse(twitterUser);
-
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-
-    let user = await tryCatch(
-      scoreboard.findOne({ userId })
-    );
-
-    if (!user) {
-      user = await tryCatch(
-        createUserObject(newUser)
-      );
-      scoreboard.insert(user);
-    }
-
-    res.json(user);
     mongo.close();
   },
 
@@ -340,23 +315,6 @@ export default ({
       return;
     }
     res.json(users);
-    mongo.close();
-  },
-
-  async getUser({ params: { userId } }, res) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-    const user = await tryCatch(
-      scoreboard.findOne({ userId })
-    );
-
-    if (!user) {
-      res.json(null);
-      mongo.close();
-      return;
-    }
-
-    res.json(user);
     mongo.close();
   },
 

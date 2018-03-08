@@ -1,6 +1,11 @@
+import { MongoClient }  from 'mongodb';
 import { tryCatch }     from 'Utils'
 import { getFollowing } from 'Utils/twitter'
 
+const {
+  MONGODB_URI: url,
+  MONGO_DB:    DB
+} = process.env;
 
 export function buildUpdatesForRank(stats) {
 
@@ -140,4 +145,38 @@ export function createUserObject(profile) {
       }
     });
   });
+}
+
+
+export async function findOrCreateUser(userId, twitterUser) {
+  const mongo = await tryCatch(MongoClient.connect(url));
+  const scoreboard = mongo.db(DB).collection('scoreboard');
+
+  let user = await tryCatch(
+    scoreboard.findOne({ userId })
+  );
+
+  if (!user) {
+    user = await tryCatch(
+      createUserObject(twitterUser)
+    );
+    await tryCatch(
+      scoreboard.insert(user)
+    );
+  }
+
+  mongo.close();
+  return user;
+}
+
+
+export async function getUser(userId) {
+  const mongo = await tryCatch(MongoClient.connect(url));
+  const scoreboard = mongo.db(DB).collection('scoreboard');
+  const user = await tryCatch(
+    scoreboard.findOne({ userId })
+  );
+
+  mongo.close();
+  return user;
 }

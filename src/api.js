@@ -6,17 +6,6 @@ const upload = multer({ dest: 'uploads/' });
 
 export default (app) => {
 
-  // CORS
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.header('Access-Control-Max-Age', '86400'); // 24 hours
-    res.header('Access-Control-Allow-Headers',
-               'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-  });
-
-
   app.get('/api/cards/earned',    DB.getEarnedCards);
 
   app.get('/api/cards/old',       DB.getOldCards);
@@ -29,11 +18,7 @@ export default (app) => {
 
   app.get('/api/recent',          DB.serveRecentAnswers);
 
-  app.get('/api/signin/:userId',  DB.findOrCreateUser);
-
   app.get('/api/scores',          DB.getScores);
-
-  app.get('/api/user/:userId',    DB.getUser);
 
   app.get('/api/userStats',       DB.getUserStats);
 
