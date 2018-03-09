@@ -659,15 +659,9 @@ function getRecentAnswers() {
               .sort({ answerPostedAt: -1 })
               .limit(12)
               .project({
-                _id:                 0,
-                answerId:            1,
-                answerPostedAt:      1,
-                answers:             1,
-                cardId:              1,
-                game:                1,
-                mediaUrls:           1,
-                otherVisibleContext: 1,
-                questionText:        1
+                _id:             0,
+                alreadyAnswered: 0,
+                userPoints:      0
               })
               .toArray()
     );

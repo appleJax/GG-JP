@@ -4,9 +4,9 @@
   "description": "Language Quiz Bot for Video Game Text",
   "scripts": {
     "build": "webpack --config webpack.dev.js",
-    "deploy": "webpack --config webpack.prod.js",
+    "deploy": "webpack -p --config webpack.prod.js",
     "server": "node --require dotenv/config ./dist/server.js",
-    "devStart": "npm run build && npm run server",
+    "devstart": "npm run build && npm run server",
     "start": "node ./dist/server.js",
     "test": "jest --watch",
     "testOnce": "jest"
