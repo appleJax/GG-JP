@@ -569,6 +569,9 @@ function addPointsToScoreboard({ userPoints, cardId }, mongo) {
                 'monthlyStats.totalPossible': 1,
                 'weeklyStats.totalPossible':  1,
                 'dailyStats.totalPossible':   1
+              },
+              $push: {
+                'allTimeStats.unanswered': cardId
               }
             }
           }
