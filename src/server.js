@@ -35,7 +35,8 @@ app.use((req, res, next) => {
 auth(app);
 route(app);
 
-//twitterBot.start();
+if (process.env.NODE_ENV === 'production')
+  twitterBot.start();
 
 const PORT = app.get('port');
 app.listen(PORT, () =>

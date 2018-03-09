@@ -373,6 +373,15 @@ export default ({
     const collection = mongo.db(DB).collection('liveQuestions');
     const liveQuestions = await tryCatch(
       collection.find()
+                .project({
+                  _id:                 0,
+                  answers:             0,
+                  answerAltText:       0,
+                  answerImg:           0,
+                  answerText:          0,
+                  otherVisibleContext: 0,
+                  userPoints:          0
+                })
                 .sort({ questionPostedAt: -1 })
                 .toArray()
     );
