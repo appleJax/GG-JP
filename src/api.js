@@ -6,9 +6,9 @@ const upload = multer({ dest: 'uploads/' });
 
 export default (app) => {
 
-  app.get('/api/cards/earned', DB.getEarnedCards);
-
   app.get('/api/cards/old',    DB.getOldCards);
+
+  app.get('/api/cards',        DB.serveCards);
 
   app.get('/api/decks',        DB.getDeckTitles);
 

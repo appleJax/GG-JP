@@ -199,17 +199,17 @@ export default ({
     res.json(titles);
   },
 
-  async getEarnedCards({ query: { ids } }, res) {
+  async serveCards({ query: { ids } }, res) {
     if (!ids || ids.length === 0) {
       res.json(null);
       return;
     }
     const mongo = await tryCatch(MongoClient.connect(url));
     const oldCards = mongo.db(DB).collection('oldCards');
-    const earnedCards = await tryCatch(
+    const cards = await tryCatch(
       getCards(ids, oldCards)
     );
-    res.json(earnedCards);
+    res.json(cards);
     mongo.close();
   },
 
