@@ -14,6 +14,7 @@ app.use(
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false
+    // cookie: { maxAge: 604800000 } // one week
   })
 )
 

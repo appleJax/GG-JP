@@ -18,7 +18,13 @@ export default (app) => {
 
   app.get('/api/session/user', (req, res) => {
     res.json(req.session.user || null);
-    req.session.destroy(console.error);
   });
+
+  app.get('/api/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) console.error(err)
+      res.json(null)
+    })
+  })
 
 }

@@ -79,7 +79,17 @@ export function parseAnkiJson(filePath) {
       cardId
     ] = card.fields;
 
-    [ engMeaning, expression, notes ] = [ engMeaning, expression, notes ].map(stripHtml);
+    [ altAnswers,
+      engMeaning,
+      expression,
+      notes
+    ] = [
+      altAnswers,
+      engMeaning,
+      expression,
+      notes
+    ].map(stripHtml);
+
     engMeaning = engMeaning.replace(/"/g, "'");
     const answers = getAnswers(expression, altAnswers);
 
