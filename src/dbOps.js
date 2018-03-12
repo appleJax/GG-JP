@@ -326,7 +326,7 @@ export default ({
     res.json(user);
   },
 
-  async getUserStats({ query: { handle } }, res) {
+  async getUserStats({ params: { handle }}, res) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
     const oldCards = mongo.db(DB).collection('oldCards');

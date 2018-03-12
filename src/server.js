@@ -1,7 +1,7 @@
 import express    from 'express';
 import bodyParser from 'body-parser';
 import path       from 'path';
-import session    from 'express-session'
+import session    from 'express-session';
 import twitterBot from './twitterBot';
 import auth       from './auth';
 import route      from './api';
@@ -16,7 +16,7 @@ app.use(
     saveUninitialized: false
     // cookie: { maxAge: 604800000 } // one week
   })
-)
+);
 
 app.set('port', (process.env.PORT || 3000));
 app.use(express.static(path.resolve(__dirname, '../dist')));
