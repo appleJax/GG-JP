@@ -31,26 +31,31 @@ export default (app) => {
   );
 
   app.get('/api/deck/:slug',
+    browserCache,
     cache.route(untilNextTweet()),
     DB.getDeck
   );
 
   app.get('/api/live',
+    browserCache,
     cache.route(untilNextTweet()),
     DB.serveLiveQuestions
   );
 
   app.get('/api/recent',
+    browserCache,
     cache.route(untilNextTweet()),
     DB.serveRecentAnswers
   );
 
   app.get('/api/scores',
+    browserCache,
     cache.route(untilNextTweet()),
     DB.getScores
   );
 
   app.get('/api/user/:userId',
+    browserCache,
     (req, res, next) => {
       res.express_redis_cache_name = 'user-' + req.params.userid;
       next();
@@ -60,6 +65,7 @@ export default (app) => {
   );
 
   app.get('/api/userStats/:handle',
+    browserCache,
     (req, res, next) => {
       res.express_redis_cache_name = 'user-' + req.params.handle;
       next();
@@ -84,6 +90,11 @@ export default (app) => {
 
   app.get('/cards/new',    DB.getNewCards);
 
+}
+
+function browserCache(req, res, next) {
+  res.set('Cache-Control', `max-age=${untilNextTweet()}`);
+  next();
 }
 
 function untilNextTweet() {

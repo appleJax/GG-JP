@@ -24,7 +24,9 @@ app.use(bodyParser.json());
 
 // CORS
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', `${req.protocol}://${UI_URL}`);
+  let protocol = 'http';
+  if (req.secure) protocol += 's';
+  res.header('Access-Control-Allow-Origin', `${protocol}://${UI_URL}`);
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.header('Vary', 'Origin');
   res.header('Access-Control-Allow-Credentials', true);
