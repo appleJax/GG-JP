@@ -76,7 +76,10 @@ export function formatAnswerText(answers, cardId, engMeaning, webLookup) {
   const s = answers.length > 1 ? 's' : '';
   let answerText = `Answer${s}: ${answers.join(', ')}`;
   answerText += `\nEnglish: "${engMeaning}"`;
-  answerText += '\nLookup: ' + WEBLOOKUP_URL + urlencode(webLookup);
+
+  if (webLookup)
+    answerText += '\nLookup: ' + WEBLOOKUP_URL + urlencode(webLookup);
+
   answerText += `\nQID${cardId}`;
   return answerText;
 }
