@@ -64,10 +64,6 @@ export function contains(item, list) {
   return valid(list.indexOf(item));
 }
 
-export function isDaylightSavings(date) {
-  return date.getTimezoneOffset() < stdTimezoneOffset(date);
-}
-
 export function extractAnswer(text) {
   return text.trim().slice(TWITTER_ACCOUNT.length + 2);
 }
@@ -241,12 +237,9 @@ function formatHint(expression) {
 
 function _getTimeUntil(hour) {
   // UTC offset +6 ... DST +5
+  const offset = 5;
 
   const now = new Date();
-  let offset = 6;
-  if (isDaylightSavings(now))
-    offset--;
-
   hour = (hour + offset) % 24;
   const utcNow = now.getTime();
   let millisUntilTime = Date.UTC(
@@ -301,12 +294,6 @@ function split(str) {
 
 function scalar(v) {
   return !Array.isArray(v);
-}
-
-function stdTimezoneOffset(date) {
-  const jan = new Date(date.getFullYear(), 0, 1);
-  const jul = new Date(date.getFullYear(), 6, 1);
-  return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
 }
 
 function valid(index) {

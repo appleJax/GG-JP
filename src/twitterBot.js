@@ -4,7 +4,6 @@ import { evaluateResponse } from './evaluateTwitterReply';
 import {
   HOURS,
   addLinks,
-  isDaylightSavings,
   getTimeTilNextTweet,
   getTimeUntil,
   tryCatch
@@ -18,8 +17,6 @@ const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;
 const QUESTION_INTERVAL = 6*HOURS;
-
-let tweetTimer
 
 export default ({
 
@@ -40,7 +37,10 @@ async function scheduleActions() {
   const timeUntilTweet = getTimeTilNextTweet();
   const timeUntilMidnight = getTimeUntil(0);
 
-  setTimeout(startTweeting, timeUntilTweet);
+  setTimeout(() => {
+    tweetRandomQuestion();
+    setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
+  }, timeUntilTweet);
 
   setTimeout(() => {
     updateStats();
@@ -147,25 +147,4 @@ function updateStats() {
   const resetWeeklyStats  = now.getUTCDay()  === 0;
   const resetMonthlyStats = now.getUTCDate() === 1;
   DB.updateStats(resetWeeklyStats, resetMonthlyStats);
-
-  if (resetWeeklyStats) {
-    const wasDST = isDaylightSavings(now);
-    setTimeout(() => resetIfDST(wasDST), 4*HOURS);
-  }
-}
-
-function resetIfDST(wasDST) {
-  const now = new Date();
-  const isDST = isDaylightSavings(now);
-
-  if (wasDST !== isDST) {
-    const newTimeTilTweet = getTimeTilNextTweet();
-    clearInterval(tweetTimer);
-    setTimeout(startTweeting, newTimeTilTweet);
-  }
-}
-
-function startTweeting() {
-  tweetRandomQuestion();
-  tweetTimer = setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
 }

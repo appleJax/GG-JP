@@ -37,8 +37,6 @@ export default (app) => {
   );
 
   app.get('/api/live',
-    browserCache,
-    cache.route(untilNextTweet()),
     DB.serveLiveQuestions
   );
 
