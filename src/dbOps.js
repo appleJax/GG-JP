@@ -164,7 +164,7 @@ export default ({
     );
 
     if (!deck) {
-      res.json(null);
+      res.json({ cards: null, total: 0 });
       mongo.close();
       return;
     }
@@ -173,6 +173,12 @@ export default ({
     const total = await tryCatch(
       oldCards.find({ game: deck.fullTitle }).count()
     );
+
+    if (total === 0) {
+      res.json({ cards: null, total: 0 });
+      mongo.close();
+      return;
+    }
 
     const rawCards = await tryCatch(
       oldCards.find({
