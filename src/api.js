@@ -31,8 +31,6 @@ export default (app) => {
   );
 
   app.get('/api/deck/:slug',
-    browserCache,
-    cache.route(untilNextTweet()),
     DB.getDeck
   );
 
@@ -53,12 +51,6 @@ export default (app) => {
   );
 
   app.get('/api/user/:userId',
-    browserCache,
-    (req, res, next) => {
-      res.express_redis_cache_name = 'user-' + req.params.userid;
-      next();
-    },
-    cache.route(untilNextTweet()),
     DB.getUser
   );
 

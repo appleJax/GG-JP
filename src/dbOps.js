@@ -148,10 +148,16 @@ export default ({
     });
   },
 
-  async getDeck({ params: { slug }}, res) {
+  async getDeck(req, res) {
+    const {
+      params: { slug },
+      query:  { page = 1 }
+    } = req
+
     const mongo = await tryCatch(MongoClient.connect(url));
-    const deckTitles    = mongo.db(DB).collection('deckTitles');
-    const oldCards      = mongo.db(DB).collection('oldCards');
+    const deckTitles = mongo.db(DB).collection('deckTitles');
+    const oldCards   = mongo.db(DB).collection('oldCards');
+    const CARDS_PER_PAGE = 12;
 
     const deck = await tryCatch(
       deckTitles.findOne({ slug })
@@ -162,6 +168,11 @@ export default ({
       mongo.close();
       return;
     }
+
+    const skipCount = (page - 1) * CARDS_PER_PAGE;
+    const total = await tryCatch(
+      oldCards.find({ game: deck.fullTitle }).count()
+    );
 
     const rawCards = await tryCatch(
       oldCards.find({
@@ -178,6 +189,8 @@ export default ({
         questionText:   1,
       })
       .sort({ answerPostedAt: -1 })
+      .skip(skipCount)
+      .limit(CARDS_PER_PAGE)
       .toArray()
     );
 
@@ -188,7 +201,7 @@ export default ({
     }
 
     const cards = formatFlashCards(rawCards);
-    res.json(cards);
+    res.json({ cards, total });
     mongo.close();
   },
 
