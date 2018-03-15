@@ -51,6 +51,11 @@ export default (app) => {
   );
 
   app.get('/api/user/:userId',
+    (req, res, next) => {
+      res.express_redis_cache_name = 'user-' + req.params.userId;
+      next();
+    },
+    cache.route(untilNextTweet()),
     DB.getUser
   );
 
