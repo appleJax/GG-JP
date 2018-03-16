@@ -6,10 +6,10 @@ import { evaluateResponse } from '../evaluateTwitterReply';
 
 export function getFollowing(userId) {
   return new Promise((resolve, reject) => {
-    Twitter.get('friends/ids', { userId }, (err, data, response) => {
-      if (err) console.error(err);
-      resolve(data.ids);
-    });
+    Twitter.get('friends/ids',
+      { user_id: userId, stringify_ids: true }
+    ).then(({ data }) => resolve(data.ids)
+    ).catch(console.error)
   });
 }
 

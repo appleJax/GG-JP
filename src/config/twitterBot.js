@@ -4,7 +4,6 @@ const {
   TWITTER_API_SECRET,
   TWITTER_TOKEN,
   TWITTER_TOKEN_SECRET,
-  TWITTER_ACCOUNT
 } = process.env;
 
 // const appConfig = {
@@ -12,6 +11,11 @@ const {
 //   consumer_secret: TWITTER_API_SECRET,
 //   app_only_auth: true
 // }
+
+console.log('API_KEY', TWITTER_API_KEY)
+console.log('API_SECRET', TWITTER_API_SECRET)
+console.log('TOKEN', TWITTER_TOKEN)
+console.log('TOKEN_SECRET', TWITTER_TOKEN_SECRET)
 
 const userConfig = {
   consumer_key:        TWITTER_API_KEY,
