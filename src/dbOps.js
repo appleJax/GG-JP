@@ -507,7 +507,7 @@ export default ({
 
 // private functions
 
-function addPointsToScoreboard({ userPoints, cardId }, mongo) {
+function addPointsToScoreboard({ userPoints = [], cardId = '' }, mongo) {
   return new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
 
