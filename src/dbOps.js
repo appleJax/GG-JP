@@ -320,13 +320,21 @@ export default ({
     } = req;
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
+
+    const match = {
+      handle: { $regex: search, $options: 'i' },
+      [`${view}.score`]: { $gt: 0 }
+    };
+    const total = await tryCatch(
+      scoreboard.find(match).count()
+    );
+
+    const skipCount = (page - 1) * PAGE_SIZE;
     const users = await tryCatch(
-      scoreboard.find({
-        handle: { $regex: search, $options: 'i' },
-        [`${view}.score`]: { $gt: 0 }
-      })
+      scoreboard.find(match)
       .sort({[`${view}.rank`]: 1, handle: 1})
-      .limit(PAGE_SIZE*page)
+      .skip(skipCount)
+      .limit(PAGE_SIZE)
       .toArray()
     );
     if (users.length === 0) {
@@ -334,7 +342,7 @@ export default ({
       mongo.close();
       return;
     }
-    res.json(users);
+    res.json({ users, total });
     mongo.close();
   },
 
