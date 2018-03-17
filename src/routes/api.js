@@ -1,22 +1,9 @@
-import redis      from 'redis';
-import redisCache from 'express-redis-cache';
-import DB         from './dbOps';
-import multer     from 'multer';
+import { cache } from 'Config/redis';
+import DB        from '../dbOps';
+import multer    from 'multer';
 import { getTimeTilNextTweet } from 'Utils';
 
-const {
-  REDIS_HOST,
-  REDIS_PORT,
-  REDIS_PW
-} = process.env;
 const upload = multer({ dest: 'uploads/' });
-const cache = redisCache({
-  client: redis.createClient({
-    host: REDIS_HOST,
-    port: REDIS_PORT,
-    password: REDIS_PW
-  })
-});
 
 
 export default (app) => {

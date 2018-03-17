@@ -1,5 +1,5 @@
 import DB                   from './dbOps';
-import Twitter              from 'Config/twitterBot';
+import Twitter              from 'Config/twitter';
 import { evaluateResponse } from './evaluateTwitterReply';
 import {
   HOURS,

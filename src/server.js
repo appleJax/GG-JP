@@ -1,22 +1,13 @@
-import express    from 'express';
-import bodyParser from 'body-parser';
-import path       from 'path';
-import session    from 'express-session';
-import twitterBot from './twitterBot';
-import auth       from './auth';
-import route      from './api';
+import express     from 'express';
+import bodyParser  from 'body-parser';
+import path        from 'path';
+import { session } from 'Config/redis';
+import twitterBot  from './twitterBot';
+import route       from './routes';
 
-const { SESSION_SECRET } = process.env
 const app = express();
 
-app.use(
-  session({
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-    // cookie: { maxAge: 604800000 } // one week
-  })
-);
+app.use(session);
 
 app.set('port', (process.env.PORT || 3000));
 app.use(express.static(path.resolve(__dirname, '../dist')));
@@ -25,7 +16,7 @@ app.use(bodyParser.json());
 // CORS
 app.use((req, res, next) => {
   const protocol = ((req.get('Origin') || '').match(/^[a-z]+:\/\//i) || [])[0];
-  res.header('Access-Control-Allow-Origin', `${protocol || 'https://'}${ORIGIN_URL}`);
+  res.header('Access-Control-Allow-Origin', `${protocol || 'https://'}${ORIGIN_URL}`); // ORIGIN_URL defined in webpack
   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Max-Age', '86400'); // 24 hours
@@ -34,7 +25,6 @@ app.use((req, res, next) => {
   next();
 });
 
-auth(app);
 route(app);
 
 if (process.env.NODE_ENV === 'production')

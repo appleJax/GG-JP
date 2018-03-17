@@ -16,6 +16,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.39",
     "body-parser": "^1.18.2",
+    "connect-redis": "^3.3.3",
     "express": "^4.16.2",
     "express-redis-cache": "^1.1.1",
     "express-session": "^1.15.6",
