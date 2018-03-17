@@ -20,7 +20,6 @@ const {
   MONGO_DB:    DB
 } = process.env;
 
-const PAGE_SIZE = 100;
 
 export default ({
 
@@ -314,10 +313,12 @@ export default ({
     const {
       query: {
         page = 1,
+        pageSize = 100,
         view = 'weeklyStats',
         search = ''
       }
     } = req;
+
     const mongo = await tryCatch(MongoClient.connect(url));
     const scoreboard = mongo.db(DB).collection('scoreboard');
 
@@ -329,16 +330,16 @@ export default ({
       scoreboard.find(match).count()
     );
 
-    const skipCount = (page - 1) * PAGE_SIZE;
+    const skipCount = (Number(page) - 1) * Number(pageSize);
     const users = await tryCatch(
       scoreboard.find(match)
       .sort({[`${view}.rank`]: 1, handle: 1})
       .skip(skipCount)
-      .limit(PAGE_SIZE)
+      .limit(Number(pageSize))
       .toArray()
     );
     if (users.length === 0) {
-      res.json(null);
+      res.json({ users: [], total: 0 });
       mongo.close();
       return;
     }
