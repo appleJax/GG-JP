@@ -1,12 +1,12 @@
 const { TWITTER_ACCOUNT } = process.env;
-import Twitter from 'Config/twitterBot';
+import Twitter, { TwitApp } from 'Config/twitterBot';
 import { tryCatch } from 'Utils';
 import { evaluateResponse } from '../evaluateTwitterReply';
 
 
 export function getFollowing(userId) {
   return new Promise((resolve, reject) => {
-    Twitter.get('friends/ids',
+    TwitApp.get('friends/ids',
       { user_id: userId, stringify_ids: true }
     ).then(({ data }) => resolve(data.ids)
     ).catch(console.error)

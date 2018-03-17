@@ -163,6 +163,32 @@ export async function findOrCreateUser(userId, twitterUser) {
     await tryCatch(
       scoreboard.insert(user)
     );
+
+  } else {
+
+    const {
+      name,
+      screen_name: handle,
+      profile_image_url_https: avatar,
+      profile_banner_url: profileBanner
+    } = twitterUser;
+    const following = await tryCatch (
+      getFollowing(userId)
+    );
+    user = await tryCatch(
+      scoreboard.findOneAndUpdate({ userId },
+        { $set: {
+            avatar,
+            following,
+            name,
+            handle,
+            profileBanner
+          }
+        },
+        { returnOriginal: false }
+      )
+      .then(doc => Promise.resolve(doc.value))
+    );
   }
 
   mongo.close();
