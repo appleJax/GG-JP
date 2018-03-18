@@ -1,5 +1,6 @@
-import routeAuth from './auth';
-import routeApi  from './api';
+import routeAuth  from './auth';
+import routeApi   from './api';
+import addWebhook from './twitter';
 
 
 export default (app) => {
@@ -16,6 +17,7 @@ export default (app) => {
     next();
   });
 
+  addWebhook(app);
   routeAuth(app);
   routeApi(app);
 
