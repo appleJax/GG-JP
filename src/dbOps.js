@@ -214,7 +214,11 @@ export default ({
     const titles = await tryCatch(
       getCollection('deckTitles')
     );
-    res.json(titles);
+    titles.sort((a, b) => a.slug > b.slug);
+    const response = await tryCatch(
+      addTweetedCardCounts(titles)
+    );
+    res.json(response);
   },
 
   async serveCards({ query: { ids } }, res) {
@@ -641,6 +645,24 @@ function addPointsToScoreboard({ userPoints = [], cardId = '' }, mongo) {
     await tryCatch(scoreboard.bulkWrite(ops));
     await tryCatch(recalculateRank(scoreboard));
     resolve();
+  });
+}
+
+function addTweetedCardCounts(deckTitles) {
+  return new Promise(async (resolve, reject) => {
+    const mongo = await tryCatch(MongoClient.connect(url));
+    const oldCards = mongo.db(DB).collection('oldCards');
+
+    for (let i = 0; i < deckTitles.length; i++) {
+      const title = deckTitles[i];
+      const tweetedCards = await tryCatch(
+        oldCards.find({ game: title.fullTitle }).count()
+      );
+
+      title.tweetedCards = tweetedCards;
+    }
+
+    resolve(deckTitles);
   });
 }
 
