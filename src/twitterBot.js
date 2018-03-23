@@ -76,9 +76,9 @@ async function tweetRandomQuestion() {
     cardId,
     game,
     questionText,
-    questionImg,
+    questionImages,
     questionAltText,
-    prevLineImg,
+    prevLineImages,
     prevLineAltText,
     answers
   } = await tryCatch(DB.getRandomQuestion());
@@ -91,9 +91,9 @@ async function tweetRandomQuestion() {
   } = await tryCatch(
     postMedia(
       questionText,
-      questionImg,
+      questionImages,
       questionAltText,
-      prevLineImg,
+      prevLineImages,
       prevLineAltText
     )
   );
@@ -111,7 +111,7 @@ async function tweetRandomQuestion() {
 async function tweetAnswer(cardId, questionId) {
   const {
     answerText,
-    answerImg,
+    answerImages,
     answerAltText
   } = await tryCatch(
     DB.getAnswerCard(cardId)
@@ -125,7 +125,7 @@ async function tweetAnswer(cardId, questionId) {
     // Tweet the answer
     postMedia(
       addLinks(answerText, questionId),
-      answerImg,
+      answerImages,
       answerAltText
     )
   );
@@ -135,7 +135,7 @@ async function tweetAnswer(cardId, questionId) {
   // - removes base64 image from card
   // - adds userPoints to scoreboard
   // - moves card from liveQuestions to oldCards
-  DB.processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls[0]);
+  DB.processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls);
 }
 
 function openStream() {

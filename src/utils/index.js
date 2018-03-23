@@ -120,11 +120,8 @@ export function formatFlashCards(cards) {
     card.questionText = card.questionText.split('\n')[0];
     const s = card.answers.length > 1 ? 's' : '';
     card.answers = `Answer${s}: ${card.answers.join(', ')}`;
-    card.mediaUrl = (card.mediaUrls.length === 3)
-      ? card.mediaUrls[1]
-      : card.mediaUrls[0];
+    card.mediaUrls = card.mediaUrls.slice(...card.mainImageSlice);
 
-    delete card.mediaUrls;
     return card;
   });
 }

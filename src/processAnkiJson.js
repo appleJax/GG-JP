@@ -66,10 +66,10 @@ export function parseAnkiJson(filePath) {
       , // jpMeaning,
       engMeaning,
       , // officialEng,
-      questionImg,
-      answerImg,
+      questionImages,
+      answerImages,
       , // audio
-      prevLineImg,
+      prevLineImages,
       prevLineAltText,
       otherVisibleContext,
       altAnswers,
@@ -92,17 +92,24 @@ export function parseAnkiJson(filePath) {
 
     engMeaning = engMeaning.replace(/"/g, "'");
     const answers = getAnswers(expression, altAnswers);
+    questionImages = getBase64(questionImages);
+    prevLineImages = getBase64(prevLineImages);
+
+    const lowerSliceIndex = prevLineImages.length;
+    const upperSliceIndex = lowerSliceIndex + questionImages.length;
+    const mainImageSlice = [ lowerSliceIndex, upperSliceIndex ];
 
     return {
       cardId,
       game,
       questionText:    formatQuestionText(cardId, engMeaning, expression, game, notes),
-      questionImg:     getBase64(questionImg),
+      questionImages,
       questionAltText: formatQuestionAltText(expression),
-      prevLineImg:     getBase64(prevLineImg),
+      prevLineImages,
       prevLineAltText,
+      mainImageSlice,
       answerText:      formatAnswerText(answers, cardId, engMeaning, webLookup),
-      answerImg:       getBase64(answerImg),
+      answerImages:    getBase64(answerImages),
       answerAltText:   formatAnswerAltText(expression),
       answers,
       otherVisibleContext,
@@ -132,24 +139,28 @@ function stripHtml(string) {
   return string.replace(/<.*?>|&.*?;/g, '');
 }
 
-function getSrc(string) {
-  return (string.match(/src="(.+)"/) || [,])[1];
+function getImageNames(string) {
+  return (string.match(/src="(.+?)"/g) || []).map(str => str.slice(5, -1));
 }
 
-function getBase64(string) {
-  if (!string || string.length === 0) return;
+function getBase64(rawString) {
+  if (!rawString) return [];
 
-  let base64;
+  const imageNames = getImageNames(rawString);
+  let base64Images;
   try {
-    base64 = fs.readFileSync(
-      `${UPLOADS_PATH}/media/${getSrc(string)}`,
-      { encoding: 'base64' }
+    base64Images = imageNames.map(
+      (imageName) =>
+        fs.readFileSync(
+          `${UPLOADS_PATH}/media/${imageName}`,
+          { encoding: 'base64' }
+        )
     );
   } catch (e) {
     console.error(e);
     // return undefined...
   }
-  return base64;
+  return base64Images;
 }
 
 function cleanUp(files) {

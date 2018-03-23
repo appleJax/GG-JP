@@ -379,16 +379,16 @@ export default ({
     mongo.close();
   },
 
-  async processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrl) {
+  async processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls) {
     const mongo = await tryCatch(MongoClient.connect(url));
     const oldCards      = mongo.db(DB).collection('oldCards');
     const liveQuestions = mongo.db(DB).collection('liveQuestions');
 
     const currentQuestion = await tryCatch(
       liveQuestions.findOneAndUpdate({ cardId },
-        { $push:  { mediaUrls: mediaUrl },
+        { $push:  { mediaUrls: { $each: mediaUrls } },
           $set:   { answerId, answerPostedAt },
-          $unset: { answerImg: '', answerAltText: '' }
+          $unset: { answerImages: '', answerAltText: '' }
         },
         { returnOriginal: false }
       )
@@ -409,7 +409,7 @@ export default ({
                   _id:                 0,
                   answers:             0,
                   answerAltText:       0,
-                  answerImg:           0,
+                  answerImages:        0,
                   answerText:          0,
                   otherVisibleContext: 0,
                   userPoints:          0
@@ -456,9 +456,9 @@ export default ({
             userPoints: []
           },
           $unset: {
-            questionImg: '',
+            questionImages: '',
             questionAltText: '',
-            prevLineImg: '',
+            prevLineImages: '',
             prevLineAltText: ''
           }
         }

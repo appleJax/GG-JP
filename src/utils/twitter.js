@@ -16,14 +16,28 @@ export function getFollowing(userId) {
   //
   // post a tweet with media
   //
-export function postMedia(status, b64Image1, altText1, b64Image2, altText2) {
+export function postMedia(status, mainImages, altText1, prevLineImages, altText2) {
   return new Promise(async (resolve, reject) => {
-    const mediaId1 = await tryCatch(uploadMedia(b64Image1, altText1));
-    const media_ids = [mediaId1];
-    if (b64Image2) {
-      const mediaId2 = await tryCatch(uploadMedia(b64Image2, altText2));
-      media_ids.unshift(mediaId2);
+
+    const mainImageId = await tryCatch(uploadMedia(mainImages[0], altText1));
+    const mainMediaIds = [ mainImageId ];
+    for (let i = 1; i < mainImages.length; i++) {
+      const nextImage = await tryCatch(uploadMedia(mainImages[i], ''));
+      mainMediaIds.push(nextImage);
     }
+
+    const prevLineMediaIds = [];
+    if (prevLineImages.length > 0) {
+      const prevLineImageId = await tryCatch(uploadMedia(prevLineImages[0], altText2));
+      prevLineMediaIds.push(prevLineImageId);
+
+      for (let i = 1; i < prevLineImages.length; i++) {
+        const nextImage = await tryCatch(uploadMedia(prevLineImages[i], ''));
+        prevLineMediaIds.push(nextImage);
+      }
+    }
+
+    const media_ids = prevLineMediaIds.concat(mainImageIds);
 
     const params = { status, media_ids, tweet_mode: 'extended', include_ext_alt_text: true };
     Twitter.post('statuses/update', params, (err, data, response) => {
