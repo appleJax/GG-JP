@@ -258,7 +258,7 @@ function _getTimeUntil(hour) {
 }
 
 function groupMultiXs(string) {
-  return string.replace(/[≠x]\((.*)\)/g, '(≠$1)')
+  return string.replace(/[≠x]\((.*?)\)/g, '(≠$1)')
 }
 
 function groupQuestionMarks(string) {
