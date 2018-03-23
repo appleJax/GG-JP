@@ -20,6 +20,10 @@ const QUESTION_INTERVAL = 6*HOURS;
 
 export default ({
 
+  // tweet() {
+  //   tweetRandomQuestion();
+  // },
+
   register() {
     Twitter.post('account_activity/webhooks',
     { url: 'https://twitterbot-dot-gamegogakuen-jp.appspot.com/webhook/twitter' },

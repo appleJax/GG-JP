@@ -37,7 +37,7 @@ export function postMedia(status, mainImages, altText1, prevLineImages, altText2
       }
     }
 
-    const media_ids = prevLineMediaIds.concat(mainImageIds);
+    const media_ids = prevLineMediaIds.concat(mainMediaIds);
 
     const params = { status, media_ids, tweet_mode: 'extended', include_ext_alt_text: true };
     Twitter.post('statuses/update', params, (err, data, response) => {
@@ -126,9 +126,15 @@ function uploadMedia(b64Image, altText) {
         reject(new Error("Media upload failed."));
         return;
       }
+
       // now we can assign alt text to the media, for use by screen readers and
       // other text-based presentations and interpreters
       const mediaIdStr = data.media_id_string;
+      if (!altText) {
+        resolve(mediaIdStr);
+        return;
+      }
+
       const meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
 
       Twitter.post('media/metadata/create', meta_params, (err, data, response) => {
