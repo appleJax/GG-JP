@@ -27,7 +27,7 @@ export function postMedia(status, mainImages, altText1, prevLineImages, altText2
     }
 
     const prevLineMediaIds = [];
-    if (prevLineImages.length > 0) {
+    if (prevLineImages && prevLineImages.length > 0) {
       const prevLineImageId = await tryCatch(uploadMedia(prevLineImages[0], altText2));
       prevLineMediaIds.push(prevLineImageId);
 
