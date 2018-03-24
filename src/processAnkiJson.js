@@ -105,7 +105,7 @@ export function parseAnkiJson(filePath) {
       questionText:    formatQuestionText(cardId, engMeaning, expression, game, notes),
       questionImages,
       questionAltText: formatQuestionAltText(expression),
-      prevLineImages,
+      prevLineImages: upperSliceIndex < 5 ? prevLineImages : [],
       prevLineAltText,
       mainImageSlice,
       answerText:      formatAnswerText(answers, cardId, engMeaning, webLookup),

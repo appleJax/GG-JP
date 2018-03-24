@@ -2,6 +2,9 @@ import urlencode from 'urlencode';
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
 const { TWITTER_ACCOUNT, LEADERBOARD } = process.env;
 
+// Normal +6 ... DST +5
+const UTC_OFFSET = 5;
+
 export const HOURS = 3600000;
 
 export function addLinks(answerText, questionId) {
@@ -135,6 +138,14 @@ export function getAnswers(expression, altAnswers) {
   return [acceptedAnswer].concat(otherAnswers);
 }
 
+export function getHour() {
+  let utcHours = new Date().getUTCHours() - UTC_OFFSET;
+  if (utcHours < 0) {
+    utcHours += 24
+  }
+  return utcHours
+}
+
 export const getLiveAnswers = (cards) =>
   cards.reduce(
     (allAnswers, card) =>
@@ -236,11 +247,8 @@ function formatHint(expression) {
 }
 
 function _getTimeUntil(hour) {
-  // UTC offset +6 ... DST +5
-  const offset = 5;
-
   const now = new Date();
-  hour = (hour + offset) % 24;
+  hour = (hour + UTC_OFFSET) % 24;
   const utcNow = now.getTime();
   let millisUntilTime = Date.UTC(
     now.getUTCFullYear(),

@@ -9,8 +9,9 @@ import {
   average,
   calculateNewStats,
   formatFlashCards,
-  getSpoilerText,
+  getHour,
   getLiveAnswers,
+  getSpoilerText,
   isSpoiled,
   tryCatch
 } from 'Utils';
@@ -258,11 +259,29 @@ export default ({
       const mongo = await tryCatch(MongoClient.connect(url));
       const newCards      = mongo.db(DB).collection('newCards');
       const liveQuestions = mongo.db(DB).collection('liveQuestions');
+      const schedule      = mongo.db(DB).collection('schedule');
+
+      const match = {};
+      const currentHour = getHour();
+      const timeslot = await tryCatch(
+        schedule.findOne({ time: currentHour });
+      );
+      if (timeslot) {
+        const scheduledGame = timeslot.deck;
+        const available = await tryCatch(
+          newCards.find({ game: scheduledGame }).count()
+        );
+        if (available > 0) match.game = scheduledGame;
+      }
+
 
       let randomCard = await tryCatch(
-        newCards.aggregate([{ $sample: { size: 1 }}])
-                .toArray()
-                .then(cards => Promise.resolve(cards[0]))
+        newCards.aggregate([
+          { $match: match },
+          { $sample: { size: 1 }}
+        ])
+        .toArray()
+        .then(cards => Promise.resolve(cards[0]))
       );
       if (randomCard == null) {
         reject(new Error(
