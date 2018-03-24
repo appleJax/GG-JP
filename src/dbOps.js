@@ -264,7 +264,7 @@ export default ({
       const match = {};
       const currentHour = getHour();
       const timeslot = await tryCatch(
-        schedule.findOne({ time: currentHour });
+        schedule.findOne({ time: currentHour })
       );
       if (timeslot) {
         const scheduledGame = timeslot.deck;
@@ -273,7 +273,6 @@ export default ({
         );
         if (available > 0) match.game = scheduledGame;
       }
-
 
       let randomCard = await tryCatch(
         newCards.aggregate([
