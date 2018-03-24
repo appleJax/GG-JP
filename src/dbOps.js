@@ -191,6 +191,7 @@ export default ({
         answers:        1,
         cardId:         1,
         game:           1,
+        mainImageSlice: 1,
         mediaUrls:      1,
         questionText:   1,
       })
@@ -271,7 +272,31 @@ export default ({
         const available = await tryCatch(
           newCards.find({ game: scheduledGame }).count()
         );
-        if (available > 0) match.game = scheduledGame;
+        if (available > 0) {
+          match.game = scheduledGame;
+        } else {
+          const deckTitles = mongo.db(DB).collection('deckTitles');
+          const titles = await tryCatch(
+            deckTitles.find({ finished: { $ne: true } }).toArray().then(docs => docs.map(doc => doc.fullTitle))
+          );
+          const scheduledDecks = await tryCatch(
+            schedule.find().toArray().then(docs => docs.map(doc => doc.deck))
+          );
+          for (let i = 0; i < titles.length; i++) {
+            if (!scheduledDecks.find(title => titles[i] === title)) {
+              const newCardCount = await tryCatch(
+                newCards.find({ game: titles[i] }).count()
+              );
+              if (newCardCount > 0) {
+                match.game = titles[i];
+                await tryCatch(
+                  schedule.update({ time: currentHour }, { $set: { deck: titles[i] } })
+                );
+              }
+            }
+          }
+          // TODO: REFACTOR auto schedule new deck!!!!!
+        }
       }
 
       let randomCard = await tryCatch(
