@@ -1,9 +1,10 @@
-import express     from 'express';
-import bodyParser  from 'body-parser';
-import path        from 'path';
-import { session } from 'Config/redis';
-import twitterBot  from './twitterBot';
-import route       from './routes';
+import express       from 'express';
+import bodyParser    from 'body-parser';
+import path          from 'path';
+import { session }   from 'Config/redis';
+import { connectDB } from 'Config/mongo';
+import twitterBot    from './twitterBot';
+import route         from './routes';
 
 const app = express();
 
@@ -21,8 +22,14 @@ if (process.env.NODE_ENV === 'production')
   twitterBot.start();
 
 const PORT = app.get('port');
-app.listen(PORT, () =>
-  console.log('Listening on port', PORT)
-);
+
+async function startApp() {
+  await connectDB();
+  app.listen(PORT, () =>
+    console.log('Listening on port', PORT)
+  );
+}
+
+startApp();
 
 export default app;

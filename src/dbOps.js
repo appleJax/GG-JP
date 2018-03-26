@@ -1,15 +1,16 @@
 import { MongoClient }   from 'mongodb';
 import { processUpload } from './processAnkiJson';
+import models            from './models';
 import {
   buildUpdatesForRank,
   createUserObject,
+  getScheduledDeck,
   getUser
 } from 'Utils/db';
 import {
   average,
   calculateNewStats,
   formatFlashCards,
-  getHour,
   getLiveAnswers,
   getSpoilerText,
   isSpoiled,
@@ -17,10 +18,17 @@ import {
 } from 'Utils';
 
 const {
+  DeckTitles,
+  NewCards,
+  OldCards,
+  LiveQuestion,
+  Schedule
+} = models;
+
+const {
   MONGODB_URI: url,
   MONGO_DB:    DB
 } = process.env;
-
 
 export default ({
 
@@ -67,7 +75,7 @@ export default ({
   },
 
   addOrUpdateUser(newUser) {
-    return new Promise(async (resolve, reject) => {
+    return tryCatch(new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
       const scoreboard = mongo.db(DB).collection('scoreboard');
       const { userId } = newUser;
@@ -100,7 +108,7 @@ export default ({
 
       resolve(user || newUser);
       mongo.close();
-    });
+    }));
   },
 
   adjustScore(req, res) {
@@ -108,7 +116,7 @@ export default ({
   },
 
   cachePoints(questionId, userPoints) {
-    return new Promise(async (resolve, reject) => {
+    return tryCatch(new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
       const liveQuestions = mongo.db(DB).collection('liveQuestions');
       const { userId } = userPoints;
@@ -124,7 +132,7 @@ export default ({
       );
       mongo.close();
       resolve();
-    });
+    }));
   },
 
   async createUser({ body: user }, res) {
@@ -137,7 +145,7 @@ export default ({
   },
 
   getAnswerCard(cardId) {
-    return new Promise(async (resolve, reject) => {
+    return tryCatch(new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
       const liveQuestions = mongo.db(DB).collection('liveQuestions');
       const answerCard = await tryCatch(
@@ -145,7 +153,7 @@ export default ({
       );
       resolve(answerCard);
       mongo.close();
-    });
+    }));
   },
 
   async getDeck(req, res) {
@@ -256,52 +264,18 @@ export default ({
   },
 
   getRandomQuestion() {
-    return new Promise(async (resolve, reject) => {
+    return tryCatch(new Promise(async (resolve, reject) => {
       const mongo = await tryCatch(MongoClient.connect(url));
       const newCards      = mongo.db(DB).collection('newCards');
       const liveQuestions = mongo.db(DB).collection('liveQuestions');
-      const schedule      = mongo.db(DB).collection('schedule');
 
-      const match = {};
-      const currentHour = getHour();
-      const timeslot = await tryCatch(
-        schedule.findOne({ time: currentHour })
+      const scheduledDeck = await tryCatch(
+        getScheduledDeck(mongo, newCards)
       );
-      if (timeslot) {
-        const scheduledGame = timeslot.deck;
-        const available = await tryCatch(
-          newCards.find({ game: scheduledGame }).count()
-        );
-        if (available > 0) {
-          match.game = scheduledGame;
-        } else {
-          const deckTitles = mongo.db(DB).collection('deckTitles');
-          const titles = await tryCatch(
-            deckTitles.find({ finished: { $ne: true } }).toArray().then(docs => docs.map(doc => doc.fullTitle))
-          );
-          const scheduledDecks = await tryCatch(
-            schedule.find().toArray().then(docs => docs.map(doc => doc.deck))
-          );
-          for (let i = 0; i < titles.length; i++) {
-            if (!scheduledDecks.find(title => titles[i] === title)) {
-              const newCardCount = await tryCatch(
-                newCards.find({ game: titles[i] }).count()
-              );
-              if (newCardCount > 0) {
-                match.game = titles[i];
-                await tryCatch(
-                  schedule.update({ time: currentHour }, { $set: { deck: titles[i] } })
-                );
-              }
-            }
-          }
-          // TODO: REFACTOR auto schedule new deck!!!!!
-        }
-      }
 
       let randomCard = await tryCatch(
         newCards.aggregate([
-          { $match: match },
+          { $match: scheduledDeck },
           { $sample: { size: 1 }}
         ])
         .toArray()
@@ -343,7 +317,7 @@ export default ({
       await tryCatch(newCards.remove(randomCard));
       resolve(randomCard);
       mongo.close();
-    });
+    }));
   },
 
   // TODO - delete this method if not needed
@@ -444,28 +418,25 @@ export default ({
   },
 
   async serveLiveQuestions(req, res) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const collection = mongo.db(DB).collection('liveQuestions');
     const liveQuestions = await tryCatch(
-      collection.find()
-                .project({
-                  _id:                 0,
-                  answers:             0,
-                  answerAltText:       0,
-                  answerImages:        0,
-                  answerText:          0,
-                  otherVisibleContext: 0,
-                  userPoints:          0
-                })
-                .sort({ questionPostedAt: -1 })
-                .toArray()
+      LiveQuestion.find({})
+                  .select({
+                    _id:                 0,
+                    answers:             0,
+                    answerAltText:       0,
+                    answerImages:        0,
+                    answerText:          0,
+                    otherVisibleContext: 0,
+                    userPoints:          0
+                  })
+                  .sort({ questionPostedAt: 'desc' })
     );
+
     if (liveQuestions.length === 0)
       res.json(null)
     else
       res.json(liveQuestions);
 
-    mongo.close();
   },
 
   async serveRecentAnswers(req, res) {
@@ -564,7 +535,7 @@ export default ({
 // private functions
 
 function addPointsToScoreboard({ userPoints = [], cardId = '' }, mongo) {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
     const scoreboard = mongo.db(DB).collection('scoreboard');
 
     const cachedUpdates = {};
@@ -688,11 +659,11 @@ function addPointsToScoreboard({ userPoints = [], cardId = '' }, mongo) {
     await tryCatch(scoreboard.bulkWrite(ops));
     await tryCatch(recalculateRank(scoreboard));
     resolve();
-  });
+  }));
 }
 
 function addTweetedCardCounts(deckTitles) {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
     const mongo = await tryCatch(MongoClient.connect(url));
     const oldCards = mongo.db(DB).collection('oldCards');
 
@@ -706,11 +677,11 @@ function addTweetedCardCounts(deckTitles) {
     }
 
     resolve(deckTitles);
-  });
+  }));
 }
 
 function getCards(ids, collection) {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
     const data = await tryCatch(
       collection.find({ cardId: { $in: ids }})
                 .project({
@@ -729,11 +700,11 @@ function getCards(ids, collection) {
 
     const cards = formatFlashCards(data);
     resolve(cards);
-  });
+  }));
 }
 
 function getCollection(collectionName) {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
     const mongo = await tryCatch(MongoClient.connect(url));
     const collection = mongo.db(DB).collection(collectionName);
     const data = await tryCatch(
@@ -743,11 +714,11 @@ function getCollection(collectionName) {
     );
     resolve(data);
     mongo.close();
-  });
+  }));
 }
 
 function getRecentAnswers() {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
     const mongo = await tryCatch(MongoClient.connect(url));
     const oldCards = mongo.db(DB).collection('oldCards');
     const recentAnswers = await tryCatch(
@@ -764,11 +735,11 @@ function getRecentAnswers() {
 
     resolve(recentAnswers);
     mongo.close();
-  });
+  }));
 }
 
 function recalculateRank(scoreboard) {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
     const stats = await tryCatch(scoreboard.aggregate([
       { $project: {
           _id: 0,
@@ -823,5 +794,5 @@ function recalculateRank(scoreboard) {
     }
     await tryCatch(scoreboard.bulkWrite(bulkUpdateOps));
     resolve();
-  });
+  }));
 }

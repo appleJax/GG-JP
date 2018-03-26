@@ -1,6 +1,6 @@
 import { MongoClient }  from 'mongodb';
-import { tryCatch }     from 'Utils'
 import { getFollowing } from 'Utils/twitter'
+import { getHour, tryCatch } from 'Utils'
 
 const {
   MONGODB_URI: url,
@@ -195,6 +195,75 @@ export async function findOrCreateUser(userId, twitterUser) {
   return user;
 }
 
+export function getScheduledDeck(mongo, newCards) {
+  return tryCatch(new Promise(async (resolve, reject) => {
+    const schedule = mongo.db(DB).collection('schedule');
+
+    const currentHour = getHour();
+    const timeslot = await tryCatch(
+      schedule.findOne({ time: currentHour })
+    );
+
+    if (!timeslot) {
+      console.error('No timeslot found in schedule for:', currentHour);
+      console.error('Picking card from random deck...');
+      resolve({});
+      return;
+    }
+
+    const scheduledGame = timeslot.deck;
+    let availableCards = await tryCatch(
+      newCards.find({ game: scheduledGame }).count()
+    );
+
+    if (availableCards > 0) {
+      resolve({ game: scheduledGame });
+      return;
+    }
+
+    // scheduled deck is empty
+    // so schedule a new deck in its place
+    const deckTitles = mongo.db(DB).collection('deckTitles');
+    await tryCatch(
+      deckTitles.update(
+        { deck: scheduledGame },
+        { $set: { finished: true } }
+      )
+    );
+
+    const allDecks = await tryCatch(
+      deckTitles.find({
+        totalCards: { $gt: 0 },
+        finished:   { $ne: true }
+      }).toArray().then(docs => docs.map(doc => doc.fullTitle))
+    );
+    const alreadyScheduled = await tryCatch(
+      schedule.find().toArray().then(docs => docs.map(doc => doc.deck))
+    );
+
+    for (let i = 0; i < allDecks.length; i++) {
+      const currentTitle = allDecks[i];
+      if (alreadyScheduled.find(title => title === currentTitle))
+        continue;
+
+      availableCards = await tryCatch(
+        newCards.find({ game: currentTitle }).count()
+      );
+      if (availableCards > 0) {
+        await tryCatch(
+          schedule.update(
+            { time: currentHour },
+            { $set: { deck: currentTitle } }
+          )
+        );
+        resolve({ game: currentTitle });
+        return;
+      }
+    }
+
+    resolve({});
+  }));
+}
 
 export function getUser(userId) {
   return new Promise(async (resolve, reject) => {

@@ -23,7 +23,7 @@ export function evaluateResponse({
     profile_banner_url: profileBanner
   }
 }) {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
     const liveQuestions = await tryCatch(DB.getLiveQuestions());
     const foundQuestion = liveQuestions.find(
       questionCard => questionCard.questionId === questionId
@@ -72,5 +72,5 @@ export function evaluateResponse({
         )
       );
     }
-  });
+  }));
 }

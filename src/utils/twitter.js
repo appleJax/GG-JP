@@ -17,7 +17,7 @@ export function getFollowing(userId) {
   // post a tweet with media
   //
 export function postMedia(status, mainImages, altText1, prevLineImages, altText2) {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
 
     const mainImageId = await tryCatch(uploadMedia(mainImages[0], altText1));
     const mainMediaIds = [ mainImageId ];
@@ -58,11 +58,11 @@ export function postMedia(status, mainImages, altText1, prevLineImages, altText2
       };
       resolve(result);
     });
-  });
+  }));
 }
 
 export function retrieveAndCountMissedReplies(liveQuestions) {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
     const lastQuestionPosted = getLastQuestionPosted(liveQuestions);
     const params = {
       q: `@${TWITTER_ACCOUNT}`,
@@ -96,7 +96,7 @@ export function retrieveAndCountMissedReplies(liveQuestions) {
     }
 
     resolve();
-  });
+  }));
 }
 
 
@@ -118,7 +118,7 @@ function getLastQuestionPosted(liveQuestions) {
 // attaching media to a tweet
 //
 function uploadMedia(b64Image, altText) {
-  return new Promise((resolve, reject) => {
+  return tryCatch(new Promise((resolve, reject) => {
     // first we must post the media to Twitter
     Twitter.post('media/upload', { media_data: b64Image }, (err, data, response) => {
       if (err) {
@@ -146,5 +146,5 @@ function uploadMedia(b64Image, altText) {
         resolve(mediaIdStr);
       });
     });
-  });
+  }));
 }

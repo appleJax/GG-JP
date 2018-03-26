@@ -14,7 +14,7 @@ const UPLOADS_PATH = path.resolve(__dirname, '../uploads');
 
 
 export function processUpload(zipfilePath) {
-  return new Promise(async (resolve, reject) => {
+  return tryCatch(new Promise(async (resolve, reject) => {
     const stream = fs.createReadStream(zipfilePath)
       .pipe(unzip.Extract({ path: 'uploads' }));
 
@@ -27,20 +27,20 @@ export function processUpload(zipfilePath) {
       cleanUp(files);
       resolve(newCards);
     });
-  });
+  }));
 }
 
 export function optimizeImages(dirPath) {
-  return new Promise((resolve, reject) => {
+  return tryCatch(new Promise((resolve, reject) => {
     const filesProcessing = [];
     fs.readdirSync(dirPath).forEach(file => {
       if (/.*\.png$/.test(file)) {
         const currentFile = dirPath + "/" + file;
         const contents = fs.readFileSync(currentFile);
         const writeStream = fs.createWriteStream(currentFile);
-        const currentImage = new Promise((res, rej) =>
+        const currentImage = tryCatch(new Promise((res, rej) =>
           writeStream.on('close', res)
-        );
+        ));
         filesProcessing.push(currentImage);
         new PNG({ filterType: 4, deflateLevel: 1 })
           .parse(contents, (err, png) => {
@@ -53,7 +53,7 @@ export function optimizeImages(dirPath) {
       }
     });
     Promise.all(filesProcessing).then(resolve);
-  });
+  }));
 }
 
 export function parseAnkiJson(filePath) {
