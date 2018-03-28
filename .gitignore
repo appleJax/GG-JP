@@ -4,6 +4,7 @@
 __DBScripts
 app.yaml
 node_modules
+coverage
 dist
 Procfile
 TODO.md

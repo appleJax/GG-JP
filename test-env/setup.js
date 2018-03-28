@@ -1,3 +1,4 @@
+require('dotenv').config();
 const MongodbMemoryServer = require('mongodb-memory-server');
 
 const MONGO_DB_NAME = 'jest';

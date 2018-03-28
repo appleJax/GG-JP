@@ -1,6 +1,15 @@
 import { MongoClient }  from 'mongodb';
+import models from 'Models'
 import { getFollowing } from 'Utils/twitter'
 import { getHour, tryCatch } from 'Utils'
+
+const {
+  DeckTitle,
+  NewCard,
+  OldCard,
+  LiveQuestion,
+  Schedule
+} = models;
 
 const {
   MONGODB_URI: url,
@@ -195,73 +204,34 @@ export async function findOrCreateUser(userId, twitterUser) {
   return user;
 }
 
-export function getScheduledDeck(mongo, newCards) {
+export function getScheduledDeck(hour) {
   return tryCatch(new Promise(async (resolve, reject) => {
-    const schedule = mongo.db(DB).collection('schedule');
-
-    const currentHour = getHour();
     const timeslot = await tryCatch(
-      schedule.findOne({ time: currentHour })
+      Schedule.findOne({ time: hour }).exec()
     );
 
     if (!timeslot) {
-      console.error('No timeslot found in schedule for:', currentHour);
-      console.error('Picking card from random deck...');
+      console.log('No timeslot found in schedule for:', hour);
+      console.log('Picking card from random deck...');
       resolve({});
       return;
     }
 
-    const scheduledGame = timeslot.deck;
-    let availableCards = await tryCatch(
-      newCards.find({ game: scheduledGame }).count()
+    const scheduledDeck = timeslot.deck;
+    const availableCards = await tryCatch(
+      NewCard.find({ game: scheduledDeck }).count().exec()
     );
 
     if (availableCards > 0) {
-      resolve({ game: scheduledGame });
+      resolve({ game: scheduledDeck });
       return;
     }
 
-    // scheduled deck is empty
-    // so schedule a new deck in its place
-    const deckTitles = mongo.db(DB).collection('deckTitles');
-    await tryCatch(
-      deckTitles.update(
-        { deck: scheduledGame },
-        { $set: { finished: true } }
-      )
+    const newScheduledDeck = await tryCatch(
+      updateScheduledDeck(hour, scheduledDeck)
     );
 
-    const allDecks = await tryCatch(
-      deckTitles.find({
-        totalCards: { $gt: 0 },
-        finished:   { $ne: true }
-      }).toArray().then(docs => docs.map(doc => doc.fullTitle))
-    );
-    const alreadyScheduled = await tryCatch(
-      schedule.find().toArray().then(docs => docs.map(doc => doc.deck))
-    );
-
-    for (let i = 0; i < allDecks.length; i++) {
-      const currentTitle = allDecks[i];
-      if (alreadyScheduled.find(title => title === currentTitle))
-        continue;
-
-      availableCards = await tryCatch(
-        newCards.find({ game: currentTitle }).count()
-      );
-      if (availableCards > 0) {
-        await tryCatch(
-          schedule.update(
-            { time: currentHour },
-            { $set: { deck: currentTitle } }
-          )
-        );
-        resolve({ game: currentTitle });
-        return;
-      }
-    }
-
-    resolve({});
+    resolve(newScheduledDeck);
   }));
 }
 
@@ -276,4 +246,50 @@ export function getUser(userId) {
     resolve(user);
     mongo.close();
   });
+}
+
+
+// private functions
+
+function updateScheduledDeck(hour, scheduledDeck) {
+  return tryCatch(new Promise(async (resolve, reject) => {
+    await tryCatch(
+      DeckTitle.update(
+        { deck: scheduledDeck },
+        { $set: { finished: true } }
+      ).exec()
+    );
+
+    const allDecks = await tryCatch(
+      DeckTitle.find({
+        totalCards: { $gt: 0 },
+        finished:   { $ne: true }
+      }).exec().then(docs => docs.map(doc => doc.fullTitle))
+    );
+    const alreadyScheduled = await tryCatch(
+      Schedule.find().exec().then(docs => docs.map(doc => doc.deck))
+    );
+
+    for (let i = 0; i < allDecks.length; i++) {
+      const currentTitle = allDecks[i];
+      if (alreadyScheduled.find(title => title === currentTitle))
+        continue;
+
+      const availableCards = await tryCatch(
+        NewCard.find({ game: currentTitle }).count().exec()
+      );
+      if (availableCards > 0) {
+        await tryCatch(
+          Schedule.update(
+            { time: hour },
+            { $set: { deck: currentTitle } }
+          ).exec()
+        );
+        resolve({ game: currentTitle });
+        return;
+      }
+    }
+
+    resolve({});
+  }));
 }

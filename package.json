@@ -8,8 +8,9 @@
     "server": "node --require dotenv/config ./dist/server.js",
     "devstart": "npm run build && npm run server",
     "start": "node ./dist/server.js",
-    "test": "jest --runInBand --watch",
-    "testOnce": "jest --runInBand"
+    "test": "jest --runInBand",
+    "testCov": "jest --runInBand --collectCoverage",
+    "testWatch": "jest --runInBand --watch"
   },
   "author": "appleJax <appleJax@users.noreply.github.com>",
   "license": "MIT",
@@ -58,6 +59,9 @@
     "testEnvironment": "./test-env/mongo-env.js",
     "moduleNameMapper": {
       "^Config(.*)$": "<rootDir>/src/config$1",
+      "^Models(.*)$": "<rootDir>/src/models$1",
+      "^TestUtils(.*)$": "<rootDir>/test-env/utils$1",
+      "^Src(.*)$": "<rootDir>/src$1",
       "^Utils(.*)$": "<rootDir>/src/utils$1"
     }
   }

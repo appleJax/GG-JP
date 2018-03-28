@@ -1,18 +1,11 @@
-import Mongoose from 'mongoose'
-
-const {
-  MONGODB_URI: url,
-  MONGO_DB:    DB
-} = process.env;
-
-Mongoose.pluralize(null);
+const Mongoose = require('mongoose');
 
 export function connectDB() {
    return new Promise((resolve, reject) => {
-     Mongoose.connect(url);
+     Mongoose.pluralize(null);
+     Mongoose.connect(global.__MONGO_URI__);
      const db = Mongoose.connection;
      db.on('error', console.error);
-     db.on('disconnect', connectDB);
      db.once('open', resolve);
    });
 }

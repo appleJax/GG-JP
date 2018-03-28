@@ -1,6 +1,6 @@
 import { MongoClient }   from 'mongodb';
 import { processUpload } from './processAnkiJson';
-import models            from './models';
+import models            from 'Models';
 import {
   buildUpdatesForRank,
   createUserObject,
@@ -18,9 +18,9 @@ import {
 } from 'Utils';
 
 const {
-  DeckTitles,
-  NewCards,
-  OldCards,
+  DeckTitle,
+  NewCard,
+  OldCard,
   LiveQuestion,
   Schedule
 } = models;
@@ -222,7 +222,7 @@ export default ({
 
   async getDeckTitles(req, res) {
     const titles = await tryCatch(
-      getCollection('deckTitles')
+      DeckTitle.find().select({ _id: 0 }).exec()
     );
     titles.sort((a, b) => a.slug > b.slug);
     const response = await tryCatch(
@@ -245,78 +245,45 @@ export default ({
     mongo.close();
   },
 
-  getLiveQuestions() {
-    return getCollection('liveQuestions');
+  async getLiveQuestions() {
+    return await tryCatch(
+      LiveQuestion.find().select({ _id: 0 }).exec()
+    );
   },
 
   async getNewCards(req, res) {
     const newCards = await tryCatch(
-      getCollection('newCards')
+      NewCard.find().select({ _id: 0 }).exec()
     );
     res.json(newCards);
   },
 
   async getOldCards(req, res) {
-    const newCards = await tryCatch(
-      getCollection('oldCards')
+    const oldCards = await tryCatch(
+      OldCard.find().select({ _id: 0 }).exec()
     );
-    res.json(newCards);
+    res.json(oldCards);
   },
 
   getRandomQuestion() {
     return tryCatch(new Promise(async (resolve, reject) => {
-      const mongo = await tryCatch(MongoClient.connect(url));
-      const newCards      = mongo.db(DB).collection('newCards');
-      const liveQuestions = mongo.db(DB).collection('liveQuestions');
-
+      const currentHour = getHour();
       const scheduledDeck = await tryCatch(
-        getScheduledDeck(mongo, newCards)
+        getScheduledDeck(currentHour)
       );
 
-      let randomCard = await tryCatch(
-        newCards.aggregate([
-          { $match: scheduledDeck },
-          { $sample: { size: 1 }}
-        ])
-        .toArray()
-        .then(cards => Promise.resolve(cards[0]))
+      const randomCard = await tryCatch(
+        getRandomCard(scheduledDeck)
       );
-      if (randomCard == null) {
-        reject(new Error(
-          'Empty deck. Please Add More Cards to DB.'
-        ));
-        mongo.close();
+
+      if (!randomCard) {
+        reject(new Error('No appropriate cards available.'));
         return;
       }
 
-      const liveCards = await tryCatch(liveQuestions.find().toArray());
-      const recentCards = await tryCatch(getRecentAnswers());
-      const spoilerText = getSpoilerText(liveCards.concat(recentCards));
-      const liveAnswers = getLiveAnswers(liveCards);
-
-      let spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
-      let tries = 0;
-      while(spoiled) {
-        if (tries > 20) {
-          reject(new Error(
-            "All new cards contain spoilers. Please try again later."
-          ));
-          mongo.close();
-          return;
-        }
-        randomCard = await tryCatch(
-          newCards.aggregate([{ $sample: { size: 1 }}])
-                  .toArray()
-                  .then(cards => Promise.resolve(cards[0]))
-        );
-        spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
-        tries++;
-      }
-
-      await tryCatch(liveQuestions.insert(randomCard));
-      await tryCatch(newCards.remove(randomCard));
+      await tryCatch(LiveQuestion.create(randomCard));
+      await tryCatch(NewCard.deleteOne(randomCard).exec());
       resolve(randomCard);
-      mongo.close();
     }));
   },
 
@@ -691,6 +658,7 @@ function getCards(ids, collection) {
                   answers:        1,
                   cardId:         1,
                   game:           1,
+                  mainImageSlice: 1,
                   mediaUrls:      1,
                   questionText:   1,
                 })
@@ -703,38 +671,69 @@ function getCards(ids, collection) {
   }));
 }
 
-function getCollection(collectionName) {
-  return tryCatch(new Promise(async (resolve, reject) => {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const collection = mongo.db(DB).collection(collectionName);
-    const data = await tryCatch(
-      collection.find()
-                .project({ _id: 0 })
-                .toArray()
+
+// Exported for testing
+export function getRandomCard(scheduledDeck) {
+  return new Promise(async (resolve, reject) => {
+    let randomCard = await tryCatch(
+      NewCard.aggregate([
+        { $match: scheduledDeck },
+        { $sample: { size: 1 }}
+      ])
+      .then(cards => Promise.resolve(cards[0]))
     );
-    resolve(data);
-    mongo.close();
-  }));
+    if (randomCard == null) {
+      console.error('Empty deck. Please Add More Cards to DB.');
+      resolve(null);
+      return;
+    }
+
+    const liveCards = await tryCatch(LiveQuestion.find().exec());
+    const recentCards = await tryCatch(getRecentAnswers());
+    const spoilerText = getSpoilerText(liveCards.concat(recentCards));
+    const liveAnswers = getLiveAnswers(liveCards);
+
+    let spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
+    let tries = 0;
+    while(spoiled) {
+      if (tries > 20) {
+        console.error('All new cards contain spoilers. Please try again later.');
+        resolve(null);
+        return;
+      }
+      if (tries > 10)
+        scheduledDeck = {};
+
+      randomCard = await tryCatch(
+        NewCard.aggregate([
+          { $match: scheduledDeck },
+          { $sample: { size: 1 }}
+        ])
+        .then(cards => Promise.resolve(cards[0]))
+      );
+      spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
+      tries++;
+    }
+
+    resolve(randomCard);
+  });
 }
 
 function getRecentAnswers() {
   return tryCatch(new Promise(async (resolve, reject) => {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const oldCards = mongo.db(DB).collection('oldCards');
     const recentAnswers = await tryCatch(
-      oldCards.find()
-              .sort({ answerPostedAt: -1 })
-              .limit(12)
-              .project({
-                _id:             0,
-                alreadyAnswered: 0,
-                userPoints:      0
-              })
-              .toArray()
+      OldCard.find()
+             .sort({ answerPostedAt: 'desc' })
+             .limit(12)
+             .select({
+               _id:             0,
+               alreadyAnswered: 0,
+               userPoints:      0
+             })
+             .exec()
     );
 
     resolve(recentAnswers);
-    mongo.close();
   }));
 }
 

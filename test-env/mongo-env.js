@@ -6,7 +6,6 @@ class MongoEnvironment extends NodeEnvironment {
   }
 
   async setup() {
-    require('dotenv').config();
     console.log('Setup MongoDB Test Environment');
 
     this.global.__MONGO_URI__ = await global.__MONGOD__.getConnectionString();
