@@ -9,8 +9,7 @@ const schema = new Schema({
   slug: String,
   totalCards: String,
   tweetedCards: Number
-},
-{ _id: false });
+});
 
 schema.post('find', getTotalTweeted);
 schema.post('findOne', getTotalTweeted);

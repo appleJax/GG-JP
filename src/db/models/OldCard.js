@@ -25,7 +25,6 @@ const schema = new Schema({
     points: Number,
     timeToAnswer: Number
   }]
-},
-{ _id: false });
+});
 
 export default Mongoose.model('oldCards', schema);
