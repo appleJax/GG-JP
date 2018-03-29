@@ -13,7 +13,7 @@ export default (app) => {
   app.get('/api/cards', DB.serveCards);
 
   app.get('/api/decks',
-    //cache.route(untilNextTweet()),
+    cache.route(untilNextTweet()),
     DB.getDeckTitles
   );
 

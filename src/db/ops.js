@@ -163,7 +163,6 @@ export default ({
     } = req
 
     const mongo = await tryCatch(MongoClient.connect(url));
-    const deckTitles = mongo.db(DB).collection('deckTitles');
     const oldCards   = mongo.db(DB).collection('oldCards');
     const CARDS_PER_PAGE = 12;
 
@@ -178,15 +177,6 @@ export default ({
     }
 
     const skipCount = (page - 1) * CARDS_PER_PAGE;
-    // const total = await tryCatch(
-    //   oldCards.find({ game: deck.fullTitle }).count()
-    // );
-    //
-    // if (total === 0) {
-    //   res.json({ cards: null, total: 0 });
-    //   mongo.close();
-    //   return;
-    // }
 
     const rawCards = await tryCatch(
       oldCards.find({
@@ -223,7 +213,7 @@ export default ({
 
   async getDeckTitles(req, res) {
     const titles = await tryCatch(
-      DeckTitle.find().select({ _id: 0 }).exec()
+      DeckTitle.find().exec()
     );
     titles.sort((a, b) => a.slug > b.slug);
     res.json(titles);
@@ -245,20 +235,20 @@ export default ({
 
   async getLiveQuestions() {
     return await tryCatch(
-      LiveQuestion.find().select({ _id: 0 }).exec()
+      LiveQuestion.find().exec()
     );
   },
 
   async getNewCards(req, res) {
     const newCards = await tryCatch(
-      NewCard.find().select({ _id: 0 }).exec()
+      NewCard.find().exec()
     );
     res.json(newCards);
   },
 
   async getOldCards(req, res) {
     const oldCards = await tryCatch(
-      OldCard.find().select({ _id: 0 }).exec()
+      OldCard.find().exec()
     );
     res.json(oldCards);
   },
@@ -730,7 +720,6 @@ function getRecentAnswers() {
              .sort({ answerPostedAt: 'desc' })
              .limit(12)
              .select({
-               _id:             0,
                alreadyAnswered: 0,
                userPoints:      0
              })

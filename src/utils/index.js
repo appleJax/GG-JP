@@ -121,10 +121,7 @@ export function formatQuestionText(
 export function formatFlashCards(cards) {
   return cards.map(card => {
     card.questionText = card.questionText.split('\n')[0];
-    const s = card.answers.length > 1 ? 's' : '';
-    card.answers = `Answer${s}: ${card.answers.join(', ')}`;
     card.mediaUrls = card.mediaUrls.slice(...card.mainImageSlice);
-
     return card;
   });
 }
