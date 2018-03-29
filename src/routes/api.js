@@ -1,5 +1,5 @@
 import { cache } from 'Config/redis';
-import DB        from '../dbOps';
+import DB        from 'DB/ops';
 import multer    from 'multer';
 import { getTimeTilNextTweet } from 'Utils';
 
@@ -13,7 +13,7 @@ export default (app) => {
   app.get('/api/cards', DB.serveCards);
 
   app.get('/api/decks',
-    cache.route(untilNextTweet()),
+    //cache.route(untilNextTweet()),
     DB.getDeckTitles
   );
 

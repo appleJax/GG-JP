@@ -1,75 +1,89 @@
 const Mongoose = require('mongoose');
 const Models = require('Models').default;
 const { connectDB } = require('TestUtils')
-const DBOps = require('Src/dbOps');
+const DBOps = require('DB/ops').default;
 
 const { getRandomQuestion } = DBOps;
 const {
   DeckTitle,
   LiveQuestion,
   NewCard,
-  OldCard,
   Schedule
 } = Models;
 
+// shared variable
+let newCardIds;
+
 beforeAll(async () => {
   await connectDB();
+});
 
-  await Schedule.insertMany([
-    { time: 2, deck: 'DeckAtTwo'},
-    { time: 8, deck: 'DeckAtEight'}
-  ]);
+afterAll(async (done) => {
+  Mongoose.disconnect(done);
+});
 
-  await DeckTitle.insertMany([
-    { fullTitle: 'DeckAtTwo',   finished: false },
-    { fullTitle: 'DeckAtEight', finished: false }
-  ]);
+beforeEach(async () => {
+  await Schedule.create(
+    { time: 2, deck: 'Scheduled Game'},
+  );
 
-
-  await LiveQuestion.insertMany(
-    sampleLiveQuestions()
+  await DeckTitle.create(
+    { fullTitle: 'Scheduled Game', finished: false }
   );
 
   await NewCard.insertMany(
     sampleNewCards()
   );
 
-  await OldCard.insertMany(
-    sampleOldCards()
-  );
-
+  const newCards = await NewCard.find().exec();
+  newCardIds = newCards.map(card => card.cardId);
 });
 
-afterAll(async (done) => {
+afterEach(async () => {
   await DeckTitle.remove().exec();
   await LiveQuestion.remove().exec();
   await NewCard.remove().exec();
-  await OldCard.remove().exec();
   await Schedule.remove().exec();
-  Mongoose.disconnect(done);
 });
 
 it('should return a random question card from NewCards', async () => {
-  //TODO
+  const randomQuestionId = await getRandomQuestionId();
+  expect(newCardIds).toContain(randomQuestionId);
+});
 
-  expect('result').toEqual('some result')
+it('should remove the random card from NewCards', async () => {
+  const randomQuestionId = await getRandomQuestionId();
+  const afterNewCards = await NewCard.find().exec();
+  const afterNewCardIds = afterNewCards.map(card => card.cardId);
+
+  expect(newCardIds).toHaveLength(5);
+  expect(afterNewCardIds).toHaveLength(4);
+  expect(afterNewCardIds).not.toContain(randomQuestionId)
+});
+
+it('should add the random card to LiveQuestions', async () => {
+  const liveQuestions = await LiveQuestion.find().exec();
+  const randomQuestionId = await getRandomQuestionId();
+  const afterLiveQuestions = await LiveQuestion.find().exec();
+  const liveQuestionId = afterLiveQuestions[0].cardId;
+
+  expect(liveQuestions).toHaveLength(0);
+  expect(afterLiveQuestions).toHaveLength(1);
+  expect(liveQuestionId).toEqual(randomQuestionId);
 });
 
 
-// Data initialization
+// helper
 
-function sampleLiveQuestions() {
-  return [
-    {
-      cardId: 'Live1',
-      answers: [],
-      mediaUrls: [
-        { altText: '' }
-      ],
-      otherVisibleContext: ''
-    }
-  ];
+function getRandomQuestionId() {
+  return new Promise(async (resolve, reject) => {
+    const randomQuestion = await getRandomQuestion(2);
+    resolve(randomQuestion.cardId);
+  });
 }
+
+
+// Data initialization
 
 function sampleNewCards() {
   return [
@@ -118,18 +132,5 @@ function sampleNewCards() {
       answerAltText: '',
       otherVisibleContext: ''
     },
-  ];
-}
-
-function sampleOldCards() {
-  return [
-    {
-      cardId: 'Old1',
-      answers: [],
-      mediaUrls: [
-        { altText: '' }
-      ],
-      otherVisibleContext: ''
-    }
   ];
 }

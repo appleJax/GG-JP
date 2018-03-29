@@ -35,10 +35,13 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      Config: __dirname + '/src/config',
-      Models: __dirname + '/src/models',
-      Src:    __dirname + '/src',
-      Utils:  __dirname + '/src/utils'
+      Anki:    __dirname + '/src/anki',
+      Config:  __dirname + '/src/config',
+      DB:      __dirname + '/src/db',
+      Models:  __dirname + '/src/db/models',
+      Src:     __dirname + '/src',
+      Twitter: __dirname + '/src/twitter',
+      Utils:   __dirname + '/src/utils'
     }
   },
   output: {

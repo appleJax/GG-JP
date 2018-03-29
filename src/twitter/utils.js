@@ -1,8 +1,8 @@
-const { TWITTER_ACCOUNT } = process.env;
-import Twitter from 'Config/twitter';
-import { tryCatch } from 'Utils';
-import { evaluateResponse } from '../evaluateTwitterReply';
+import Twitter          from 'Config/twitter';
+import { tryCatch }     from 'Utils';
+import evaluateResponse from './evaluateResponse';
 
+const { TWITTER_ACCOUNT } = process.env;
 
 export function getFollowing(userId) {
   return new Promise((resolve, reject) => {

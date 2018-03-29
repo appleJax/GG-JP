@@ -58,6 +58,7 @@ const schema = new Schema({
       value: Number
     }
   }
-});
+},
+{ _id: false });
 
 export default Mongoose.model('scoreboard', schema);

@@ -1,5 +1,5 @@
-import DB from './dbOps';
-import { createUserObject } from 'Utils/db'
+import DB from 'DB/ops';
+import { createUserObject } from 'DB/utils'
 const { TWITTER_ACCOUNT } = process.env;
 import {
   calculateScore,
@@ -10,7 +10,7 @@ import {
 } from 'Utils';
 
 
-export function evaluateResponse({
+export default function evaluateResponse({
   in_reply_to_status_id_str: questionId,
   created_at: replyPostedAt,
   text,

@@ -5,13 +5,11 @@ const Schema = Mongoose.Schema;
 const schema = new Schema({
   alreadyAnswered: [String],
   answerAltText: String,
-  answerId: String,
-  answerPostedAt: Number,
+  answerImages: [String],
   answers: [String],
   answerText: String,
   cardId: String,
   game: String,
-  questionText: String,
   mainImageSlice: [Number],
   mediaUrls: [{
     altText: String,
@@ -20,11 +18,13 @@ const schema = new Schema({
   otherVisibleContext: String,
   questionId: String,
   questionPostedAt: Number,
+  questionText: String,
   userPoints: [{
     userId: String,
     points: Number,
     timeToAnswer: Number
   }]
-});
+},
+{ _id: false });
 
-export default Mongoose.model('oldCards', schema);
+export default Mongoose.model('liveQuestions', schema);

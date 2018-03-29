@@ -16,6 +16,7 @@ const schema = new Schema({
   questionId: String,
   questionImages: [String],
   questionText: String
-});
+},
+{ _id: false });
 
 export default Mongoose.model('newCards', schema);

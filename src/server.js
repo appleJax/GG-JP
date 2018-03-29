@@ -3,7 +3,7 @@ import bodyParser    from 'body-parser';
 import path          from 'path';
 import { session }   from 'Config/redis';
 import { connectDB } from 'Config/mongo';
-import twitterBot    from './twitterBot';
+import twitterBot    from 'Twitter/bot';
 import route         from './routes';
 
 const app = express();

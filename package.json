@@ -58,10 +58,13 @@
     "globalTeardown": "./test-env/teardown.js",
     "testEnvironment": "./test-env/mongo-env.js",
     "moduleNameMapper": {
+      "^Anki(.*)$": "<rootDir>/src/anki$1",
       "^Config(.*)$": "<rootDir>/src/config$1",
-      "^Models(.*)$": "<rootDir>/src/models$1",
+      "^DB(.*)$": "<rootDir>/src/db$1",
+      "^Models(.*)$": "<rootDir>/src/db/models$1",
       "^TestUtils(.*)$": "<rootDir>/test-env/utils$1",
       "^Src(.*)$": "<rootDir>/src$1",
+      "^Twitter(.*)$": "<rootDir>/src/twitter$1",
       "^Utils(.*)$": "<rootDir>/src/utils$1"
     }
   }

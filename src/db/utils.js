@@ -1,6 +1,6 @@
-import { MongoClient }  from 'mongodb';
+import { MongoClient } from 'mongodb';
 import models from 'Models'
-import { getFollowing } from 'Utils/twitter'
+import { getFollowing } from 'Twitter/utils'
 import { getHour, tryCatch } from 'Utils'
 
 const {
@@ -206,6 +206,7 @@ export async function findOrCreateUser(userId, twitterUser) {
 
 export function getScheduledDeck(hour) {
   return tryCatch(new Promise(async (resolve, reject) => {
+    hour = hour || getHour();
     const timeslot = await tryCatch(
       Schedule.findOne({ time: hour }).exec()
     );

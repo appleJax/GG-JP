@@ -1,4 +1,4 @@
-const { buildUpdatesForRank } = require('Utils/db');
+const { buildUpdatesForRank } = require('DB/utils');
 
 const stats = [
 

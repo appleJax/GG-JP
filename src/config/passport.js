@@ -4,7 +4,7 @@ import { tryCatch } from 'Utils'
 import {
   findOrCreateUser,
   getUser
-} from 'Utils/db'
+} from 'DB/utils'
 
 const {
     TWITTER_API_KEY,

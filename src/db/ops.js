@@ -1,12 +1,12 @@
 import { MongoClient }   from 'mongodb';
-import { processUpload } from './processAnkiJson';
+import { processUpload } from 'Anki/processing';
 import models            from 'Models';
 import {
   buildUpdatesForRank,
   createUserObject,
   getScheduledDeck,
   getUser
-} from 'Utils/db';
+} from 'DB/utils';
 import {
   average,
   calculateNewStats,
@@ -168,7 +168,7 @@ export default ({
     const CARDS_PER_PAGE = 12;
 
     const deck = await tryCatch(
-      deckTitles.findOne({ slug })
+      DeckTitle.findOne({ slug })
     );
 
     if (!deck) {
@@ -178,15 +178,15 @@ export default ({
     }
 
     const skipCount = (page - 1) * CARDS_PER_PAGE;
-    const total = await tryCatch(
-      oldCards.find({ game: deck.fullTitle }).count()
-    );
-
-    if (total === 0) {
-      res.json({ cards: null, total: 0 });
-      mongo.close();
-      return;
-    }
+    // const total = await tryCatch(
+    //   oldCards.find({ game: deck.fullTitle }).count()
+    // );
+    //
+    // if (total === 0) {
+    //   res.json({ cards: null, total: 0 });
+    //   mongo.close();
+    //   return;
+    // }
 
     const rawCards = await tryCatch(
       oldCards.find({
@@ -210,12 +210,13 @@ export default ({
     );
 
     if (rawCards.length === 0) {
-      res.json(null);
+      res.json({ cards: null, total: 0 });
       mongo.close();
       return;
     }
 
     const cards = formatFlashCards(rawCards);
+    const total = deck.tweetedCards;
     res.json({ cards, total });
     mongo.close();
   },
@@ -225,10 +226,7 @@ export default ({
       DeckTitle.find().select({ _id: 0 }).exec()
     );
     titles.sort((a, b) => a.slug > b.slug);
-    const response = await tryCatch(
-      addTweetedCardCounts(titles)
-    );
-    res.json(response);
+    res.json(titles);
   },
 
   async serveCards({ query: { ids } }, res) {
@@ -265,11 +263,10 @@ export default ({
     res.json(oldCards);
   },
 
-  getRandomQuestion() {
+  getRandomQuestion(hour) {
     return tryCatch(new Promise(async (resolve, reject) => {
-      const currentHour = getHour();
       const scheduledDeck = await tryCatch(
-        getScheduledDeck(currentHour)
+        getScheduledDeck(hour)
       );
 
       const randomCard = await tryCatch(
@@ -633,6 +630,7 @@ function addTweetedCardCounts(deckTitles) {
   return tryCatch(new Promise(async (resolve, reject) => {
     const mongo = await tryCatch(MongoClient.connect(url));
     const oldCards = mongo.db(DB).collection('oldCards');
+    const titlesWithCounts = [];
 
     for (let i = 0; i < deckTitles.length; i++) {
       const title = deckTitles[i];
@@ -640,10 +638,16 @@ function addTweetedCardCounts(deckTitles) {
         oldCards.find({ game: title.fullTitle }).count()
       );
 
-      title.tweetedCards = tweetedCards;
+      console.log('TweetedCards:', tweetedCards);
+      console.log('title:', title);
+      titlesWithCounts.push({
+        ...title,
+        tweetedCards
+      });
+      // console.log('TitlesWithCounts:', titlesWithCounts);
     }
 
-    resolve(deckTitles);
+    resolve(titlesWithCounts);
   }));
 }
 

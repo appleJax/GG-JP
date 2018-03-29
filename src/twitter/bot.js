@@ -1,6 +1,6 @@
-import DB                   from './dbOps';
-import Twitter              from 'Config/twitter';
-import { evaluateResponse } from './evaluateTwitterReply';
+import DB               from 'DB/ops';
+import Twitter          from 'Config/twitter';
+import evaluateResponse from './evaluateResponse';
 import {
   HOURS,
   addLinks,
@@ -11,7 +11,7 @@ import {
 import {
   postMedia,
   retrieveAndCountMissedReplies
-} from 'Utils/twitter';
+} from 'Twitter/utils';
 
 const { TWITTER_ACCOUNT } = process.env;
 
