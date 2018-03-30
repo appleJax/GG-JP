@@ -20,7 +20,7 @@ async function getTotalTweeted(doc, next) {
       const totalTweeted = await OldCard.find({ game: doc[i].fullTitle }).count()
       doc[i].tweetedCards = totalTweeted;
     }
-  } else {
+  } else if (doc) {
     const totalTweeted = await OldCard.find({ game: doc.fullTitle }).count()
     doc.tweetedCards = totalTweeted;
   }

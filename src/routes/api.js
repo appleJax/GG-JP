@@ -17,8 +17,8 @@ export default (app) => {
     DB.getDeckTitles
   );
 
-  app.get('/api/deck/:slug',
-    DB.getDeck
+  app.get('/api/deck/:slug', (req, res) =>
+    DB.getDeck(req).then(deck => res.json(deck))
   );
 
   app.get('/api/live',

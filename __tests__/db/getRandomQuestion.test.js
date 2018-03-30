@@ -1,9 +1,8 @@
 const Mongoose = require('mongoose');
 const Models = require('Models').default;
 const { connectDB } = require('TestUtils')
-const DBOps = require('DB/ops').default;
+const { getRandomQuestion } = require('DB/ops').default;
 
-const { getRandomQuestion } = DBOps;
 const {
   DeckTitle,
   LiveQuestion,
