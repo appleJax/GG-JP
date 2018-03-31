@@ -70,6 +70,7 @@ export default ({
     }
 
     await tryCatch(newCardCollection.bulkWrite(ops));
+    console.log('Finished uploading/updating cards!');
     mongo.close();
 
     res.redirect('/');
@@ -316,7 +317,7 @@ export default ({
     mongo.close();
   },
 
-  async serveLiveQuestions(req, res) {
+  async serveLiveQuestions() {
     const liveQuestions = await tryCatch(
       LiveQuestion.find({})
                   .select({
@@ -331,23 +332,19 @@ export default ({
                   .sort({ questionPostedAt: 'desc' })
     );
 
-    if (liveQuestions.length === 0)
-      res.json(null)
-    else
-      res.json(liveQuestions);
-
+    return (liveQuestions.length > 0)
+      ? liveQuestions
+      : null;
   },
 
-  async serveRecentAnswers(req, res) {
+  async serveRecentAnswers() {
     const recentAnswers = await tryCatch(
       getRecentAnswers()
     );
-    if (recentAnswers.length === 0)
-      res.json(null);
-    else {
-      const answerCards = formatFlashCards(recentAnswers);
-      res.json(answerCards);
-    }
+
+    return (recentAnswers.length > 0)
+      ? formatFlashCards(recentAnswers)
+      : null;
   },
 
   async serveUser({ params: { userId }}) {

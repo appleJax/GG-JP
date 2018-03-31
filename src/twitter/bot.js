@@ -10,42 +10,45 @@ import {
 } from 'Utils';
 import {
   postMedia,
-  retrieveAndCountMissedReplies
+  processDMs
 } from 'Twitter/utils';
 
 const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;
 const QUESTION_INTERVAL = 6*HOURS;
+const POLL_DM_INTERVAL = 90*1000;
 
 export default ({
 
   // tweet() {
   //   tweetRandomQuestion();
   // },
+  // listen() {
+  //   pollDMs();
+  // },
 
-  register() {
-    Twitter.post('account_activity/webhooks',
-    { url: 'https://twitterbot-dot-gamegogakuen-jp.appspot.com/webhook/twitter' },
-    (err, data, response) => {
-      console.log('Error:', err);
-      console.log('Data:', data);
-    });
-  },
+  // register() {
+  //   Twitter.post('account_activity/webhooks',
+  //   { url: `${BOT_URL}/webhook/twitter` },
+  //   (err, data, response) => {
+  //     console.log('Error:', err);
+  //     console.log('Data:', data);
+  //   });
+  // },
 
   start() {
-    openStream();
+    //openStream();
     scheduleActions();
   }
 
 });
 
 async function scheduleActions() {
+  await pollDMs();
   const liveQuestions = await tryCatch(DB.getLiveQuestions());
-  if (liveQuestions.length > 0) {
-    await retrieveAndCountMissedReplies(liveQuestions);
+  if (liveQuestions.length > 0)
     tweetOrScheduleAnswers(liveQuestions);
-  }
 
   const timeUntilTweet = getTimeTilNextTweet();
   const timeUntilMidnight = getTimeUntil(0);
@@ -142,18 +145,23 @@ async function tweetAnswer(cardId, questionId) {
   DB.processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls);
 }
 
-function openStream() {
-  const stream = Twitter.stream(
-    'statuses/filter',
-    { track: `@${TWITTER_ACCOUNT}` }
-  );
-  stream.on('tweet', evaluateResponse);
-
-  stream.on('disconnect', (disconnectMsg) => {
-    console.error('Tweet stream disconnected:', disconnectMsg);
-    setTimeout(() => stream.start(), 100);
-  });
+async function pollDMs() {
+  await processDMs();
+  setInterval(processDMs, POLL_DM_INTERVAL);
 }
+
+// function openStream() {
+//   const stream = Twitter.stream(
+//     'statuses/filter',
+//     { track: `@${TWITTER_ACCOUNT}` }
+//   );
+//   stream.on('tweet', evaluateResponse);
+
+//   stream.on('disconnect', (disconnectMsg) => {
+//     console.error('Tweet stream disconnected:', disconnectMsg);
+//     setTimeout(() => stream.start(), 100);
+//   });
+// }
 
 function updateStats() {
   const now = new Date();

@@ -18,22 +18,21 @@ export default (app) => {
 
   app.get('/api/decks',
     cache.route(untilNextTweet()),
-    (req, res) =>
-      DB.getDeckTitles().then(send(res))
+    (req, res) => DB.getDeckTitles().then(send(res))
   );
 
   app.get('/api/deck/:slug', (req, res) =>
     DB.getDeck(req).then(send(res))
   );
 
-  app.get('/api/live',
-    DB.serveLiveQuestions
+  app.get('/api/live', (req, res) =>
+    DB.serveLiveQuestions().then(send(res))
   );
 
   app.get('/api/recent',
     browserCache,
     cache.route(untilNextTweet()),
-    DB.serveRecentAnswers
+    (req, res) => DB.serveRecentAnswers().then(send(res))
   );
 
   app.get('/api/scores',

@@ -4,13 +4,25 @@ import evaluateResponse from './evaluateResponse';
 
 const { TWITTER_ACCOUNT } = process.env;
 
-export function getFollowing(userId) {
-  return new Promise((resolve, reject) => {
-    Twitter.get('friends/ids',
-      { user_id: userId, stringify_ids: true }
-    ).then(({ data }) => resolve(data.ids)
-    ).catch(console.error)
-  });
+export async function fetchTwitterUser(userId) {
+  const params = { user_id: userId };
+
+  return await tryCatch(
+    Twitter.get('users/show', params)
+    .then(({ data }) => data)
+  );
+}
+
+export async function getFollowing(userId) {
+  const params = {
+    user_id: userId,
+    stringify_ids: true
+  };
+
+  return await tryCatch(
+    Twitter.get('friends/ids', params)
+    .then(({ data }) => data.ids)
+  );
 }
 
   //
@@ -59,6 +71,32 @@ export function postMedia(status, mainImages, altText1, prevLineImages, altText2
       resolve(result);
     });
   }));
+}
+
+export async function processDMs() {
+  const params = { count: 50 };
+  let missedDMs = [];
+
+  do {
+    const {
+      data: {
+        nextCursor,
+        events
+      }
+    } = await tryCatch(Twitter.get('direct_messages/events/list', params));
+
+    missedDMs = missedDMs.concat(events);
+    params.cursor = nextCursor;
+
+  } while (params.cursor)
+
+  let reply;
+  
+  for (let i = missedDMs.length - 1; i >= 0; i--) {
+    console.log('DM object:', missedDMs[i]);
+    reply = missedDMs[i];
+    await tryCatch(evaluateResponse(reply));
+  }
 }
 
 export function retrieveAndCountMissedReplies(liveQuestions) {

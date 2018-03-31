@@ -1,6 +1,6 @@
 import urlencode from 'urlencode';
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
-const { TWITTER_ACCOUNT, LEADERBOARD } = process.env;
+const { TWITTER_ACCOUNT, LEADERBOARD, DM_URL } = process.env;
 
 // Normal +6 ... DST +5
 const UTC_OFFSET = 5;
@@ -67,7 +67,10 @@ export function contains(item, list) {
   return valid(list.indexOf(item));
 }
 
-export function extractAnswer(text) {
+export const extractAnswer = (text) =>
+  text.replace(/http.*/, '').trim();
+
+export function extractAnswer_OLD(text) {
   return text.trim().slice(TWITTER_ACCOUNT.length + 2);
 }
 
@@ -111,10 +114,13 @@ export function formatQuestionText(
   if (needsHint(hint))
     tweetText += `\nHint: ${hint}`;
 
-  if (notes) tweetText += `\nNotes: ${notes}`;
+  if (notes)
+    tweetText += `\nNotes: ${notes}`;
 
   tweetText += `\nGame: ${game.replace(/\s(ENG|JP)$/, '')}`;
   tweetText += `\nQID${cardID}`;
+  tweetText += `\nTo Answer ⬇️\n${DM_URL}`;
+
   return tweetText;
 }
 

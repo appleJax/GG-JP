@@ -17,6 +17,7 @@ app.use(bodyParser.json());
 route(app);
 
 //twitterBot.register();
+//twitterBot.listen();
 
 if (process.env.NODE_ENV === 'production')
   twitterBot.start();
