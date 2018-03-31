@@ -1,24 +1,29 @@
 import { cache } from 'Config/redis';
 import DB        from 'DB/ops';
 import multer    from 'multer';
-import { getTimeTilNextTweet } from 'Utils';
+import { getTimeTilNextTweet, send } from 'Utils';
 
 const upload = multer({ dest: 'uploads/' });
 
 
 export default (app) => {
 
-  app.get('/api/cards/old', DB.getOldCards);
+  app.get('/api/cards/old', (req, res) =>
+    DB.getOldCards().then(send(res))
+  );
 
-  app.get('/api/cards', DB.serveCards);
+  app.get('/api/cards', (req, res) =>
+    DB.serveCards(req).then(send(res))
+  );
 
   app.get('/api/decks',
     cache.route(untilNextTweet()),
-    DB.getDeckTitles
+    (req, res) =>
+      DB.getDeckTitles().then(send(res))
   );
 
   app.get('/api/deck/:slug', (req, res) =>
-    DB.getDeck(req).then(deck => res.json(deck))
+    DB.getDeck(req).then(send(res))
   );
 
   app.get('/api/live',
@@ -34,7 +39,7 @@ export default (app) => {
   app.get('/api/scores',
     browserCache,
     cache.route(untilNextTweet()),
-    DB.getScores
+    (req, res) => DB.getScores(req).then(send(res))
   );
 
   app.get('/api/user/:userId',
@@ -43,7 +48,7 @@ export default (app) => {
       next();
     },
     cache.route(untilNextTweet()),
-    DB.getUser
+    (req, res) => DB.serveUser(req).then(send(res))
   );
 
   app.get('/api/userStats/:handle',
@@ -53,7 +58,7 @@ export default (app) => {
       next();
     },
     cache.route(untilNextTweet()),
-    DB.getUserStats
+    (req, res) => DB.getUserStats(req).then(send(res))
   );
 
   app.get('/api/countdown', (req, res) =>
@@ -70,7 +75,9 @@ export default (app) => {
 
   app.post('/scores/edit', DB.adjustScore);
 
-  app.get('/cards/new',    DB.getNewCards);
+  app.get('/cards/new', (req, res) =>
+    DB.getNewCards().then(send(res))
+  );
 
 }
 

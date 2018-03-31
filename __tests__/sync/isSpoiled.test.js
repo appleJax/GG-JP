@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 const { isSpoiled } = require('Utils');
 
 const card1 = {

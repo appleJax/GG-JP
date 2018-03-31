@@ -1,6 +1,7 @@
 **/.DS_Store
 .env
 .env.js
+.vscode
 __DBScripts
 app.yaml
 node_modules

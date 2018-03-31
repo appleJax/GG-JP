@@ -75,41 +75,39 @@ export default ({
     res.redirect('/');
   },
 
-  addOrUpdateUser(newUser) {
-    return tryCatch(new Promise(async (resolve, reject) => {
-      const { userId } = newUser;
-      const user = await tryCatch(
-        Scoreboard.findOne({ userId }).exec()
+  async addOrUpdateUser(newUser) {
+    const { userId } = newUser;
+    const user = await tryCatch(
+      Scoreboard.findOne({ userId }).exec()
+    );
+    if (user) {
+      const {
+        name,
+        handle,
+        avatar,
+        profileBanner,
+        following
+      } = newUser;
+
+      await tryCatch(
+        Scoreboard.updateOne(
+          { userId },
+          { $set: {
+              name,
+              handle,
+              avatar,
+              profileBanner,
+              following
+            }
+          }).exec()
       );
-      if (user) {
-        const {
-          name,
-          handle,
-          avatar,
-          profileBanner,
-          following
-        } = newUser;
+    } else {
+      await tryCatch(
+        Scoreboard.create(newUser)
+      );
+    }
 
-        await tryCatch(
-          Scoreboard.updateOne(
-            { userId },
-            { $set: {
-                name,
-                handle,
-                avatar,
-                profileBanner,
-                following
-              }
-            }).exec()
-        );
-      } else {
-        await tryCatch(
-          Scoreboard.create(newUser)
-        );
-      }
-
-      resolve(user || newUser);
-    }));
+    return user || newUser;
   },
 
   adjustScore(req, res) {
@@ -140,80 +138,71 @@ export default ({
     );
   },
 
-  getDeck(req) {
-    return new Promise(async (resolve, reject) => {
-      const {
-        params: { slug },
-        query:  {
-          page = 1,
-          pageSize = 12
-        }
-      } = req
-
-      const deck = await tryCatch(
-        DeckTitle.findOne({ slug })
-      );
-
-      if (!deck) {
-        resolve({ cards: null, total: 0 });
-        return;
+  async getDeck(req) {
+    const {
+      params: { slug },
+      query:  {
+        page = 1,
+        pageSize = 12
       }
+    } = req
 
-      const skipCount = (page - 1) * pageSize;
-
-      const rawCards = await tryCatch(
-        OldCard.find({
-          game: deck.fullTitle,
-        })
-        .select({
-          _id:            0,
-          answerId:       1,
-          answerPostedAt: 1,
-          answers:        1,
-          cardId:         1,
-          game:           1,
-          mainImageSlice: 1,
-          mediaUrls:      1,
-          questionText:   1
-        })
-        .sort({ answerPostedAt: 'desc' })
-        .skip(skipCount)
-        .limit(Number(pageSize))
-        .exec()
-      );
-
-      if (rawCards.length === 0) {
-        resolve({ cards: null, total: 0 });
-        return;
-      }
-
-      const cards = formatFlashCards(rawCards);
-      const total = deck.tweetedCards;
-
-      resolve({ cards, total });
-    });
-  },
-
-  async getDeckTitles(req, res) {
-    const titles = await tryCatch(
-      DeckTitle.find().exec()
+    const deck = await tryCatch(
+      DeckTitle.findOne({ slug }).exec()
     );
-    titles.sort((a, b) => a.slug > b.slug);
-    res.json(titles);
+
+    if (!deck)
+      return { cards: null, total: 0 };
+
+    const skipCount = (Number(page) - 1) * Number(pageSize);
+
+    const rawCards = await tryCatch(
+      OldCard.find({
+        game: deck.fullTitle,
+      })
+      .select({
+        _id:            0,
+        answerId:       1,
+        answerPostedAt: 1,
+        answers:        1,
+        cardId:         1,
+        game:           1,
+        mainImageSlice: 1,
+        mediaUrls:      1,
+        questionText:   1
+      })
+      .sort({ answerPostedAt: 'desc' })
+      .skip(skipCount)
+      .limit(Number(pageSize))
+      .exec()
+    );
+
+    if (rawCards.length === 0)
+      return { cards: null, total: 0 };
+
+    const cards = formatFlashCards(rawCards);
+    const total = deck.tweetedCards;
+
+    return { cards, total };
   },
 
-  async serveCards({ query: { ids } }, res) {
-    if (!ids || ids.length === 0) {
-      res.json(null);
-      return;
-    }
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const oldCards = mongo.db(DB).collection('oldCards');
+  async getDeckTitles() {
+    return await tryCatch(
+      DeckTitle.find()
+               .sort({ slug: 'asc' })
+               .exec()
+    );
+  },
+
+  async serveCards({ query: { ids } }) {
+    if (!ids || ids.length === 0)
+      return null;
+
     const cards = await tryCatch(
-      getCards(ids, oldCards)
+      getCards(ids, OldCard)
     );
-    res.json(cards);
-    mongo.close();
+
+    return cards;
   },
 
   async getLiveQuestions() {
@@ -222,52 +211,38 @@ export default ({
     );
   },
 
-  async getNewCards(req, res) {
-    const newCards = await tryCatch(
+  async getNewCards() {
+    return await tryCatch(
       NewCard.find().exec()
     );
-    res.json(newCards);
   },
 
-  async getOldCards(req, res) {
-    const oldCards = await tryCatch(
+  async getOldCards() {
+    return await tryCatch(
       OldCard.find().exec()
     );
-    res.json(oldCards);
   },
 
-  getRandomQuestion(hour) {
-    return tryCatch(new Promise(async (resolve, reject) => {
-      const scheduledDeck = await tryCatch(
-        getScheduledDeck(hour)
-      );
+  async getRandomQuestion(hour) {
+    const scheduledDeck = await tryCatch(
+      getScheduledDeck(hour)
+    );
 
-      const randomCard = await tryCatch(
-        getRandomCard(scheduledDeck)
-      );
+    const randomCard = await tryCatch(
+      getRandomCard(scheduledDeck)
+    );
 
-      if (!randomCard) {
-        reject(new Error('No appropriate cards available.'));
-        return;
-      }
+    if (!randomCard) {
+      console.error('No appropriate cards available.');
+      return;
+    }
 
-      await tryCatch(LiveQuestion.create(randomCard));
-      await tryCatch(NewCard.deleteOne(randomCard).exec());
-      resolve(randomCard);
-    }));
+    await tryCatch(LiveQuestion.create(randomCard));
+    await tryCatch(NewCard.deleteOne(randomCard).exec());
+    return randomCard;
   },
 
-  // TODO - delete this method if not needed
-  async getScore(req, res) {
-    const { handle } = req.params;
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-    const user = await tryCatch(scoreboard.findOne({handle}));
-    res.json(user);
-    mongo.close();
-  },
-
-  async getScores(req, res ) {
+  async getScores(req) {
     const {
       query: {
         page = 1,
@@ -277,60 +252,47 @@ export default ({
       }
     } = req;
 
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-
     const match = {
       handle: { $regex: search, $options: 'i' },
       [`${view}.score`]: { $gt: 0 }
     };
-    const total = await tryCatch(
-      scoreboard.find(match).count()
-    );
-
     const skipCount = (Number(page) - 1) * Number(pageSize);
+
     const users = await tryCatch(
-      scoreboard.find(match)
-      .sort({[`${view}.rank`]: 1, handle: 1})
+      Scoreboard.find(match)
+      .sort({
+        [`${view}.rank`]: 'asc',
+        handle: 'asc'
+      })
       .skip(skipCount)
       .limit(Number(pageSize))
-      .toArray()
+      .exec()
     );
-    if (users.length === 0) {
-      res.json({ users: [], total: 0 });
-      mongo.close();
-      return;
-    }
-    res.json({ users, total });
-    mongo.close();
+
+    if (users.length === 0)
+      return { users: [], total: 0 };
+    
+    const total = await tryCatch(
+      Scoreboard.find(match).count().exec()
+    );
+    return { users, total };
   },
 
-  async getUser({ params: { userId }}, res) {
+  async getUserStats({ params: { handle }}) {
     const user = await tryCatch(
-      getUser(userId)
+      Scoreboard.findOne({handle}).exec()
     );
-    res.json(user);
-  },
 
-  async getUserStats({ params: { handle }}, res) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-    const oldCards = mongo.db(DB).collection('oldCards');
-    const user = await tryCatch(scoreboard.findOne({handle}));
+    if (!user)
+      return null;
 
-    if (!user) {
-      res.json(null);
-      mongo.close();
-      return;
-    }
-
-    const cardIds = user.allTimeStats.correct.map(record => record.cardId);
+    const cardIds = user.allTimeStats.correct.map(card => card.cardId);
     const earnedCards = await tryCatch(
-      getCards(cardIds, oldCards)
+      getCards(cardIds, OldCard)
     );
     user.earnedCards = earnedCards;
-    res.json(user);
-    mongo.close();
+
+    return user;
   },
 
   async processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls) {
@@ -386,6 +348,12 @@ export default ({
       const answerCards = formatFlashCards(recentAnswers);
       res.json(answerCards);
     }
+  },
+
+  async serveUser({ params: { userId }}) {
+    return await tryCatch(
+      getUser(userId)
+    );
   },
 
   async updateLiveQuestion({
@@ -624,28 +592,25 @@ function addTweetedCardCounts(deckTitles) {
   }));
 }
 
-function getCards(ids, collection) {
-  return tryCatch(new Promise(async (resolve, reject) => {
-    const data = await tryCatch(
-      collection.find({ cardId: { $in: ids }})
-                .project({
-                  _id:            0,
-                  answerId:       1,
-                  answerPostedAt: 1,
-                  answers:        1,
-                  cardId:         1,
-                  game:           1,
-                  mainImageSlice: 1,
-                  mediaUrls:      1,
-                  questionText:   1,
-                })
-                .sort({ answerPostedAt: -1 })
-                .toArray()
-    );
+async function getCards(ids, model) {
+  const data = await tryCatch(
+    model.find({ cardId: { $in: ids }})
+         .select({
+           _id:            0,
+           answerId:       1,
+           answerPostedAt: 1,
+           answers:        1,
+           cardId:         1,
+           game:           1,
+           mainImageSlice: 1,
+           mediaUrls:      1,
+           questionText:   1,
+         })
+         .sort({ answerPostedAt: 'desc' })
+  );
 
-    const cards = formatFlashCards(data);
-    resolve(cards);
-  }));
+  const cards = formatFlashCards(data);
+  return cards;
 }
 
 

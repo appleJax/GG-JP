@@ -189,6 +189,9 @@ export function isSpoiled(questionCard, spoilerText, liveAnswers) {
   return existingSpoilers || willSpoil;
 }
 
+export const send = (res) =>
+  (data) => res.json(data);
+
 export function tryCatch(promise) {
  return promise
    .then(data => data)

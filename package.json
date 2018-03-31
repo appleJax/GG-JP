@@ -57,6 +57,9 @@
     "globalSetup": "./test-env/setup.js",
     "globalTeardown": "./test-env/teardown.js",
     "testEnvironment": "./test-env/mongo-env.js",
+    "setupFiles": [
+      "./test-env/env-vars.js"
+    ],
     "moduleNameMapper": {
       "^Anki(.*)$": "<rootDir>/src/anki$1",
       "^Config(.*)$": "<rootDir>/src/config$1",

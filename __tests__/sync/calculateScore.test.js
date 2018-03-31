@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 const { calculateScore } = require('Utils');
 
 const answerPostedAt = millis('Fri Jan 26 06:54:01 +0000 2018');

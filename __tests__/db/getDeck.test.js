@@ -10,8 +10,8 @@ const {
 
 beforeAll(async () => {
   await connectDB();
-  DeckTitle.insertMany(sampleDeckTitles());
-  OldCard.insertMany(sampleCards());
+  await DeckTitle.insertMany(sampleDeckTitles());
+  await OldCard.insertMany(sampleCards());
 });
 
 afterAll(async (done) => {
