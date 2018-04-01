@@ -2,7 +2,7 @@ import Twitter          from 'Config/twitter';
 import { tryCatch }     from 'Utils';
 import evaluateResponse from './evaluateResponse';
 
-const { TWITTER_ACCOUNT, DM_URL } = process.env;
+const { TWITTER_ACCOUNT } = process.env;
 
 export async function fetchTwitterUser(userId) {
   const params = { user_id: userId };
@@ -54,7 +54,6 @@ export function postMedia(status, mainImages, altText1, prevLineImages, altText2
     const params = {
       status,
       media_ids,
-      attachment_url: DM_URL,
       tweet_mode: 'extended',
       include_ext_alt_text: true
     };
@@ -99,49 +98,48 @@ export async function processDMs() {
   let reply;
   
   for (let i = missedDMs.length - 1; i >= 0; i--) {
-    console.log('DM object:', missedDMs[i]);
     reply = missedDMs[i];
     await tryCatch(evaluateResponse(reply));
   }
 }
 
-export function retrieveAndCountMissedReplies(liveQuestions) {
-  return tryCatch(new Promise(async (resolve, reject) => {
-    const lastQuestionPosted = getLastQuestionPosted(liveQuestions);
-    const params = {
-      q: `@${TWITTER_ACCOUNT}`,
-      count: 100,
-      since_id: lastQuestionPosted
-    };
+// export function retrieveAndCountMissedReplies(liveQuestions) {
+//   return tryCatch(new Promise(async (resolve, reject) => {
+//     const lastQuestionPosted = getLastQuestionPosted(liveQuestions);
+//     const params = {
+//       q: `@${TWITTER_ACCOUNT}`,
+//       count: 100,
+//       since_id: lastQuestionPosted
+//     };
 
-    let missedReplies = [];
-    let nextResults;
-    do {
-      const {
-        data: {
-          statuses,
-          search_metadata
-        }
-      } = await tryCatch(Twitter.get('search/tweets', params));
+//     let missedReplies = [];
+//     let nextResults;
+//     do {
+//       const {
+//         data: {
+//           statuses,
+//           search_metadata
+//         }
+//       } = await tryCatch(Twitter.get('search/tweets', params));
 
-      missedReplies = missedReplies.concat(statuses);
-      nextResults = search_metadata.next_results;
+//       missedReplies = missedReplies.concat(statuses);
+//       nextResults = search_metadata.next_results;
 
-      if (nextResults)
-        params.max_id = nextResults.match(/max_id=(\d+)/)[1]
+//       if (nextResults)
+//         params.max_id = nextResults.match(/max_id=(\d+)/)[1]
 
-    } while (nextResults)
+//     } while (nextResults)
 
-    let reply;
-    let i = missedReplies.length - 1;
-    for (; i >= 0; i--) {
-      reply = missedReplies[i];
-      await tryCatch(evaluateResponse(reply, liveQuestions));
-    }
+//     let reply;
+//     let i = missedReplies.length - 1;
+//     for (; i >= 0; i--) {
+//       reply = missedReplies[i];
+//       await tryCatch(evaluateResponse(reply, liveQuestions));
+//     }
 
-    resolve();
-  }));
-}
+//     resolve();
+//   }));
+// }
 
 
 // private functions

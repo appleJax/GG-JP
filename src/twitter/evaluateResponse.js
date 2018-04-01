@@ -5,7 +5,7 @@ import {
   calculateScore,
   calculateTimeToAnswer,
   contains,
-  extractAnswer,
+  parseDM,
   tryCatch
 } from 'Utils';
 
@@ -14,7 +14,6 @@ const { TWITTER_ACCOUNT } = process.env;
 
 export default async function evaluateResponse({
   created_timestamp: replyPostedAt,
-  initiated_via,
   message_create: {
     sender_id: userId,
     message_data: {
@@ -22,13 +21,11 @@ export default async function evaluateResponse({
     }
   }
 }) {
-  const questionId = (initiated_via)
-    ? initiated_via.tweet_id
-    : '0';
+  const [ cardId, userAnswer ] = parseDM(text);
 
   const liveQuestions = await tryCatch(DB.getLiveQuestions());
   const foundQuestion = liveQuestions.find(
-    questionCard => questionCard.questionId === questionId
+    questionCard => questionCard.cardId === cardId
   );
 
   if (!foundQuestion)
@@ -54,14 +51,13 @@ export default async function evaluateResponse({
   replyPostedAt = new Date(+replyPostedAt).getTime();
   const timeToAnswer = calculateTimeToAnswer(replyPostedAt, foundQuestion);
 
-  const userAnswer = extractAnswer(text);
   if (contains(userAnswer, acceptedAnswers)) {
     const points = calculateScore(replyPostedAt, foundQuestion);
     if (points >= 0) {
       console.log('Correct Answer!!!');
       await tryCatch(
         DB.cachePoints(
-          questionId,
+          cardId,
           { userId, points, timeToAnswer }
         )
       );
@@ -70,7 +66,7 @@ export default async function evaluateResponse({
   } else {
     await tryCatch(
       DB.cachePoints(
-        questionId,
+        cardId,
         { userId, points: 0, timeToAnswer }
       )
     );

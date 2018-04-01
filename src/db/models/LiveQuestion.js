@@ -5,7 +5,9 @@ const Schema = Mongoose.Schema;
 const schema = new Schema({
   alreadyAnswered: [String],
   answerAltText: String,
+  answerId: String,
   answerImages: [String],
+  answerPostedAt: Number,
   answers: [String],
   answerText: String,
   cardId: String,

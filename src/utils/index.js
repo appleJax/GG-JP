@@ -1,6 +1,6 @@
 import urlencode from 'urlencode';
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
-const { TWITTER_ACCOUNT, LEADERBOARD } = process.env;
+const { TWITTER_ACCOUNT, LEADERBOARD, DM_URL } = process.env;
 
 // Normal +6 ... DST +5
 const UTC_OFFSET = 5;
@@ -67,8 +67,11 @@ export function contains(item, list) {
   return valid(list.indexOf(item));
 }
 
-export const extractAnswer = (text) =>
-  text.replace(/http.*/, '').trim();
+export function parseDM(text) {
+  const cardId = (text.match(/QID([0-9]+)/) || [,'notFound'])[1];
+  const userAnswer = text.replace(/QID[0-9]+/, '').trim();
+  return [ cardId, userAnswer ];
+}
 
 export function extractAnswer_OLD(text) {
   return text.trim().slice(TWITTER_ACCOUNT.length + 2);
@@ -100,7 +103,7 @@ export function formatQuestionAltText(expression) {
 }
 
 export function formatQuestionText(
-  cardID,
+  cardId,
   engMeaning,
   expression,
   game,
@@ -118,8 +121,8 @@ export function formatQuestionText(
     tweetText += `\nNotes: ${notes}`;
 
   tweetText += `\nGame: ${game.replace(/\s(ENG|JP)$/, '')}`;
-  tweetText += `\nQID${cardID}`;
-  tweetText += '\nTo Answer ⬇️';
+  tweetText += `\nQID${cardId}`;
+  tweetText += `\nTo Answer ➡️ ${DM_URL}${cardId}%20`;
 
   return tweetText;
 }

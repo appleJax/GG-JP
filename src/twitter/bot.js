@@ -21,9 +21,10 @@ const POLL_DM_INTERVAL = 90*1000;
 
 export default ({
 
-  // tweet() {
-  //   tweetRandomQuestion();
-  // },
+  tweet() {
+    tweetRandomQuestion();
+    pollDMs();
+  },
 
   // listen() {
   //   pollDMs();
