@@ -1,6 +1,6 @@
 import urlencode from 'urlencode';
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
-const { TWITTER_ACCOUNT, LEADERBOARD, DM_URL } = process.env;
+const { TWITTER_ACCOUNT, LEADERBOARD } = process.env;
 
 // Normal +6 ... DST +5
 const UTC_OFFSET = 5;
@@ -119,7 +119,7 @@ export function formatQuestionText(
 
   tweetText += `\nGame: ${game.replace(/\s(ENG|JP)$/, '')}`;
   tweetText += `\nQID${cardID}`;
-  tweetText += `\nTo Answer ⬇️\n${DM_URL}`;
+  tweetText += '\nTo Answer ⬇️';
 
   return tweetText;
 }

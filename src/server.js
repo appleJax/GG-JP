@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 
 route(app);
 
-//twitterBot.register();
+// twitterBot.tweet();
 //twitterBot.listen();
 
 if (process.env.NODE_ENV === 'production')

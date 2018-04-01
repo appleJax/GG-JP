@@ -2,7 +2,7 @@ import Twitter          from 'Config/twitter';
 import { tryCatch }     from 'Utils';
 import evaluateResponse from './evaluateResponse';
 
-const { TWITTER_ACCOUNT } = process.env;
+const { TWITTER_ACCOUNT, DM_URL } = process.env;
 
 export async function fetchTwitterUser(userId) {
   const params = { user_id: userId };
@@ -51,7 +51,13 @@ export function postMedia(status, mainImages, altText1, prevLineImages, altText2
 
     const media_ids = prevLineMediaIds.concat(mainMediaIds);
 
-    const params = { status, media_ids, tweet_mode: 'extended', include_ext_alt_text: true };
+    const params = {
+      status,
+      media_ids,
+      attachment_url: DM_URL,
+      tweet_mode: 'extended',
+      include_ext_alt_text: true
+    };
     Twitter.post('statuses/update', params, (err, data, response) => {
       if (err) {
         console.error(err)
