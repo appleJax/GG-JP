@@ -7,42 +7,47 @@ const {
   LiveQuestion
 } = Models;
 
+const sampleCard = {
+  cardId: '1',
+  alreadyAnswered: [],
+  userPoints: []
+}
+
 beforeAll(async () => {
   await connectDB();
 });
 
 afterAll(async (done) => {
-  Mongoose.disconnect(done);
+  await Mongoose.disconnect(done);
 });
 
 beforeEach(async () => {
-  await LiveQuestion.create({
-    questionId: '1',
-    alreadyAnswered: [],
-    userPoints: []
-  });
+  await LiveQuestion.create(sampleCard);
 });
 
 afterEach(async () => {
-  await LiveQuestion.remove().exec();
+  await LiveQuestion.remove();
 });
 
 it('should add the given points to the given LiveQuestion', async () => {
+  const cardBefore = await toString(fetchLiveQuestion('1'));
+  const expectedBefore = JSON.stringify(sampleCard)
   const userPoints = {
     userId: '5',
     points: 24,
     timeToAnswer: 10
   };
-  const expected = JSON.stringify({
-    questionId: '1',
+  const expectedAfter = JSON.stringify({
+    cardId: '1',
     alreadyAnswered: [ '5' ],
     userPoints: [ userPoints ]
   });
 
   await cachePoints('1', userPoints);
-  const liveQuestion = await toString(fetchLiveQuestion('1'));
+  const cardAfter = await toString(fetchLiveQuestion('1'));
 
-  expect(liveQuestion).toEqual(expected);
+  expect(cardBefore).toEqual(expectedBefore);
+  expect(cardAfter).toEqual(expectedAfter);
 });
 
 
@@ -50,10 +55,10 @@ it('should add the given points to the given LiveQuestion', async () => {
 
 async function fetchLiveQuestion(id) {
   return await LiveQuestion.findOne(
-    { questionId: id }
+    { cardId: id }
   ).select({
     _id: 0,
-    questionId: 1,
+    cardId: 1,
     alreadyAnswered: 1,
     'userPoints.userId': 1,
     'userPoints.points': 1,
@@ -64,7 +69,7 @@ async function fetchLiveQuestion(id) {
 function toString(promise) {
   return promise.then(doc =>
     JSON.stringify({
-      questionId: doc.questionId,
+      cardId: doc.cardId,
       alreadyAnswered: doc.alreadyAnswered,
       userPoints: doc.userPoints
     })

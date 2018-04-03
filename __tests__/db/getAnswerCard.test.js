@@ -12,7 +12,8 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  Mongoose.disconnect(done);
+  await LiveQuestion.remove();
+  await Mongoose.disconnect(done);
 });
 
 it('should return the requested card from LiveQuestions', async () => {

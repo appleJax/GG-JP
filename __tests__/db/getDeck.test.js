@@ -15,7 +15,9 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  Mongoose.disconnect(done);
+  await DeckTitle.remove();
+  await OldCard.remove();
+  await Mongoose.disconnect(done);
 });
 
 const EMPTY = {

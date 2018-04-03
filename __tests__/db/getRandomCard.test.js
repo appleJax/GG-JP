@@ -18,8 +18,8 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  await NewCard.remove().exec();
-  Mongoose.disconnect(done);
+  await NewCard.remove();
+  await Mongoose.disconnect(done);
 });
 
 it('should return a random card from NewCards', async () => {

@@ -12,7 +12,8 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  Mongoose.disconnect(done);
+  await Scoreboard.remove();
+  await Mongoose.disconnect(done);
 });
 
 it('should add the given user to the Scoreboard collection', async () => {

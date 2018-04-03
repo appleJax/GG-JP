@@ -16,7 +16,9 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  Mongoose.disconnect(done);
+  await OldCard.remove();
+  await Scoreboard.remove();
+  await Mongoose.disconnect(done);
 });
 
 it(`should return the requested user with their correct

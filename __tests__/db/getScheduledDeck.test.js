@@ -30,10 +30,10 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  await DeckTitle.remove().exec();
-  await NewCard.remove().exec();
-  await Schedule.remove().exec();
-  Mongoose.disconnect(done);
+  await DeckTitle.remove();
+  await NewCard.remove();
+  await Schedule.remove();
+  await Mongoose.disconnect(done);
 });
 
 it('should get the scheduled deck for the current time', async () => {

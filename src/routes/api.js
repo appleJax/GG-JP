@@ -31,7 +31,7 @@ export default (app) => {
 
   app.get('/api/recent',
     browserCache,
-    cache.route(untilNextTweet()),
+    cache.route(untilNextTweet() + 5000),
     (req, res) => DB.serveRecentAnswers().then(send(res))
   );
 

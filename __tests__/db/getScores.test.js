@@ -16,8 +16,8 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  await Scoreboard.remove().exec();
-  Mongoose.disconnect(done);
+  await Scoreboard.remove();
+  await Mongoose.disconnect(done);
 });
 
 

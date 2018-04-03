@@ -18,7 +18,7 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  Mongoose.disconnect(done);
+  await Mongoose.disconnect(done);
 });
 
 beforeEach(async () => {
@@ -39,10 +39,10 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await DeckTitle.remove().exec();
-  await LiveQuestion.remove().exec();
-  await NewCard.remove().exec();
-  await Schedule.remove().exec();
+  await DeckTitle.remove();
+  await LiveQuestion.remove();
+  await NewCard.remove();
+  await Schedule.remove();
 });
 
 it('should return a random question card from NewCards', async () => {

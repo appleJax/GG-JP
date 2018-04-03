@@ -117,13 +117,13 @@ export default ({
 
   async cachePoints(cardId, userPoints) {
     return await tryCatch(
-      LiveQuestion.updateOne(
+      LiveQuestion.update(
         { cardId },
         { $push: {
             alreadyAnswered: userPoints.userId,
             userPoints
           }
-      })
+      }).exec()
     );
   },
 
@@ -281,7 +281,7 @@ export default ({
 
   async getUserStats({ params: { handle }}) {
     const user = await tryCatch(
-      Scoreboard.findOne({handle}).exec()
+      Scoreboard.findOne({ handle }).exec()
     );
 
     if (!user)
@@ -598,21 +598,18 @@ export function getRandomCard(scheduledDeck) {
   });
 }
 
-function getRecentAnswers() {
-  return tryCatch(new Promise(async (resolve, reject) => {
-    const recentAnswers = await tryCatch(
-      OldCard.find()
-             .sort({ answerPostedAt: 'desc' })
-             .limit(12)
-             .select({
-               alreadyAnswered: 0,
-               userPoints:      0
-             })
-             .exec()
-    );
-
-    resolve(recentAnswers);
-  }));
+async function getRecentAnswers() {
+  return await tryCatch(
+    OldCard
+      .find()
+      .sort({ answerPostedAt: 'desc' })
+      .limit(12)
+      .select({
+        alreadyAnswered: 0,
+        userPoints:      0
+      })
+      .exec()
+  );
 }
 
 function initialPointsUpdates({ userPoints = [], cardId = '' }) {

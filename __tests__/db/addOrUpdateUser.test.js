@@ -12,11 +12,11 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  Mongoose.disconnect(done);
+  await Mongoose.disconnect(done);
 });
 
 afterEach(async () => {
-  await Scoreboard.remove().exec();
+  await Scoreboard.remove();
 });
 
 const sampleUser = {

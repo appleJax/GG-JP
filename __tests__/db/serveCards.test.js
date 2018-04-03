@@ -11,7 +11,8 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  Mongoose.disconnect(done);
+  await OldCard.remove();
+  await Mongoose.disconnect(done);
 });
 
 it('should return the existing cards with the given cardIds', async () => {

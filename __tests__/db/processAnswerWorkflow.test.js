@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  Mongoose.disconnect(done);
+  await Mongoose.disconnect(done);
 });
 
 const mediaUrl1 = { altText: 'altText1', image: 'mediaUrl1' };
@@ -36,9 +36,9 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await LiveQuestion.remove().exec();
-  await OldCard.remove().exec();
-  await Scoreboard.remove().exec();
+  await LiveQuestion.remove();
+  await OldCard.remove();
+  await Scoreboard.remove();
 });
 
 
