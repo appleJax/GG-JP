@@ -122,7 +122,7 @@ export function formatQuestionText(
 
   tweetText += `\nGame: ${game.replace(/\s(ENG|JP)$/, '')}`;
   tweetText += `\nQID${cardId}`;
-  tweetText += `\nTo Answer ➡️ ${DM_URL}${cardId}%20`;
+  tweetText += `\nSubmit Answer ➡️ ${DM_URL}${cardId}%20`;
 
   return tweetText;
 }
