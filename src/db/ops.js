@@ -310,7 +310,7 @@ export default ({
 
     await tryCatch(addPointsToScoreboard(currentQuestion));
     await tryCatch(OldCard.create(currentQuestion))
-    await tryCatch(LiveQuestion.deleteOne(currentQuestion).exec());
+    await tryCatch(LiveQuestion.remove({ cardId }).exec());
   },
 
   async serveLiveQuestions() {

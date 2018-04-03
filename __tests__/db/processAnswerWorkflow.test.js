@@ -43,6 +43,7 @@ afterEach(async () => {
 
 
 it('should add the updated card to OldCards and delete the card from LiveQuestions', async () => {
+  const lQCount0 = await LiveQuestion.find().count().exec();
   const liveQuestionBefore = await fetch(LiveQuestion);
   const mediaUrlsBefore = liveQuestionBefore.mediaUrls.map(obj => obj.image);
   const sampleMediaUrls = sampleCard.mediaUrls.map(obj => obj.image);
@@ -55,6 +56,7 @@ it('should add the updated card to OldCards and delete the card from LiveQuestio
   const oldCardAfter = await fetch(OldCard);
   const mediaUrlsAfter = oldCardAfter.mediaUrls.map(obj => obj.image);
   const expectedMediaUrlsAfter = [mediaUrl1, mediaUrl2, mediaUrl3].map(obj => obj.image);
+  const lQCount = await LiveQuestion.find().count().exec();
 
   expect(liveQuestionBefore.answerAltText).toEqual(sampleCard.answerAltText);
   expect(String(liveQuestionBefore.answerImages)).toEqual(String(sampleCard.answerImages));
@@ -69,6 +71,8 @@ it('should add the updated card to OldCards and delete the card from LiveQuestio
   expect(mediaUrlsAfter).toEqual(expectedMediaUrlsAfter);
   expect(oldCardAfter.answerPostedAt).toEqual(answerPostedAt);
   expect(oldCardAfter.answerId).toEqual('answerId1');
+  expect(lQCount0).toEqual(1);
+  expect(lQCount).toEqual(0);
 });
 
 
