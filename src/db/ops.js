@@ -36,24 +36,19 @@ export default ({
   async addDeck(req, res) {
     const filePath = req.file.path;
     const newCards = await tryCatch(processUpload(filePath));
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const newCardCollection = mongo.db(DB).collection('newCards');
-    const oldCardCollection = mongo.db(DB).collection('oldCards');
     const oldCards = await tryCatch(
-      oldCardCollection.find()
-                       .project({_id: 0, cardId: 1})
-                       .toArray()
-                       .then(cards =>
-                         Promise.resolve(
-                           cards.map(card => card.cardId)
-                         ))
+      OldCard
+        .find()
+        .select({_id: 0, cardId: 1})
+        .lean()
+        .exec()
     );
 
     const ops = [];
     for (let i = 0; i < newCards.length; ++i) {
       const newCard = newCards[i];
       const { cardId } = newCard;
-      if (oldCards.indexOf(cardId) === -1)
+      if (!oldCards.find(card => card.cardId === cardId))
         ops.push({
           replaceOne: {
              filter: { cardId },
@@ -63,23 +58,17 @@ export default ({
         });
     }
 
-    if (ops.length === 0) {
-      mongo.close();
-      res.redirect('/');
+    if (ops.length === 0)
       return;
-    }
 
-    await tryCatch(newCardCollection.bulkWrite(ops));
+    await tryCatch(NewCard.bulkWrite(ops));
     console.log('Finished uploading/updating cards!');
-    mongo.close();
-
-    res.redirect('/');
   },
 
   async addOrUpdateUser(newUser) {
     const { userId } = newUser;
     const user = await tryCatch(
-      Scoreboard.findOne({ userId }).exec()
+      Scoreboard.findOne({ userId }).lean().exec()
     );
     if (user) {
       const {
@@ -135,7 +124,7 @@ export default ({
 
   async getAnswerCard(cardId) {
     return await tryCatch(
-      LiveQuestion.findOne({ cardId }).exec()
+      LiveQuestion.findOne({ cardId }).lean().exec()
     );
   },
 
@@ -149,7 +138,7 @@ export default ({
     } = req
 
     const deck = await tryCatch(
-      DeckTitle.findOne({ slug }).exec()
+      DeckTitle.findOne({ slug }).lean().exec()
     );
 
     if (!deck)
@@ -175,6 +164,7 @@ export default ({
       .sort({ answerPostedAt: 'desc' })
       .skip(skipCount)
       .limit(Number(pageSize))
+      .lean()
       .exec()
     );
 
@@ -191,6 +181,7 @@ export default ({
     return await tryCatch(
       DeckTitle.find()
                .sort({ slug: 'asc' })
+               .lean()
                .exec()
     );
   },
@@ -208,19 +199,19 @@ export default ({
 
   async getLiveQuestions() {
     return await tryCatch(
-      LiveQuestion.find().exec()
+      LiveQuestion.find().lean().exec()
     );
   },
 
   async getNewCards() {
     return await tryCatch(
-      NewCard.find().exec()
+      NewCard.find().lean().exec()
     );
   },
 
   async getOldCards() {
     return await tryCatch(
-      OldCard.find().exec()
+      OldCard.find().lean().exec()
     );
   },
 
@@ -267,6 +258,7 @@ export default ({
       })
       .skip(skipCount)
       .limit(Number(pageSize))
+      .lean()
       .exec()
     );
 
@@ -281,7 +273,7 @@ export default ({
 
   async getUserStats({ params: { handle }}) {
     const user = await tryCatch(
-      Scoreboard.findOne({ handle }).exec()
+      Scoreboard.findOne({ handle }).lean().exec()
     );
 
     if (!user)
@@ -325,6 +317,7 @@ export default ({
                     otherVisibleContext: 0,
                     userPoints:          0
                   })
+                  .lean()
                   .sort({ questionPostedAt: 'desc' })
     );
 
@@ -355,11 +348,8 @@ export default ({
     questionId,
     questionPostedAt
   }) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const liveQuestions = mongo.db(DB).collection('liveQuestions');
-
     await tryCatch(
-      liveQuestions.updateOne({ cardId },
+      LiveQuestion.updateOne({ cardId },
         { $set: {
             alreadyAnswered: [],
             mediaUrls,
@@ -374,31 +364,28 @@ export default ({
             prevLineAltText: ''
           }
         }
-      )
-    )
-    mongo.close();
+      ).exec()
+    );
   },
 
   async updateStats(resetWeeklyStats, resetMonthlyStats) {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-    const users = await tryCatch(scoreboard.find().toArray());
-    const bulkUpdateOps = [];
+    const users = await tryCatch(
+      Scoreboard.find().lean().exec()
+    );
 
+    const bulkUpdateOps = [];
     let i = 0;
     let end = users.length;
     for (; i < end; i++) {
       const user = users[i];
-      const { userId, dailyStats } = user;
-      const newDailyStats = calculateNewStats(dailyStats);
+      const { userId } = user;
+      const dailyStats = calculateNewStats(user.dailyStats);
 
       const op = {
         updateOne: {
           filter: { userId },
           update: {
-            $set: {
-              'dailyStats': newDailyStats
-            }
+            $set: { dailyStats }
           }
         }
       };
@@ -418,13 +405,12 @@ export default ({
       bulkUpdateOps.push(op);
     }
 
-    if (bulkUpdateOps.length === 0) {
-      mongo.close();
+    if (bulkUpdateOps.length === 0)
       return;
-    }
 
-    await tryCatch(scoreboard.bulkWrite(bulkUpdateOps));
-    mongo.close();
+    await tryCatch(
+      Scoreboard.bulkWrite(bulkUpdateOps)
+    );
   }
 
 }) // dbOps export
@@ -446,31 +432,6 @@ async function addPointsToScoreboard(liveQuestion) {
 
   await tryCatch(Scoreboard.bulkWrite(ops));
   await tryCatch(recalculateRank());
-}
-
-function addTweetedCardCounts(deckTitles) {
-  return tryCatch(new Promise(async (resolve, reject) => {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const oldCards = mongo.db(DB).collection('oldCards');
-    const titlesWithCounts = [];
-
-    for (let i = 0; i < deckTitles.length; i++) {
-      const title = deckTitles[i];
-      const tweetedCards = await tryCatch(
-        oldCards.find({ game: title.fullTitle }).count()
-      );
-
-      console.log('TweetedCards:', tweetedCards);
-      console.log('title:', title);
-      titlesWithCounts.push({
-        ...title,
-        tweetedCards
-      });
-      // console.log('TitlesWithCounts:', titlesWithCounts);
-    }
-
-    resolve(titlesWithCounts);
-  }));
 }
 
 function finishPointsUpdateOps(cachedUpdates, allUsers, cardId) {
@@ -552,50 +513,46 @@ async function getCards(ids, model) {
 
 
 // Exported for testing
-export function getRandomCard(scheduledDeck) {
-  return new Promise(async (resolve, reject) => {
-    let randomCard = await tryCatch(
+export async function getRandomCard(scheduledDeck) {
+  let randomCard = await tryCatch(
+    NewCard.aggregate([
+      { $match: scheduledDeck },
+      { $sample: { size: 1 }}
+    ])
+    .then(cards => Promise.resolve(cards[0]))
+  );
+  if (randomCard == null) {
+    console.error('Empty deck. Please Add More Cards to DB.');
+    return null;
+  }
+
+  const liveCards = await tryCatch(LiveQuestion.find().lean().exec());
+  const recentCards = await tryCatch(getRecentAnswers());
+  const spoilerText = getSpoilerText(liveCards.concat(recentCards));
+  const liveAnswers = getLiveAnswers(liveCards);
+
+  let spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
+  let tries = 0;
+  while(spoiled) {
+    if (tries > 20) {
+      console.error('All new cards contain spoilers. Please try again later.');
+      return null;
+    }
+    if (tries > 10)
+      scheduledDeck = {};
+
+    randomCard = await tryCatch(
       NewCard.aggregate([
         { $match: scheduledDeck },
         { $sample: { size: 1 }}
       ])
       .then(cards => Promise.resolve(cards[0]))
     );
-    if (randomCard == null) {
-      console.error('Empty deck. Please Add More Cards to DB.');
-      resolve(null);
-      return;
-    }
+    spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
+    tries++;
+  }
 
-    const liveCards = await tryCatch(LiveQuestion.find().exec());
-    const recentCards = await tryCatch(getRecentAnswers());
-    const spoilerText = getSpoilerText(liveCards.concat(recentCards));
-    const liveAnswers = getLiveAnswers(liveCards);
-
-    let spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
-    let tries = 0;
-    while(spoiled) {
-      if (tries > 20) {
-        console.error('All new cards contain spoilers. Please try again later.');
-        resolve(null);
-        return;
-      }
-      if (tries > 10)
-        scheduledDeck = {};
-
-      randomCard = await tryCatch(
-        NewCard.aggregate([
-          { $match: scheduledDeck },
-          { $sample: { size: 1 }}
-        ])
-        .then(cards => Promise.resolve(cards[0]))
-      );
-      spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
-      tries++;
-    }
-
-    resolve(randomCard);
-  });
+  return randomCard;
 }
 
 async function getRecentAnswers() {
@@ -608,6 +565,7 @@ async function getRecentAnswers() {
         alreadyAnswered: 0,
         userPoints:      0
       })
+      .lean()
       .exec()
   );
 }

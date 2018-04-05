@@ -16,10 +16,12 @@ afterAll(async (done) => {
   await Mongoose.disconnect(done);
 });
 
+const USER_ID = 'c6';
+
 it('should add the given user to the Scoreboard collection', async () => {
   const newUser = {
     body: {
-      userId: '6',
+      userId: USER_ID,
       name: 'Bob'
     }
   };
@@ -27,7 +29,7 @@ it('should add the given user to the Scoreboard collection', async () => {
   const existingUserCount = await Scoreboard.find().count().exec();
   await createUser(newUser);
   const newUserCount = await Scoreboard.find().count().exec();
-  const newUserObj = await Scoreboard.findOne({ userId: '6' }).exec();
+  const newUserObj = await Scoreboard.findOne({ userId: USER_ID }).lean().exec();
 
   expect(existingUserCount).toEqual(0);
   expect(newUserCount).toEqual(1);

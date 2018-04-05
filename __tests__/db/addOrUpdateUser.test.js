@@ -31,7 +31,7 @@ const sampleUser = {
   ]
 };
 
-const sampleUser2 = {
+const updatedUser = {
   userId: '1',
   name: 'New Name',
   handle: 'newname',
@@ -43,30 +43,25 @@ const sampleUser2 = {
   ]
 };
 
-const [
-  sampleUserString,
-  sampleUser2String
-] = [ sampleUser, sampleUser2 ].map(JSON.stringify);
-
 it('should add the user if the user does not exist', async () => {
   const dbUser = await fetchUser('1');
   await addOrUpdateUser(sampleUser);
-  const newUser = await toString(fetchUser('1'));
+  const newUser = await fetchUser('1');
 
   expect(dbUser).toBeNull();
-  expect(newUser).toEqual(sampleUserString);
+  expect(newUser).toEqual(sampleUser);
 });
 
 it('should update the user if the user exists', async () => {
   await addOrUpdateUser(sampleUser);
-  const dbUser = await toString(fetchUser('1'));
-  await addOrUpdateUser(sampleUser2);
-  const newUser = await toString(fetchUser('1'));
+  const dbUser = await fetchUser('1');
+  await addOrUpdateUser(updatedUser);
+  const newUser = await fetchUser('1');
   const userCount = await Scoreboard.find().count().exec();
 
   expect(userCount).toEqual(1);
-  expect(dbUser).toEqual(sampleUserString);
-  expect(newUser).toEqual(sampleUser2String);
+  expect(dbUser).toEqual(sampleUser);
+  expect(newUser).toEqual(updatedUser);
 });
 
 
@@ -83,18 +78,5 @@ async function fetchUser(id) {
     avatar: 1,
     profileBanner: 1,
     following: 1
-  }).exec();
-}
-
-function toString(promise) {
-  return promise.then(doc =>
-    JSON.stringify({
-      userId: doc.userId,
-      name: doc.name,
-      handle: doc.handle,
-      avatar: doc.avatar,
-      profileBanner: doc.profileBanner,
-      following: doc.following
-    })
-  );
+  }).lean().exec();
 }

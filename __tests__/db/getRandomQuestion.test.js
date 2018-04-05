@@ -10,7 +10,6 @@ const {
   Schedule
 } = Models;
 
-// shared variable
 let newCardIds;
 
 beforeAll(async () => {
@@ -34,7 +33,7 @@ beforeEach(async () => {
     sampleNewCards()
   );
 
-  const newCards = await NewCard.find().exec();
+  const newCards = await fetch(NewCard);
   newCardIds = newCards.map(card => card.cardId);
 });
 
@@ -52,7 +51,7 @@ it('should return a random question card from NewCards', async () => {
 
 it('should remove the random card from NewCards', async () => {
   const randomQuestionId = await getRandomQuestionId();
-  const afterNewCards = await NewCard.find().exec();
+  const afterNewCards = await fetch(NewCard);
   const afterNewCardIds = afterNewCards.map(card => card.cardId);
 
   expect(newCardIds).toHaveLength(5);
@@ -61,9 +60,9 @@ it('should remove the random card from NewCards', async () => {
 });
 
 it('should add the random card to LiveQuestions', async () => {
-  const liveQuestions = await LiveQuestion.find().exec();
+  const liveQuestions = await fetch(LiveQuestion);
   const randomQuestionId = await getRandomQuestionId();
-  const afterLiveQuestions = await LiveQuestion.find().exec();
+  const afterLiveQuestions = await fetch(LiveQuestion);
   const liveQuestionId = afterLiveQuestions[0].cardId;
 
   expect(liveQuestions).toHaveLength(0);
@@ -79,6 +78,10 @@ function getRandomQuestionId() {
     const randomQuestion = await getRandomQuestion(2);
     resolve(randomQuestion.cardId);
   });
+}
+
+async function fetch(model) {
+  return await model.find().lean().exec();
 }
 
 

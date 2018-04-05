@@ -68,8 +68,8 @@ export default (app) => {
   // TODO - add authentication to following endpoints
 
   app.post('/deck/new',
-    upload.single('zipfile'),
-    DB.addDeck
+    upload.single('zipfile'), (req, res) =>
+      DB.addDeck(req).then(_ => res.redirect('/'))
   );
 
   app.post('/scores/edit', DB.adjustScore);

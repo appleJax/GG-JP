@@ -7,11 +7,10 @@ const UTC_OFFSET = 5;
 
 export const HOURS = 3600000;
 
-export function addLinks(answerText, questionId) {
+export function addLink(answerText, questionId) {
   const questionLink = `Question: twitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
   const lines = answerText.split('\n');
   lines.splice(-1, 0, questionLink);
-  lines.splice(-1, 0, `Leaderboard: ${LEADERBOARD}`);
   return lines.join('\n');
 }
 
@@ -89,6 +88,7 @@ export function formatAnswerText(answers, cardId, engMeaning, webLookup) {
   if (webLookup)
     answerText += '\nLookup: ' + WEBLOOKUP_URL + urlencode(webLookup);
 
+  answerText += `\nLeaderboard: ${LEADERBOARD}`;
   answerText += `\nQID${cardId}`;
   return answerText;
 }
@@ -121,8 +121,9 @@ export function formatQuestionText(
     tweetText += `\nNotes: ${notes}`;
 
   tweetText += `\nGame: ${game.replace(/\s(ENG|JP)$/, '')}`;
-  tweetText += `\nQID${cardId}`;
+  tweetText += `\nLeaderboard: ${LEADERBOARD}`;
   tweetText += `\nSubmit Answer ➡️ ${DM_URL}${cardId}%20`;
+  tweetText += `\nQID${cardId}`;
 
   return tweetText;
 }
@@ -205,7 +206,7 @@ export function tryCatch(promise) {
  return promise
    .then(data => data)
    .catch(err => {
-     console.error('Error:',err);
+     console.error('Error:', err);
      return {};
    });
 }

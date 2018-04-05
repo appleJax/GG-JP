@@ -5,8 +5,7 @@ const { processAnswerWorkflow } = require('DB/ops').default;
 
 const {
   LiveQuestion,
-  OldCard,
-  Scoreboard
+  OldCard
 } = Models;
 
 beforeAll(async () => {
@@ -17,6 +16,7 @@ afterAll(async (done) => {
   await Mongoose.disconnect(done);
 });
 
+const CARD_ID = 'c1'
 const mediaUrl1 = { altText: 'altText1', image: 'mediaUrl1' };
 const mediaUrl2 = { altText: 'altText2', image: 'mediaUrl2' };
 const mediaUrl3 = { altText: 'altText3', image: 'mediaUrl3' };
@@ -24,58 +24,65 @@ const mediaUrl3 = { altText: 'altText3', image: 'mediaUrl3' };
 const sampleCard = {
   answerAltText: 'altText',
   answerImages: ['image1'],
-  cardId: 'cardId1',
+  cardId: CARD_ID,
   mediaUrls: [ mediaUrl1 ],
+  userPoints: [],
+  alreadyAnswered: []
+};
+
+const ANSWER_ID = 'a1'
+const ANSWER_POSTED_AT = 1234;
+const updatedCard = {
+  answerId: ANSWER_ID,
+  answerPostedAt: ANSWER_POSTED_AT,
+  cardId: CARD_ID,
+  mediaUrls: [ mediaUrl1, mediaUrl2, mediaUrl3 ],
   userPoints: [],
   alreadyAnswered: []
 };
 
 beforeEach(async () => {
   await LiveQuestion.create(sampleCard);
-  await Scoreboard.create({ userId: '1' });
 });
 
 afterEach(async () => {
   await LiveQuestion.remove();
   await OldCard.remove();
-  await Scoreboard.remove();
 });
 
 
 it('should add the updated card to OldCards and delete the card from LiveQuestions', async () => {
-  const lQCount0 = await LiveQuestion.find().count().exec();
   const liveQuestionBefore = await fetch(LiveQuestion);
-  const mediaUrlsBefore = liveQuestionBefore.mediaUrls.map(obj => obj.image);
-  const sampleMediaUrls = sampleCard.mediaUrls.map(obj => obj.image);
-  const oldCardBefore = await fetch(OldCard)
+  const oldCardBefore      = await fetch(OldCard);
 
-  const answerPostedAt = 1234;
-  await processAnswerWorkflow('answerId1', answerPostedAt, 'cardId1', [ mediaUrl2, mediaUrl3 ]);
+  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ]);
 
   const liveQuestionAfter = await fetch(LiveQuestion);
-  const oldCardAfter = await fetch(OldCard);
-  const mediaUrlsAfter = oldCardAfter.mediaUrls.map(obj => obj.image);
-  const expectedMediaUrlsAfter = [mediaUrl1, mediaUrl2, mediaUrl3].map(obj => obj.image);
-  const lQCount = await LiveQuestion.find().count().exec();
+  const oldCardAfter      = await fetch(OldCard);
 
-  expect(liveQuestionBefore.answerAltText).toEqual(sampleCard.answerAltText);
-  expect(String(liveQuestionBefore.answerImages)).toEqual(String(sampleCard.answerImages));
-  expect(liveQuestionBefore.answerId).toBeUndefined();
-  expect(liveQuestionBefore.answerPostedAt).toBeUndefined();
-  expect(mediaUrlsBefore).toEqual(sampleMediaUrls);
-  expect(oldCardBefore).toBeNull();
 
+  expect(liveQuestionBefore).toEqual(sampleCard);
   expect(liveQuestionAfter).toBeNull();
-  expect(oldCardAfter.answerAltText).toBeUndefined();
-  expect(oldCardAfter.answerImages).toBeUndefined();
-  expect(mediaUrlsAfter).toEqual(expectedMediaUrlsAfter);
-  expect(oldCardAfter.answerPostedAt).toEqual(answerPostedAt);
-  expect(oldCardAfter.answerId).toEqual('answerId1');
-  expect(lQCount0).toEqual(1);
-  expect(lQCount).toEqual(0);
+
+  expect(oldCardBefore).toBeNull();
+  expect(oldCardAfter).toEqual(updatedCard);
 });
 
 
+// helper
+
 async function fetch(model) {
-  return await model.findOne({ cardId: 'cardId1' }).lean().exec();
+  return await model.findOne({ cardId: CARD_ID })
+                    .select({
+                      _id: 0,
+                      answerId: 1,
+                      answerAltText: 1,
+                      answerImages: 1,
+                      answerPostedAt: 1,
+                      cardId: 1,
+                      'mediaUrls.altText': 1,
+                      'mediaUrls.image': 1,
+                      userPoints: 1,
+                      alreadyAnswered: 1
+                    }).lean().exec();
 }

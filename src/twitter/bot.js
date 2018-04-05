@@ -3,7 +3,7 @@ import Twitter          from 'Config/twitter';
 import evaluateResponse from './evaluateResponse';
 import {
   HOURS,
-  addLinks,
+  addLink,
   getTimeTilNextTweet,
   getTimeUntil,
   tryCatch
@@ -133,7 +133,7 @@ async function tweetAnswer(cardId, questionId) {
   } = await tryCatch(
     // Tweet the answer
     postMedia(
-      addLinks(answerText, questionId),
+      addLink(answerText, questionId),
       answerImages,
       answerAltText
     )

@@ -16,13 +16,15 @@ afterAll(async (done) => {
   await Mongoose.disconnect(done);
 });
 
+const CARD_ID = 'c1';
+
 it('should return the requested card from LiveQuestions', async () => {
   await LiveQuestion.create({
-    cardId: '1',
+    cardId: CARD_ID,
     questionText: 'text'
   });
 
-  const answerCard = await getAnswerCard('1');
+  const answerCard = await getAnswerCard(CARD_ID);
 
   expect(answerCard.questionText).toEqual('text');
 });
