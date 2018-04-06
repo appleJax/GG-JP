@@ -1,4 +1,3 @@
-import { MongoClient } from 'mongodb';
 import models from 'Models'
 import { getFollowing } from 'Twitter/utils'
 import { getHour, tryCatch } from 'Utils'
@@ -8,7 +7,8 @@ const {
   NewCard,
   OldCard,
   LiveQuestion,
-  Schedule
+  Schedule,
+  Scoreboard
 } = models;
 
 const {
@@ -31,10 +31,12 @@ export function buildUpdatesForRank(stats) {
     let i = 0;
     for (; i < end; i++) {
       const currentStat = scores[i];
-      if (currentStat.score === 0) continue;
+      if (currentStat.score === 0)
+        continue;
 
       currentStat.users.sort(
-        (a, b) => a[category].avgTimeToAnswer - b[category].avgTimeToAnswer
+        (a, b) =>
+          a[category].avgTimeToAnswer - b[category].avgTimeToAnswer
       );
       let currentAvgTime = -1;
 
@@ -87,82 +89,81 @@ export function buildUpdatesForRank(stats) {
   return bulkUpdateOps;
 }
 
-export function createUserObject(profile) {
-  return new Promise(async (resolve, reject) => {
-    const {
-      id_str: userId,
-      name,
-      screen_name: handle,
-      profile_image_url_https: avatar,
-      profile_banner_url: profileBanner
-    } = profile;
-    const following = await tryCatch(
+// noSideEffects for testing purposes
+export async function createUserObject(profile, noSideEffects) {
+  const {
+    id_str: userId,
+    name,
+    screen_name: handle,
+    profile_image_url_https: avatar,
+    profile_banner_url: profileBanner
+  } = profile;
+
+  const following = noSideEffects
+    ? []
+    : await tryCatch(
       getFollowing(userId)
     );
 
-    resolve({
-      userId,
-      name,
-      handle,
-      avatar,
-      profileBanner,
-      following,
-      allTimeStats: {
-        attempts: 0,
-        correct: [],
-        incorrect: [],
-        unanswered: [],
-        totalPossible: 0,
-        rank: 0,
-        score: 0,
-        avgTimeToAnswer: 0
-      },
-      monthlyStats: {
-        attempts: 0,
-        correct: 0,
-        totalPossible: 0,
-        rank: 0,
-        score: 0,
-        avgTimeToAnswer: 0,
-        average: {
-          n: 0,
-          value: 0
-        }
-      },
-      weeklyStats: {
-        attempts: 0,
-        correct: 0,
-        totalPossible: 0,
-        rank: 0,
-        score: 0,
-        avgTimeToAnswer: 0,
-        average: {
-          n: 0,
-          value: 0
-        }
-      },
-      dailyStats: {
-        attempts: 0,
-        correct: 0,
-        totalPossible: 0,
-        score: 0,
-        avgTimeToAnswer: 0,
-        average: {
-          n: 0,
-          value: 0
-        }
+  return {
+    userId,
+    name,
+    handle,
+    avatar,
+    profileBanner,
+    following,
+    allTimeStats: {
+      attempts: 0,
+      correct: [],
+      incorrect: [],
+      unanswered: [],
+      totalPossible: 0,
+      rank: 0,
+      score: 0,
+      avgTimeToAnswer: 0
+    },
+    monthlyStats: {
+      attempts: 0,
+      correct: 0,
+      totalPossible: 0,
+      rank: 0,
+      score: 0,
+      avgTimeToAnswer: 0,
+      average: {
+        n: 0,
+        value: 0
       }
-    });
-  });
+    },
+    weeklyStats: {
+      attempts: 0,
+      correct: 0,
+      totalPossible: 0,
+      rank: 0,
+      score: 0,
+      avgTimeToAnswer: 0,
+      average: {
+        n: 0,
+        value: 0
+      }
+    },
+    dailyStats: {
+      attempts: 0,
+      correct: 0,
+      totalPossible: 0,
+      score: 0,
+      avgTimeToAnswer: 0,
+      average: {
+        n: 0,
+        value: 0
+      }
+    }
+  };
 }
 
-
-export async function findOrCreateUser(userId, twitterUser) {
-  const mongo = await tryCatch(MongoClient.connect(url));
-  const scoreboard = mongo.db(DB).collection('scoreboard');
-
+// noSideEffects for testing purposes
+export async function findOrCreateUser(userId, twitterUser, noSideEffects) {
   let user = await tryCatch(
-    scoreboard.findOne({ userId })
+    Scoreboard.findOne({ userId }).lean().exec()
   );
 
   if (!user) {
@@ -170,22 +171,26 @@ export async function findOrCreateUser(userId, twitterUser) {
       createUserObject(twitterUser)
     );
     await tryCatch(
-      scoreboard.insert(user)
+      Scoreboard.create(user)
     );
 
   } else {
-
     const {
       name,
       screen_name: handle,
       profile_image_url_https: avatar,
       profile_banner_url: profileBanner
     } = twitterUser;
-    const following = await tryCatch (
-      getFollowing(userId)
-    );
+
+    const following = noSideEffects
+      ? []
+      : await tryCatch (
+          getFollowing(userId)
+        );
+
     user = await tryCatch(
-      scoreboard.findOneAndUpdate({ userId },
+      Scoreboard.findOneAndUpdate(
+        { userId },
         { $set: {
             avatar,
             following,
@@ -194,103 +199,88 @@ export async function findOrCreateUser(userId, twitterUser) {
             profileBanner
           }
         },
-        { returnOriginal: false }
-      )
-      .then(doc => Promise.resolve(doc.value))
+        { new: true, lean: true }
+      ).exec()
     );
   }
-
-  mongo.close();
   return user;
 }
 
-export function getScheduledDeck(hour) {
-  return tryCatch(new Promise(async (resolve, reject) => {
-    hour = hour || getHour();
-    const timeslot = await tryCatch(
-      Schedule.findOne({ time: hour }).exec()
-    );
+export async function getScheduledDeck(hour) {
+  hour = hour || getHour();
+  const timeslot = await tryCatch(
+    Schedule.findOne({ time: hour }).lean().exec()
+  );
 
-    if (!timeslot) {
-      console.log('No timeslot found in schedule for:', hour);
-      console.log('Picking card from random deck...');
-      resolve({});
-      return;
-    }
+  if (!timeslot) {
+    console.log('No timeslot found in schedule for:', hour);
+    console.log('Picking card from random deck...');
+    return {};
+  }
 
-    const scheduledDeck = timeslot.deck;
-    const availableCards = await tryCatch(
-      NewCard.find({ game: scheduledDeck }).count().exec()
-    );
+  const scheduledDeck = timeslot.deck;
+  const availableCards = await tryCatch(
+    NewCard.find({ game: scheduledDeck }).count().exec()
+  );
 
-    if (availableCards > 0) {
-      resolve({ game: scheduledDeck });
-      return;
-    }
+  if (availableCards > 0)
+    return { game: scheduledDeck };
 
-    const newScheduledDeck = await tryCatch(
-      updateScheduledDeck(hour, scheduledDeck)
-    );
+  const newScheduledDeck = await tryCatch(
+    updateScheduledDeck(hour, scheduledDeck)
+  );
 
-    resolve(newScheduledDeck);
-  }));
+  return newScheduledDeck;
 }
 
-export function getUser(userId) {
-  return new Promise(async (resolve, reject) => {
-    const mongo = await tryCatch(MongoClient.connect(url));
-    const scoreboard = mongo.db(DB).collection('scoreboard');
-    const user = await tryCatch(
-      scoreboard.findOne({ userId })
-    );
-
-    resolve(user);
-    mongo.close();
-  });
+export async function getUser(userId) {
+  return await tryCatch(
+    Scoreboard.findOne({ userId }).lean().exec()
+  );
 }
 
 
 // private functions
+// (exported for testing)
+export async function updateScheduledDeck(hour, scheduledDeck) {
+  await tryCatch(
+    DeckTitle.updateOne(
+      { fullTitle: scheduledDeck },
+      { $set: { finished: true } }
+    ).exec()
+  );
 
-function updateScheduledDeck(hour, scheduledDeck) {
-  return tryCatch(new Promise(async (resolve, reject) => {
-    await tryCatch(
-      DeckTitle.update(
-        { deck: scheduledDeck },
-        { $set: { finished: true } }
-      ).exec()
+  let allDecks = await tryCatch(
+    DeckTitle.find({
+      totalCards: { $gt: 0 },
+      finished:   { $ne: true }
+    }).lean().exec()
+  );
+  allDecks = allDecks.map(doc => doc.fullTitle);
+
+  let alreadyScheduled = await tryCatch(
+    Schedule.find().lean().exec()
+  )
+  alreadyScheduled = alreadyScheduled.map(doc => doc.deck);
+
+  for (let i = 0; i < allDecks.length; i++) {
+    const currentTitle = allDecks[i];
+    if (alreadyScheduled.find(title => title === currentTitle))
+      continue;
+
+    const availableCards = await tryCatch(
+      NewCard.find({ game: currentTitle }).count().exec()
     );
 
-    const allDecks = await tryCatch(
-      DeckTitle.find({
-        totalCards: { $gt: 0 },
-        finished:   { $ne: true }
-      }).exec().then(docs => docs.map(doc => doc.fullTitle))
-    );
-    const alreadyScheduled = await tryCatch(
-      Schedule.find().exec().then(docs => docs.map(doc => doc.deck))
-    );
-
-    for (let i = 0; i < allDecks.length; i++) {
-      const currentTitle = allDecks[i];
-      if (alreadyScheduled.find(title => title === currentTitle))
-        continue;
-
-      const availableCards = await tryCatch(
-        NewCard.find({ game: currentTitle }).count().exec()
+    if (availableCards > 0) {
+      await tryCatch(
+        Schedule.updateOne(
+          { time: hour },
+          { $set: { deck: currentTitle } }
+        ).exec()
       );
-      if (availableCards > 0) {
-        await tryCatch(
-          Schedule.update(
-            { time: hour },
-            { $set: { deck: currentTitle } }
-          ).exec()
-        );
-        resolve({ game: currentTitle });
-        return;
-      }
+      return { game: currentTitle };
     }
-
-    resolve({});
-  }));
+  }
+  return {};
 }

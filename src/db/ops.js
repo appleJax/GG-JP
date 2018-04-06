@@ -1,9 +1,7 @@
-import { MongoClient }   from 'mongodb';
 import { processUpload } from 'Anki/processing';
 import models            from 'Models';
 import {
   buildUpdatesForRank,
-  createUserObject,
   getScheduledDeck,
   getUser
 } from 'DB/utils';
