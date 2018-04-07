@@ -68,7 +68,8 @@ export function contains(item, list) {
 
 export function parseDM(text) {
   const cardId = (text.match(/QID([0-9]+)/) || [,'notFound'])[1];
-  const userAnswer = text.replace(/QID[0-9]+/, '').trim();
+  const userAnswer = text.replace(/QID[0-9]+/, '')
+                         .replace(/\s+/g, '');
   return [ cardId, userAnswer ];
 }
 
