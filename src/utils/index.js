@@ -1,6 +1,6 @@
 import urlencode from 'urlencode';
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
-const { TWITTER_ACCOUNT, LEADERBOARD, DM_URL } = process.env;
+const { TWITTER_ACCOUNT, APP_URL, DM_URL } = process.env;
 
 // Normal +6 ... DST +5
 const UTC_OFFSET = 5;
@@ -89,7 +89,7 @@ export function formatAnswerText(answers, cardId, engMeaning, webLookup) {
   if (webLookup)
     answerText += '\nLookup: ' + WEBLOOKUP_URL + urlencode(webLookup);
 
-  answerText += `\nLeaderboard: ${LEADERBOARD}`;
+  answerText += `\nLeaderboard: ${APP_URL}/stats`;
   answerText += `\nQID${cardId}`;
   return answerText;
 }
@@ -122,7 +122,7 @@ export function formatQuestionText(
     tweetText += `\nNotes: ${notes}`;
 
   tweetText += `\nGame: ${game.replace(/\s(ENG|JP)$/, '')}`;
-  tweetText += `\nLeaderboard: ${LEADERBOARD}`;
+  tweetText += `\nHow to Play: ${APP_URL}/how-to-play`;
   tweetText += `\nSubmit Answer ➡️ ${DM_URL}${cardId}%20`;
   tweetText += `\nQID${cardId}`;
 

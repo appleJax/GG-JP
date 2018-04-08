@@ -31,7 +31,7 @@ export default (app) => {
 
   app.get('/api/recent',
     browserCache,
-    cache.route(untilNextTweet() + 5000),
+    cache.route(untilNextTweet()),
     (req, res) => DB.serveRecentAnswers().then(send(res))
   );
 
@@ -87,5 +87,5 @@ function browserCache(req, res, next) {
 
 function untilNextTweet() {
   const millis = getTimeTilNextTweet();
-  return Math.ceil(millis / 1000);
+  return Math.ceil(millis / 1000) + 4;
 }
