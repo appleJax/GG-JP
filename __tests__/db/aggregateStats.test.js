@@ -64,37 +64,55 @@ function sampleScoreboard() {
     {
       userId: '1',
       allTimeStats : {
-        score: 9
+        rank: 0,
+        score: 9,
+        avgTimeToAnswer: 1
       },
       monthlyStats: {
-        score: 6
+        rank: 0,
+        score: 6,
+        avgTimeToAnswer: 1
       },
       weeklyStats: {
-        score: 3
+        rank: 0,
+        score: 3,
+        avgTimeToAnswer: 1
       }
     },
     {
       userId: '2',
       allTimeStats : {
-        score: 7
+        rank: 0,
+        score: 7,
+        avgTimeToAnswer: 1
       },
       monthlyStats: {
-        score: 4
+        rank: 0,
+        score: 4,
+        avgTimeToAnswer: 1
       },
       weeklyStats: {
-        score: 1
+        rank: 0,
+        score: 1,
+        avgTimeToAnswer: 1
       }
     },
     {
       userId: '3',
       allTimeStats : {
-        score: 8
+        rank: 0,
+        score: 8,
+        avgTimeToAnswer: 1
       },
       monthlyStats: {
-        score: 5
+        rank: 0,
+        score: 5,
+        avgTimeToAnswer: 1
       },
       weeklyStats: {
-        score: 2
+        rank: 0,
+        score: 2,
+        avgTimeToAnswer: 1
       }
     }
   ];

@@ -69,6 +69,8 @@ export async function aggregateStats() {
 }
 
 export function buildUpdatesForRank(stats) {
+  if (!stats || stats.length === 0)
+    return [];
 
   const usersToUpdate = {};
   const currentRanks = {

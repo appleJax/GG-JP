@@ -631,20 +631,12 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
   return cachedUpdates;
 }
 
-async function recalculateRank() {
-  const stats = aggregateStats();
-
-  if (empty(stats))
-    return;
-  
+export async function recalculateRank() {
+  const stats = await aggregateStats();
   const bulkUpdateOps = buildUpdatesForRank(stats);
 
-  if (empty(bulkUpdateOps))
+  if (bulkUpdateOps.length === 0)
     return;
 
   await tryCatch(Scoreboard.bulkWrite(bulkUpdateOps));
-}
-
-function empty(arr) {
-  return arr.length === 0;
 }

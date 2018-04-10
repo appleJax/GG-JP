@@ -54,7 +54,6 @@ export default async function evaluateResponse({
   if (contains(userAnswer, acceptedAnswers)) {
     const points = calculateScore(replyPostedAt, foundQuestion);
     if (points >= 0) {
-      console.log('Correct Answer!!!');
       await tryCatch(
         DB.cachePoints(
           cardId,
