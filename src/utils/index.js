@@ -133,7 +133,8 @@ export function formatQuestionText(
 export function formatFlashCards(cards) {
   return cards.map(card => {
     card.questionText = card.questionText.split('\n')[0];
-    card.mediaUrls = card.mediaUrls.slice(...card.mainImageSlice);
+    card.questionMediaUrls = card.mediaUrls.slice(...card.mainImageSlice);
+    card.answerMediaUrls = card.mediaUrls.slice(card.mainImageSlice[1]);
     return card;
   });
 }

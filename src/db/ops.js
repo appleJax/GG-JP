@@ -317,8 +317,9 @@ export default ({
                     otherVisibleContext: 0,
                     userPoints:          0
                   })
-                  .lean()
                   .sort({ questionPostedAt: 'desc' })
+                  .lean()
+                  .exec()
     );
 
     return (liveQuestions.length > 0)
@@ -505,6 +506,8 @@ async function getCards(ids, model) {
            questionText:   1,
          })
          .sort({ answerPostedAt: 'desc' })
+         .lean()
+         .exec()
   );
 
   const cards = formatFlashCards(data);
@@ -631,6 +634,7 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
   return cachedUpdates;
 }
 
+// Exported for testing
 export async function recalculateRank() {
   const stats = await aggregateStats();
   const bulkUpdateOps = buildUpdatesForRank(stats);
