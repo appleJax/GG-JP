@@ -1,6 +1,7 @@
 import { processUpload } from 'Anki/processing';
 import models            from 'Models';
 import {
+  aggregateStats,
   buildUpdatesForRank,
   getScheduledDeck,
   getUser
@@ -14,6 +15,7 @@ import {
   isSpoiled,
   tryCatch
 } from 'Utils';
+import { buildStatsAggregation } from './utils';
 
 const {
   DeckTitle,
@@ -630,65 +632,19 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
 }
 
 async function recalculateRank() {
-  const stats = await tryCatch(Scoreboard.aggregate([
-    { $project: {
-        _id: 0,
-        orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'allTimeStats' ] },
-        userId:                         1,
-        'allTimeStats.avgTimeToAnswer': 1,
-        'allTimeStats.score':           1,
-        'allTimeStats.rank':            1,
-        'monthlyStats.avgTimeToAnswer': 1,
-        'monthlyStats.score':           1,
-        'monthlyStats.rank':            1,
-        'weeklyStats.avgTimeToAnswer':  1,
-        'weeklyStats.score':            1,
-        'weeklyStats.rank':             1
-      }
-    },
-    { $unwind: '$orderBy' },
-    { $group:
-      { _id:
-        { orderBy: '$orderBy',
-          score:
-          { $cond: {
-              if: { $eq: ['$orderBy', 'weeklyStats' ] },
-              then: '$weeklyStats.score',
-              else: {
-                if: { $eq: ['$orderBy', 'monthlyStats'] },
-                then: '$monthlyStats.score',
-                else: '$allTimeStats.score'
-              }
-            }
-          }
-        },
-        users: { $push: '$$CURRENT' }
-      }
-    },
-    { $sort: { '_id.score': -1 } },
-    { $group:
-      { _id: '$_id.orderBy',
-        scores: {
-          $push: {
-            score: '$_id.score',
-            users: '$users'
-          }
-        }
-      }
-    }
-  ]).exec());
+  const stats = aggregateStats();
 
   if (empty(stats))
     return;
   
   const bulkUpdateOps = buildUpdatesForRank(stats);
 
-  if (bulkUpdateOps.length === 0)
+  if (empty(bulkUpdateOps))
     return;
 
   await tryCatch(Scoreboard.bulkWrite(bulkUpdateOps));
 }
 
-function empty(obj) {
-  return Object.keys(obj).length === 0;
+function empty(arr) {
+  return arr.length === 0;
 }

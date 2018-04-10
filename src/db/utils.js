@@ -16,6 +16,58 @@ const {
   MONGO_DB:    DB
 } = process.env;
 
+export async function aggregateStats() {
+  return await tryCatch(Scoreboard.aggregate([
+    { $project: {
+        _id: 0,
+        orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'allTimeStats' ] },
+        userId:                         1,
+        'allTimeStats.avgTimeToAnswer': 1,
+        'allTimeStats.score':           1,
+        'allTimeStats.rank':            1,
+        'monthlyStats.avgTimeToAnswer': 1,
+        'monthlyStats.score':           1,
+        'monthlyStats.rank':            1,
+        'weeklyStats.avgTimeToAnswer':  1,
+        'weeklyStats.score':            1,
+        'weeklyStats.rank':             1
+      }
+    },
+    { $unwind: '$orderBy' },
+    { $group:
+      { _id:
+        { orderBy: '$orderBy',
+          score:
+          { $cond: {
+            if: { $eq: ['$orderBy', 'weeklyStats' ] },
+            then: '$weeklyStats.score',
+            else:
+            { $cond: {
+                if: { $eq: ['$orderBy', 'monthlyStats'] },
+                then: '$monthlyStats.score',
+                else: '$allTimeStats.score'
+                }
+              }
+            }
+          }
+        },
+        users: { $push: '$$CURRENT' }
+      }
+    },
+    { $sort: { '_id.score': -1 } },
+    { $group:
+      { _id: '$_id.orderBy',
+        scores: {
+          $push: {
+            score: '$_id.score',
+            users: '$users'
+          }
+        }
+      }
+    }
+  ]).exec());
+}
+
 export function buildUpdatesForRank(stats) {
 
   const usersToUpdate = {};

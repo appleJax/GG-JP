@@ -4,142 +4,8 @@
 
 const { buildUpdatesForRank } = require('DB/utils');
 
-const stats = [
+const updateOps = buildUpdatesForRank(sampleStats());
 
-  // stat1
-  { _id: 'allTimeStats',
-    scores: [
-      { score: 100,
-        users: [
-          { userId: '1',
-            allTimeStats: {
-              avgTimeToAnswer: 100,
-              rank: 0
-            }
-          },
-          { userId: '2',
-            allTimeStats: {
-              avgTimeToAnswer: 200,
-              rank: 0
-            }
-          }
-        ] // users
-      },
-      { score: 50,
-        users: [
-          { userId: '3',
-            allTimeStats: {
-              avgTimeToAnswer: 100,
-              rank: 0
-            }
-          },
-          { userId: '4',
-            allTimeStats: {
-              avgTimeToAnswer: 200,
-              rank: 0
-            }
-          },
-          { userId: '5',
-            allTimeStats: {
-              avgTimeToAnswer: 300,
-              rank: 0
-            }
-          }
-        ] // users
-      }
-    ] // scores
-  },
-
-  // stat2
-  { _id: 'monthlyStats',
-    scores: [
-      { score: 100,
-        users: [
-          { userId: '1',
-            monthlyStats: {
-              avgTimeToAnswer: 100,
-              rank: 0
-            }
-          },
-          { userId: '2',
-            monthlyStats: {
-              avgTimeToAnswer: 100,
-              rank: 0
-            }
-          }
-        ] // users
-      },
-      { score: 50,
-        users: [
-          { userId: '3',
-            monthlyStats: {
-              avgTimeToAnswer: 100,
-              rank: 0
-            }
-          },
-          { userId: '4',
-            monthlyStats: {
-              avgTimeToAnswer: 200,
-              rank: 0
-            }
-          },
-          { userId: '5',
-            monthlyStats: {
-              avgTimeToAnswer: 300,
-              rank: 0
-            }
-          }
-        ] // users
-      }
-    ] // scores
-  },
-
-  // stat3
-  { _id: 'weeklyStats',
-    scores: [
-      { score: 100,
-        users: [
-          { userId: '1',
-            weeklyStats: {
-              avgTimeToAnswer: 100,
-              rank: 1
-            }
-          },
-          { userId: '2',
-            weeklyStats: {
-              avgTimeToAnswer: 200,
-              rank: 0
-            }
-          }
-        ] // users
-      },
-      { score: 50,
-        users: [
-          { userId: '3',
-            weeklyStats: {
-              avgTimeToAnswer: 100,
-              rank: 3
-            }
-          },
-          { userId: '4',
-            weeklyStats: {
-              avgTimeToAnswer: 200,
-              rank: 0
-            }
-          },
-          { userId: '5',
-            weeklyStats: {
-              avgTimeToAnswer: 300,
-              rank: 0
-            }
-          }
-        ] // users
-      }
-    ] // scores
-  }
-]; // stats
-
-const updateOps = buildUpdatesForRank(stats);
 const users = [
   getUser('1', updateOps),
   getUser('2', updateOps),
@@ -147,7 +13,6 @@ const users = [
   getUser('4', updateOps),
   getUser('5', updateOps)
 ];
-
 
 describe(`
   new ranks are calculated according to
@@ -193,4 +58,140 @@ function ranks(users, category) {
 
 function rank(category) {
   return (user) => user.$set[`${category}.rank`]
+}
+
+function sampleStats() {
+  return [
+    // stat1
+    { _id: 'allTimeStats',
+      scores: [
+        { score: 100,
+          users: [
+            { userId: '1',
+              allTimeStats: {
+                avgTimeToAnswer: 100,
+                rank: 0
+              }
+            },
+            { userId: '2',
+              allTimeStats: {
+                avgTimeToAnswer: 200,
+                rank: 0
+              }
+            }
+          ] // users
+        },
+        { score: 50,
+          users: [
+            { userId: '3',
+              allTimeStats: {
+                avgTimeToAnswer: 100,
+                rank: 0
+              }
+            },
+            { userId: '4',
+              allTimeStats: {
+                avgTimeToAnswer: 200,
+                rank: 0
+              }
+            },
+            { userId: '5',
+              allTimeStats: {
+                avgTimeToAnswer: 300,
+                rank: 0
+              }
+            }
+          ] // users
+        }
+      ] // scores
+    },
+
+    // stat2
+    { _id: 'monthlyStats',
+      scores: [
+        { score: 100,
+          users: [
+            { userId: '1',
+              monthlyStats: {
+                avgTimeToAnswer: 100,
+                rank: 0
+              }
+            },
+            { userId: '2',
+              monthlyStats: {
+                avgTimeToAnswer: 100,
+                rank: 0
+              }
+            }
+          ] // users
+        },
+        { score: 50,
+          users: [
+            { userId: '3',
+              monthlyStats: {
+                avgTimeToAnswer: 100,
+                rank: 0
+              }
+            },
+            { userId: '4',
+              monthlyStats: {
+                avgTimeToAnswer: 200,
+                rank: 0
+              }
+            },
+            { userId: '5',
+              monthlyStats: {
+                avgTimeToAnswer: 300,
+                rank: 0
+              }
+            }
+          ] // users
+        }
+      ] // scores
+    },
+
+    // stat3
+    { _id: 'weeklyStats',
+      scores: [
+        { score: 100,
+          users: [
+            { userId: '1',
+              weeklyStats: {
+                avgTimeToAnswer: 100,
+                rank: 1
+              }
+            },
+            { userId: '2',
+              weeklyStats: {
+                avgTimeToAnswer: 200,
+                rank: 0
+              }
+            }
+          ] // users
+        },
+        { score: 50,
+          users: [
+            { userId: '3',
+              weeklyStats: {
+                avgTimeToAnswer: 100,
+                rank: 3
+              }
+            },
+            { userId: '4',
+              weeklyStats: {
+                avgTimeToAnswer: 200,
+                rank: 0
+              }
+            },
+            { userId: '5',
+              weeklyStats: {
+                avgTimeToAnswer: 300,
+                rank: 0
+              }
+            }
+          ] // users
+        }
+      ] // scores
+    }
+  ]; // stats
 }

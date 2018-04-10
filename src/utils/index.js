@@ -66,10 +66,11 @@ export function contains(item, list) {
   return valid(list.indexOf(item));
 }
 
-export function parseDM(text) {
-  const cardId = (text.match(/QID([0-9]+)/) || [,'notFound'])[1];
-  const userAnswer = text.replace(/QID[0-9]+/, '')
-                         .replace(/\s+/g, '');
+export function parseDM(rawText) {
+  const text = rawText.replace(/\s+/g, '');
+  const cardId = (text.match(/QID([0-9]+)/i) || [,'notFound'])[1];
+  const userAnswer = text.replace(/QID[0-9]+/i, '')
+                         
   return [ cardId, userAnswer ];
 }
 
