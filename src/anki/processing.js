@@ -61,6 +61,7 @@ export function parseAnkiJson(filePath) {
   const game = contents.name;
   return contents.notes.map(card => {
     let [
+      cardId,
       expression,
       , // reading,
       , // jpMeaning,
@@ -75,8 +76,7 @@ export function parseAnkiJson(filePath) {
       altAnswers,
       webLookup, // use for every answer so people can look up pronunciation
                  // https://ejje.weblio.jp/content/[webLookup (e.g. 切り換える)]
-      notes,
-      cardId
+      notes
     ] = card.fields;
 
     [ altAnswers,
