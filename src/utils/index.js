@@ -51,15 +51,17 @@ export function calculateScore(replyPostedAt, { questionPostedAt }) {
   const timeToAnswer = Math.floor(
     (replyPostedAt - questionPostedAt) / HOURS
   );
-  const score = 24 - timeToAnswer;
+  const deduction = Math.max(timeToAnswer, 0);
+  const score = 24 - deduction;
 
   return Math.max(score, 0);
 }
 
 export function calculateTimeToAnswer(replyPostedAt, { questionPostedAt }) {
-  return Math.floor(
+  const timeToAnswer = Math.floor(
     (replyPostedAt - questionPostedAt) / 1000
-  )
+  );
+  return Math.max(timeToAnswer, 1);
 }
 
 export function contains(item, list) {
