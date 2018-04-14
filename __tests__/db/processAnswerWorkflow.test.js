@@ -68,6 +68,12 @@ it('should add the updated card to OldCards and delete the card from LiveQuestio
   expect(oldCardAfter).toEqual(updatedCard);
 });
 
+xit('should addPointsToScoreboard', async () => {
+  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ]);
+
+  // TODO: expect addPointsToScoreboard to be called
+});
+
 
 // helper
 

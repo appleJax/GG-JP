@@ -5,7 +5,8 @@ const { connectDB } = require('TestUtils')
 const { updateStats } = require('DB/ops').default;
 
 const {
-  Scoreboard
+  Scoreboard,
+  Timestamp
 } = Models;
 
 beforeAll(async () => {
@@ -16,17 +17,25 @@ afterAll(async (done) => {
   await Mongoose.disconnect(done);
 });
 
-
 const sampleStatsNoRank = {
   attempts:        9,
   correct:         9,
   totalPossible:   9,
   score:          20,
-  avgTimeToAnswer: 9,
+  avgAnswerTime: 9,
   average: {
     n:      1,
     value: 10
-  }
+  },
+  highestScore: {
+    value: 21,
+    timestamp: 0
+  },
+  lowestAvgAnswerTime: {
+    value: 1,
+    timestamp: 0
+  },
+  history: []
 };
 
 const sampleStats = {
@@ -39,11 +48,24 @@ const updatedStatsNoRank = {
   correct:         0,
   totalPossible:   0,
   score:           0,
-  avgTimeToAnswer: 0,
+  avgAnswerTime: 0,
   average: {
     n:      2,
     value: 15
-  }
+  },
+  highestScore: {
+    value: 21,
+    timestamp: 0
+  },
+  lowestAvgAnswerTime: {
+    value: 1,
+    timestamp: 0
+  },
+  history: [{
+    score: 20,
+    avgAnswerTime: 9,
+    timestamp: 123456
+  }]
 };
 
 const updatedStats = {
@@ -53,42 +75,57 @@ const updatedStats = {
 
 beforeEach(async () => {
   await Scoreboard.create(sampleUsers());
+  await Timestamp.create(sampleTimestamps());
   const users = await fetchUsers();
   expect(users).toEqual(sampleUsers());
 });
 
 afterEach(async () => {
   await Scoreboard.remove();
+  await Timestamp.remove();
 });
 
 
 it('should always update daily Stats', async () => {
-  await updateStats(false, false);
+  await updateStats(false, false, false);
 
+  await isNotUpdated('yearlyStats');
   await isNotUpdated('monthlyStats');
   await isNotUpdated('weeklyStats');
   await isUpdated('dailyStats');
 });
 
-it('should update weeklyStats when resetWeeklyStats param is true', async () => {
-  await updateStats(true, false);
+it('should update weeklyStats when newWeek param is true', async () => {
+  await updateStats(true, false, false);
 
+  await isNotUpdated('yearlyStats');
   await isNotUpdated('monthlyStats');
   await isUpdated('weeklyStats');
   await isUpdated('dailyStats');
 });
 
-it('should update monthlyStats when resetMonthlyStats param is true', async () => {
-  await updateStats(false, true);
+it('should update monthlyStats when newMonth param is true', async () => {
+  await updateStats(false, true, false);
 
+  await isNotUpdated('yearlyStats');
   await isUpdated('monthlyStats');
   await isNotUpdated('weeklyStats');
   await isUpdated('dailyStats');
 });
 
-it('should update monthlyStats and weeklyStats when both params are true', async () => {
-  await updateStats(true, true);
+it('should update yearlyStats when newYear param is true', async () => {
+  await updateStats(false, false, true);
 
+  await isUpdated('yearlyStats');
+  await isNotUpdated('monthlyStats');
+  await isNotUpdated('weeklyStats');
+  await isUpdated('dailyStats');
+});
+
+it('should update yearlyStats, monthlyStats and weeklyStats when all params are true', async () => {
+  await updateStats(true, true, true);
+
+  await isUpdated('yearlyStats');
   await isUpdated('monthlyStats');
   await isUpdated('weeklyStats');
   await isUpdated('dailyStats');
@@ -131,13 +168,7 @@ async function fetchUsers() {
     avatar:        0,
     profileBanner: 0,
     following:     0,
-    allTimeStats:  0,
-    'monthlyStats._id': 0,
-    'monthlyStats.__v': 0,
-    'weeklyStats._id':  0,
-    'weeklyStats.__v':  0,
-    'dailyStats._id':   0,
-    'dailyStats.__v':   0
+    allTimeStats:  0
   }).sort({
     userId: 'asc'
   }).lean().exec();
@@ -147,15 +178,26 @@ function sampleUsers() {
   return [
     {
       userId: '1',
+      yearlyStats: sampleStats,
       monthlyStats: sampleStats,
       weeklyStats:  sampleStats,
       dailyStats:   sampleStatsNoRank
     },
     {
       userId: '2',
+      yearlyStats: sampleStats,
       monthlyStats: sampleStats,
       weeklyStats:  sampleStats,
       dailyStats:   sampleStatsNoRank
     }
   ];
+}
+
+function sampleTimestamps() {
+  return {
+    year: 123456,
+    month: 123456,
+    week: 123456,
+    day: 123456 
+  }
 }

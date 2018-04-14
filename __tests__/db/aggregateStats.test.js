@@ -66,17 +66,17 @@ function sampleScoreboard() {
       allTimeStats : {
         rank: 0,
         score: 9,
-        avgTimeToAnswer: 1
+        avgAnswerTime: 1
       },
       monthlyStats: {
         rank: 0,
         score: 6,
-        avgTimeToAnswer: 1
+        avgAnswerTime: 1
       },
       weeklyStats: {
         rank: 0,
         score: 3,
-        avgTimeToAnswer: 1
+        avgAnswerTime: 1
       }
     },
     {
@@ -84,17 +84,17 @@ function sampleScoreboard() {
       allTimeStats : {
         rank: 0,
         score: 7,
-        avgTimeToAnswer: 1
+        avgAnswerTime: 1
       },
       monthlyStats: {
         rank: 0,
         score: 4,
-        avgTimeToAnswer: 1
+        avgAnswerTime: 1
       },
       weeklyStats: {
         rank: 0,
         score: 1,
-        avgTimeToAnswer: 1
+        avgAnswerTime: 1
       }
     },
     {
@@ -102,17 +102,17 @@ function sampleScoreboard() {
       allTimeStats : {
         rank: 0,
         score: 8,
-        avgTimeToAnswer: 1
+        avgAnswerTime: 1
       },
       monthlyStats: {
         rank: 0,
         score: 5,
-        avgTimeToAnswer: 1
+        avgAnswerTime: 1
       },
       weeklyStats: {
         rank: 0,
         score: 2,
-        avgTimeToAnswer: 1
+        avgAnswerTime: 1
       }
     }
   ];

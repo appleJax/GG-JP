@@ -1,9 +1,16 @@
 import urlencode from 'urlencode';
+
+const {
+  APP_URL,
+  DM_URL,
+  TWITTER_ACCOUNT
+} = process.env;
+
 const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
-const { TWITTER_ACCOUNT, APP_URL, DM_URL } = process.env;
 
 // Normal +6 ... DST +5
 const UTC_OFFSET = 5;
+
 
 export const HOURS = 3600000;
 
@@ -18,33 +25,6 @@ export function average(newValue, oldAverage, n) {
   return Math.floor(
     (n*oldAverage + newValue) / (n + 1)
   )
-}
-
-export function calculateNewStats(
-  { score,
-    average: {
-      n,
-      value: oldAverage
-    }
-  },
-  addRank
-) {
-
-  const newStats = {
-    attempts: 0,
-    correct: 0,
-    totalPossible: 0,
-    score: 0,
-    avgTimeToAnswer: 0,
-    average: {
-      n: n + 1,
-      value: average(score, oldAverage, n)
-    }
-  };
-
-  if (addRank) newStats.rank = 0;
-
-  return newStats;
 }
 
 export function calculateScore(replyPostedAt, { questionPostedAt }) {

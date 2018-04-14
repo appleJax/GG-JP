@@ -2,20 +2,19 @@ import { processUpload } from 'Anki/processing';
 import models            from 'Models';
 import {
   aggregateStats,
-  buildUpdatesForRank,
+  buildStatUpdates,
+  buildRankUpdates,
   getScheduledDeck,
   getUser
 } from 'DB/utils';
 import {
   average,
-  calculateNewStats,
   formatFlashCards,
   getLiveAnswers,
   getSpoilerText,
   isSpoiled,
   tryCatch
 } from 'Utils';
-import { buildStatsAggregation } from './utils';
 
 const {
   DeckTitle,
@@ -23,7 +22,8 @@ const {
   OldCard,
   LiveQuestion,
   Schedule,
-  Scoreboard
+  Scoreboard,
+  Timestamp
 } = models;
 
 const {
@@ -43,12 +43,20 @@ export default ({
         .lean()
         .exec()
     );
+    const liveQuestions = await tryCatch(
+      LiveQuestion
+        .find()
+        .select({_id: 0, cardId: 1})
+        .lean()
+        .exec()
+    );
 
+    const activeCards = oldCards.concat(liveQuestions);
     const ops = [];
     for (let i = 0; i < newCards.length; ++i) {
       const newCard = newCards[i];
       const { cardId } = newCard;
-      if (!oldCards.find(card => card.cardId === cardId))
+      if (!activeCards.find(card => card.cardId === cardId))
         ops.push({
           replaceOne: {
              filter: { cardId },
@@ -369,57 +377,30 @@ export default ({
     );
   },
 
-  async updateStats(resetWeeklyStats, resetMonthlyStats) {
-    const users = await tryCatch(
-      Scoreboard.find().lean().exec()
+  async updateStats(newWeek, newMonth, newYear) {
+    const bulkUpdateOps = await tryCatch(
+      buildStatUpdates(newWeek, newMonth, newYear)
     );
-
-    const bulkUpdateOps = [];
-    let i = 0;
-    let end = users.length;
-    for (; i < end; i++) {
-      const user = users[i];
-      const { userId } = user;
-      const dailyStats = calculateNewStats(user.dailyStats);
-
-      const op = {
-        updateOne: {
-          filter: { userId },
-          update: {
-            $set: { dailyStats }
-          }
-        }
-      };
-
-      if (resetWeeklyStats) {
-        const { weeklyStats } = user;
-        const newWeeklyStats = calculateNewStats(weeklyStats, true);
-        op.updateOne.update.$set.weeklyStats = newWeeklyStats;
-      }
-
-      if (resetMonthlyStats) {
-        const { monthlyStats } = user;
-        const newMonthlyStats = calculateNewStats(monthlyStats, true);
-        op.updateOne.update.$set.monthlyStats = newMonthlyStats;
-      }
-
-      bulkUpdateOps.push(op);
-    }
-
-    if (bulkUpdateOps.length === 0)
-      return;
 
     await tryCatch(
-      Scoreboard.bulkWrite(bulkUpdateOps)
-    );
+      updateTimestamps(newWeek, newMonth, newYear)
+    ); 
+
+    if (bulkUpdateOps.length > 0)
+      await tryCatch(
+        Scoreboard.bulkWrite(bulkUpdateOps)
+      );
   }
 
 }) // dbOps export
 
 
+
 // private functions
 
-async function addPointsToScoreboard(liveQuestion) {
+
+// Exported for testing
+export async function addPointsToScoreboard(liveQuestion) {
   const cachedUpdates = initialPointsUpdates(liveQuestion);
 
   const allUsers = await tryCatch(
@@ -454,6 +435,10 @@ function finishPointsUpdateOps(cachedUpdates, allUsers, cardId) {
               'weeklyStats.totalPossible':  1,
               'dailyStats.totalPossible':   1
             },
+            $set: {
+              'allTimeStats.currentAnswerStreak':  0,
+              'allTimeStats.currentCorrectStreak': 0
+            },
             $push: {
               'allTimeStats.unanswered': cardId
             }
@@ -463,25 +448,39 @@ function finishPointsUpdateOps(cachedUpdates, allUsers, cardId) {
 
     } else { // User attempted to answer the current question
 
-      const newTimeToAnswer = update.updateOne.update.$set['allTimeStats.avgTimeToAnswer'];
-      update.updateOne.update.$set['allTimeStats.avgTimeToAnswer'] = average(
+      const longestAnswerStreak = currentUser.allTimeStats.longestAnswerStreak;
+      const newAnswerStreak = currentUser.allTimeStats.currentAnswerStreak + 1;
+      if (newAnswerStreak > longestAnswerStreak)
+        update.updateOne.$set['allTimeStats.longestAnswerStreak'] = newAnswerStreak;
+
+      const longestCorrectStreak = currentUser.allTimeStats.longestCorrectStreak;
+      const answeredCorrectly = update.updateOne.update.$inc['allTimeStats.score'] > 0;
+      let newCorrectStreak = currentUser.allTimeStats.currentCorrectStreak;
+      if (answeredCorrectly)
+        newCorrectStreak++;
+      
+      if (newCorrectStreak > longestCorrectStreak)
+        update.updateOne.$set['allTimeStats.longestCorrectStreak'] = newCorrectStreak;
+
+      const newTimeToAnswer = update.updateOne.update.$set['allTimeStats.avgAnswerTime'];
+      update.updateOne.update.$set['allTimeStats.avgAnswerTime'] = average(
         newTimeToAnswer,
-        currentUser.allTimeStats.avgTimeToAnswer,
+        currentUser.allTimeStats.avgAnswerTime,
         currentUser.allTimeStats.attempts
       );
-      update.updateOne.update.$set['monthlyStats.avgTimeToAnswer'] = average(
+      update.updateOne.update.$set['monthlyStats.avgAnswerTime'] = average(
         newTimeToAnswer,
-        currentUser.monthlyStats.avgTimeToAnswer,
+        currentUser.monthlyStats.avgAnswerTime,
         currentUser.monthlyStats.attempts
       );
-      update.updateOne.update.$set['weeklyStats.avgTimeToAnswer'] = average(
+      update.updateOne.update.$set['weeklyStats.avgAnswerTime'] = average(
         newTimeToAnswer,
-        currentUser.weeklyStats.avgTimeToAnswer,
+        currentUser.weeklyStats.avgAnswerTime,
         currentUser.weeklyStats.attempts
       );
-      update.updateOne.update.$set['dailyStats.avgTimeToAnswer'] = average(
+      update.updateOne.update.$set['dailyStats.avgAnswerTime'] = average(
         newTimeToAnswer,
-        currentUser.dailyStats.avgTimeToAnswer,
+        currentUser.dailyStats.avgAnswerTime,
         currentUser.dailyStats.attempts
       );
     }
@@ -595,7 +594,8 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
             'allTimeStats.totalPossible': 1,
             'monthlyStats.totalPossible': 1,
             'weeklyStats.totalPossible':  1,
-            'dailyStats.totalPossible':   1
+            'dailyStats.totalPossible':   1,
+            'allTimeStats.currentAnswerStreak': 1
           },
           $set: {
             // NOTE
@@ -605,8 +605,8 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
             //
             // - missing info needed for calculation:
             //   - current DB value of stats.attempts
-            //   - current DB value of stats.avgTimeToAnswer
-            'allTimeStats.avgTimeToAnswer': timeToAnswer
+            //   - current DB value of stats.avgAnswerTime
+            'allTimeStats.avgAnswerTime': timeToAnswer
           }
         }
       }
@@ -622,8 +622,10 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
       op.updateOne.update.$inc['monthlyStats.correct'] = 1;
       op.updateOne.update.$inc['weeklyStats.correct']  = 1;
       op.updateOne.update.$inc['dailyStats.correct']   = 1;
+      op.updateOne.update.$inc['allTimeStats.currentCorrectStreak'] = 1;
 
     } else {
+      op.updateOne.update.$set['allTimeStats.currentCorrectStreak'] = 0;
       op.updateOne.update.$push = {
         'allTimeStats.incorrect': cardId
       }
@@ -637,10 +639,39 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
 // Exported for testing
 export async function recalculateRank() {
   const stats = await aggregateStats();
-  const bulkUpdateOps = buildUpdatesForRank(stats);
+  const bulkUpdateOps = buildRankUpdates(stats);
 
   if (bulkUpdateOps.length === 0)
     return;
 
   await tryCatch(Scoreboard.bulkWrite(bulkUpdateOps));
 }
+
+// Exported for testing
+export async function updateTimestamps(newWeek, newMonth, newYear) {
+  const now = new Date();
+
+  const newTimestamp = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    0, 0, 0, 0
+  );
+
+  const update = {
+    $set: { day: newTimestamp }
+  };
+
+  if (newWeek)
+    update.$set.week = newTimestamp;
+
+  if (newMonth)
+    update.$set.month = newTimestamp;
+
+  if (newYear)
+    update.$set.year = newTimestamp;
+
+  await tryCatch(
+    Timestamp.update({}, update).exec()
+  );
+} 

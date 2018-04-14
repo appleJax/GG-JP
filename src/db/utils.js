@@ -1,6 +1,10 @@
 import models from 'Models'
 import { getFollowing } from 'Twitter/utils'
-import { getHour, tryCatch } from 'Utils'
+import {
+  average,
+  getHour,
+  tryCatch
+} from 'Utils'
 
 const {
   DeckTitle,
@@ -8,7 +12,8 @@ const {
   OldCard,
   LiveQuestion,
   Schedule,
-  Scoreboard
+  Scoreboard,
+  Timestamp
 } = models;
 
 const {
@@ -22,13 +27,13 @@ export async function aggregateStats() {
         _id: 0,
         orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'allTimeStats' ] },
         userId:                         1,
-        'allTimeStats.avgTimeToAnswer': 1,
+        'allTimeStats.avgAnswerTime': 1,
         'allTimeStats.score':           1,
         'allTimeStats.rank':            1,
-        'monthlyStats.avgTimeToAnswer': 1,
+        'monthlyStats.avgAnswerTime': 1,
         'monthlyStats.score':           1,
         'monthlyStats.rank':            1,
-        'weeklyStats.avgTimeToAnswer':  1,
+        'weeklyStats.avgAnswerTime':  1,
         'weeklyStats.score':            1,
         'weeklyStats.rank':             1
       }
@@ -68,7 +73,62 @@ export async function aggregateStats() {
   ]).exec());
 }
 
-export function buildUpdatesForRank(stats) {
+export async function buildStatUpdates(newWeek, newMonth, newYear) {
+  const users = await tryCatch(
+    Scoreboard.find().lean().exec()
+  );
+
+  const {
+    year: currentYear,
+    month: currentMonth,
+    week: currentWeek,
+    day: currentDay
+  } = await tryCatch(
+    Timestamp.findOne().lean().exec()
+  );
+
+  const bulkUpdateOps = [];
+  let i = 0;
+  let end = users.length;
+  for (; i < end; i++) {
+    const user = users[i];
+    const { userId } = user;
+    const dailyStats = calculateNewStats(user.dailyStats, currentDay);
+
+    const op = {
+      updateOne: {
+        filter: { userId },
+        update: {
+          $set: { dailyStats }
+        }
+      }
+    };
+
+    if (newWeek) {
+      const { weeklyStats } = user;
+      const newWeeklyStats = calculateNewStats(weeklyStats, currentWeek, true);
+      op.updateOne.update.$set.weeklyStats = newWeeklyStats;
+    }
+
+    if (newMonth) {
+      const { monthlyStats } = user;
+      const newMonthlyStats = calculateNewStats(monthlyStats, currentMonth, true);
+      op.updateOne.update.$set.monthlyStats = newMonthlyStats;
+    }
+
+    if (newYear) {
+      const { yearlyStats } = user;
+      const newYearlyStats = calculateNewStats(yearlyStats, currentYear, true);
+      op.updateOne.update.$set.yearlyStats = newYearlyStats;
+    }
+
+    bulkUpdateOps.push(op);
+  }
+
+  return bulkUpdateOps;
+}
+
+export function buildRankUpdates(stats) {
   if (!stats || stats.length === 0)
     return [];
 
@@ -90,15 +150,15 @@ export function buildUpdatesForRank(stats) {
 
       currentStat.users.sort(
         (a, b) =>
-          a[category].avgTimeToAnswer - b[category].avgTimeToAnswer
+          a[category].avgAnswerTime - b[category].avgAnswerTime
       );
       let currentAvgTime = -1;
 
       currentStat.users.forEach(user => {
-        if (user[category].avgTimeToAnswer > currentAvgTime) {
+        if (user[category].avgAnswerTime > currentAvgTime) {
           currentRanks[category] += skip;
           skip = 1;
-          currentAvgTime = user[category].avgTimeToAnswer;
+          currentAvgTime = user[category].avgAnswerTime;
         } else skip++;
 
         const previousRank = user[category].rank;
@@ -143,6 +203,61 @@ export function buildUpdatesForRank(stats) {
   return bulkUpdateOps;
 }
 
+export function calculateNewStats(
+  { score,
+    average: {
+      n,
+      value: oldAverage
+    },
+    avgAnswerTime,
+    highestScore,
+    lowestAvgAnswerTime,
+    history
+  },
+  currentTimestamp,
+  addRank
+) {
+
+  const newDataPoint = {
+    score,
+    avgAnswerTime,
+    timestamp: currentTimestamp
+  };
+
+  const newHigh = highestScore;
+  const newLow = lowestAvgAnswerTime;
+
+  if (score > 0 && score >= highestScore.value) {
+    newHigh.value = score;
+    newHigh.timestamp = currentTimestamp;
+  }
+
+  if (avgAnswerTime > 0 && avgAnswerTime <= lowestAvgAnswerTime.value) {
+    newLow.value = avgAnswerTime;
+    newLow.timestamp = currentTimestamp;
+  }
+
+  const newStats = {
+    attempts: 0,
+    correct: 0,
+    totalPossible: 0,
+    score: 0,
+    avgAnswerTime: 0,
+    average: {
+      n: n + 1,
+      value: average(score, oldAverage, n)
+    },
+    highestScore: newHigh,
+    lowestAvgAnswerTime: newLow,
+    history: history.concat(newDataPoint)
+  };
+
+  if (addRank) newStats.rank = 0;
+
+  return newStats;
+}
+
+
 // noSideEffects for testing purposes
 export async function createUserObject(profile, noSideEffects) {
   const {
@@ -174,7 +289,32 @@ export async function createUserObject(profile, noSideEffects) {
       totalPossible: 0,
       rank: 0,
       score: 0,
-      avgTimeToAnswer: 0
+      avgAnswerTime: 0,
+      currentAnswerStreak: 0,
+      currentCorrectStreak: 0,
+      longestAnswerStreak: 0,
+      longestCorrectStreak: 0
+    },
+    yearlyStats: {
+      attempts: 0,
+      correct: 0,
+      totalPossible: 0,
+      rank: 0,
+      score: 0,
+      avgAnswerTime: 0,
+      average: {
+        n: 0,
+        value: 0
+      },
+      highestScore: {
+        value: 0,
+        timestamp: 0
+      },
+      lowestAvgAnswerTime: {
+        value: Infinity,
+        timestamp: 0
+      },
+      history: []
     },
     monthlyStats: {
       attempts: 0,
@@ -182,11 +322,20 @@ export async function createUserObject(profile, noSideEffects) {
       totalPossible: 0,
       rank: 0,
       score: 0,
-      avgTimeToAnswer: 0,
+      avgAnswerTime: 0,
       average: {
         n: 0,
         value: 0
-      }
+      },
+      highestScore: {
+        value: 0,
+        timestamp: 0
+      },
+      lowestAvgAnswerTime: {
+        value: Infinity,
+        timestamp: 0
+      },
+      history: []
     },
     weeklyStats: {
       attempts: 0,
@@ -194,22 +343,40 @@ export async function createUserObject(profile, noSideEffects) {
       totalPossible: 0,
       rank: 0,
       score: 0,
-      avgTimeToAnswer: 0,
+      avgAnswerTime: 0,
       average: {
         n: 0,
         value: 0
-      }
+      },
+      highestScore: {
+        value: 0,
+        timestamp: 0
+      },
+      lowestAvgAnswerTime: {
+        value: Infinity,
+        timestamp: 0
+      },
+      history: []
     },
     dailyStats: {
       attempts: 0,
       correct: 0,
       totalPossible: 0,
       score: 0,
-      avgTimeToAnswer: 0,
+      avgAnswerTime: 0,
       average: {
         n: 0,
         value: 0
-      }
+      },
+      highestScore: {
+        value: 0,
+        timestamp: 0
+      },
+      lowestAvgAnswerTime: {
+        value: Infinity,
+        timestamp: 0
+      },
+      history: []
     }
   };
 }

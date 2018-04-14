@@ -4,6 +4,7 @@ import NewCard      from './NewCard';
 import OldCard      from './OldCard';
 import Schedule     from './Schedule';
 import Scoreboard   from './Scoreboard';
+import Timestamp    from './Timestamp';
 
 
 export default ({
@@ -12,5 +13,6 @@ export default ({
   NewCard,
   OldCard,
   Schedule,
-  Scoreboard
+  Scoreboard,
+  Timestamp
 });

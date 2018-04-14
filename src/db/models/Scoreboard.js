@@ -10,8 +10,10 @@ const schema = new Schema({
   profileBanner: String,
   following: [String],
   allTimeStats: {
+    _id: false,
     attempts: Number,
     correct: [{
+      _id: false,
       cardId: String,
       points: Number,
       timeToAnswer: Number
@@ -21,42 +23,130 @@ const schema = new Schema({
     totalPossible: Number,
     rank: Number,
     score: Number,
-    avgTimeToAnswer: Number
+    avgAnswerTime: Number,
+    currentAnswerStreak: Number,
+    currentCorrectStreak: Number,
+    longestAnswerStreak: Number,
+    longestCorrectStreak: Number
+  },
+  yearlyStats: {
+    _id: false,
+    attempts: Number,
+    correct: Number,
+    totalPossible: Number,
+    rank: Number,
+    score: Number,
+    avgAnswerTime: Number,
+    highestScore: {
+      _id: false,
+      value: Number,
+      timestamp: Number
+    },
+    lowestAvgAnswerTime: {
+      _id: false,
+      value: Number,
+      timestamp: Number
+    },
+    average: {
+      _id: false,
+      n: Number,
+      value: Number
+    },
+    history: [{
+      _id: false,
+      score: Number,
+      avgAnswerTime: Number,
+      timestamp: Number
+    }]
   },
   monthlyStats: {
+    _id: false,
     attempts: Number,
     correct: Number,
     totalPossible: Number,
     rank: Number,
     score: Number,
-    avgTimeToAnswer: Number,
+    avgAnswerTime: Number,
+    highestScore: {
+      _id: false,
+      value: Number,
+      timestamp: Number
+    },
+    lowestAvgAnswerTime: {
+      _id: false,
+      value: Number,
+      timestamp: Number
+    },
     average: {
+      _id: false,
       n: Number,
       value: Number
-    }
+    },
+    history: [{
+      _id: false,
+      score: Number,
+      avgAnswerTime: Number,
+      timestamp: Number
+    }]
   },
   weeklyStats: {
+    _id: false,
     attempts: Number,
     correct: Number,
     totalPossible: Number,
     rank: Number,
     score: Number,
-    avgTimeToAnswer: Number,
+    avgAnswerTime: Number,
+    highestScore: {
+      _id: false,
+      value: Number,
+      timestamp: Number
+    },
+    lowestAvgAnswerTime: {
+      _id: false,
+      value: Number,
+      timestamp: Number
+    },
     average: {
+      _id: false,
       n: Number,
       value: Number
-    }
+    },
+    history: [{
+      _id: false,
+      score: Number,
+      avgAnswerTime: Number,
+      timestamp: Number
+    }]
   },
   dailyStats: {
+    _id: false,
     attempts: Number,
     correct: Number,
     totalPossible: Number,
     score: Number,
-    avgTimeToAnswer: Number,
+    avgAnswerTime: Number,
+    highestScore: {
+      _id: false,
+      value: Number,
+      timestamp: Number
+    },
+    lowestAvgAnswerTime: {
+      _id: false,
+      value: Number,
+      timestamp: Number
+    },
     average: {
+      _id: false,
       n: Number,
       value: Number
-    }
+    },
+    history: [{
+      _id: false,
+      score: Number,
+      avgAnswerTime: Number,
+      timestamp: Number
+    }]
   }
 });
 

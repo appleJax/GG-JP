@@ -167,7 +167,8 @@ async function pollDMs() {
 
 function updateStats() {
   const now = new Date();
-  const resetWeeklyStats  = now.getUTCDay()  === 0;
-  const resetMonthlyStats = now.getUTCDate() === 1;
-  DB.updateStats(resetWeeklyStats, resetMonthlyStats);
+  const newWeek  = now.getUTCDay()  === 0;
+  const newMonth = now.getUTCDate() === 1;
+  const newYear = resetMonthlyStats && now.getUTCMonth() === 0;
+  DB.updateStats(newWeek, newMonth, newYear);
 }

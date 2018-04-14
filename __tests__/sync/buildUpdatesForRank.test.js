@@ -2,9 +2,9 @@
  * @jest-environment node
  */
 
-const { buildUpdatesForRank } = require('DB/utils');
+const { buildRankUpdates } = require('DB/utils');
 
-const updateOps = buildUpdatesForRank(sampleStats());
+const updateOps = buildRankUpdates(sampleStats());
 
 const users = [
   getUser('1', updateOps),
@@ -17,19 +17,19 @@ const users = [
 describe(`
   new ranks are calculated according to
     - highest score
-    - lowest avgTimeToAnswer
+    - lowest avgAnswerTime
 
   rank numbers are skipped for ties
   e.g. if two players tie for 2nd, the next rank will be 4
 `, () => {
 
-  test('basic ranking by score, avgTimeToAnswer', () => {
+  test('basic ranking by score, avgAnswerTime', () => {
     expect(
       ranks(users, 'allTimeStats')
     ).toEqual([1, 2, 3, 4, 5]);
   });
 
-  test('next rank skips when tied score AND tied avgTimeToAnswer', () => {
+  test('next rank skips when tied score AND tied avgAnswerTime', () => {
     expect(
       ranks(users, 'monthlyStats')
     ).toEqual([1, 1, 3, 4, 5]);
@@ -69,13 +69,13 @@ function sampleStats() {
           users: [
             { userId: '1',
               allTimeStats: {
-                avgTimeToAnswer: 100,
+                avgAnswerTime: 100,
                 rank: 0
               }
             },
             { userId: '2',
               allTimeStats: {
-                avgTimeToAnswer: 200,
+                avgAnswerTime: 200,
                 rank: 0
               }
             }
@@ -85,19 +85,19 @@ function sampleStats() {
           users: [
             { userId: '3',
               allTimeStats: {
-                avgTimeToAnswer: 100,
+                avgAnswerTime: 100,
                 rank: 0
               }
             },
             { userId: '4',
               allTimeStats: {
-                avgTimeToAnswer: 200,
+                avgAnswerTime: 200,
                 rank: 0
               }
             },
             { userId: '5',
               allTimeStats: {
-                avgTimeToAnswer: 300,
+                avgAnswerTime: 300,
                 rank: 0
               }
             }
@@ -113,13 +113,13 @@ function sampleStats() {
           users: [
             { userId: '1',
               monthlyStats: {
-                avgTimeToAnswer: 100,
+                avgAnswerTime: 100,
                 rank: 0
               }
             },
             { userId: '2',
               monthlyStats: {
-                avgTimeToAnswer: 100,
+                avgAnswerTime: 100,
                 rank: 0
               }
             }
@@ -129,19 +129,19 @@ function sampleStats() {
           users: [
             { userId: '3',
               monthlyStats: {
-                avgTimeToAnswer: 100,
+                avgAnswerTime: 100,
                 rank: 0
               }
             },
             { userId: '4',
               monthlyStats: {
-                avgTimeToAnswer: 200,
+                avgAnswerTime: 200,
                 rank: 0
               }
             },
             { userId: '5',
               monthlyStats: {
-                avgTimeToAnswer: 300,
+                avgAnswerTime: 300,
                 rank: 0
               }
             }
@@ -157,13 +157,13 @@ function sampleStats() {
           users: [
             { userId: '1',
               weeklyStats: {
-                avgTimeToAnswer: 100,
+                avgAnswerTime: 100,
                 rank: 1
               }
             },
             { userId: '2',
               weeklyStats: {
-                avgTimeToAnswer: 200,
+                avgAnswerTime: 200,
                 rank: 0
               }
             }
@@ -173,19 +173,19 @@ function sampleStats() {
           users: [
             { userId: '3',
               weeklyStats: {
-                avgTimeToAnswer: 100,
+                avgAnswerTime: 100,
                 rank: 3
               }
             },
             { userId: '4',
               weeklyStats: {
-                avgTimeToAnswer: 200,
+                avgAnswerTime: 200,
                 rank: 0
               }
             },
             { userId: '5',
               weeklyStats: {
-                avgTimeToAnswer: 300,
+                avgAnswerTime: 300,
                 rank: 0
               }
             }

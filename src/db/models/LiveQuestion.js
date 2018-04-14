@@ -14,6 +14,7 @@ const schema = new Schema({
   game: String,
   mainImageSlice: [Number],
   mediaUrls: [{
+    _id: false,
     altText: String,
     image: String
   }],
@@ -26,6 +27,7 @@ const schema = new Schema({
   questionPostedAt: Number,
   questionText: String,
   userPoints: [{
+    _id: false,
     userId: String,
     points: Number,
     timeToAnswer: Number
