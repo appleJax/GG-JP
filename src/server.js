@@ -17,7 +17,6 @@ app.use(bodyParser.json());
 route(app);
 
 //twitterBot.tweet();
-twitterBot.addPoints();
 
 if (process.env.NODE_ENV === 'production')
   twitterBot.start();
