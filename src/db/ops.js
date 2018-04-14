@@ -451,7 +451,7 @@ function finishPointsUpdateOps(cachedUpdates, allUsers, cardId) {
       const longestAnswerStreak = currentUser.allTimeStats.longestAnswerStreak;
       const newAnswerStreak = currentUser.allTimeStats.currentAnswerStreak + 1;
       if (newAnswerStreak > longestAnswerStreak)
-        update.updateOne.$set['allTimeStats.longestAnswerStreak'] = newAnswerStreak;
+        update.updateOne.update.$set['allTimeStats.longestAnswerStreak'] = newAnswerStreak;
 
       const longestCorrectStreak = currentUser.allTimeStats.longestCorrectStreak;
       const answeredCorrectly = update.updateOne.update.$inc['allTimeStats.score'] > 0;
@@ -460,7 +460,7 @@ function finishPointsUpdateOps(cachedUpdates, allUsers, cardId) {
         newCorrectStreak++;
       
       if (newCorrectStreak > longestCorrectStreak)
-        update.updateOne.$set['allTimeStats.longestCorrectStreak'] = newCorrectStreak;
+        update.updateOne.update.$set['allTimeStats.longestCorrectStreak'] = newCorrectStreak;
 
       const newTimeToAnswer = update.updateOne.update.$set['allTimeStats.avgAnswerTime'];
       update.updateOne.update.$set['allTimeStats.avgAnswerTime'] = average(

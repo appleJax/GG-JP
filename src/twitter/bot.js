@@ -13,6 +13,8 @@ import {
   processDMs
 } from 'Twitter/utils';
 
+import { addPointsToScoreboard } from 'DB/ops';
+
 const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;
@@ -21,11 +23,31 @@ const POLL_DM_INTERVAL = 90*1000;
 
 export default ({
 
-  tweet() {
-    tweetRandomQuestion();
-    pollDMs();
-  },
+  // tweet() {
+  //   tweetRandomQuestion();
+  //   pollDMs();
+  // },
 
+  addPoints() {
+    const lQ = {
+      cardId: "17383318127",
+      userPoints: [
+        {
+          "userId" : "32726873",
+          "points" : 17,
+          "timeToAnswer" : 25806
+        },
+        {
+          "userId" : "955579411763531778",
+          "points" : 3,
+          "timeToAnswer" : 77774
+        }
+      ]
+    };
+    addPointsToScoreboard(lQ).then(() =>
+      console.log('Successfully added Points!')
+    );
+  },
   // listen() {
   //   pollDMs();
   // },
