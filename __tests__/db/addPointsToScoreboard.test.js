@@ -1,3 +1,6 @@
+import { isContext } from 'vm';
+import { get, set } from 'mongoose';
+
 const Mongoose = require('mongoose');
 const Models = require('Models').default;
 const { connectDB } = require('TestUtils')
@@ -16,106 +19,161 @@ afterAll(async (done) => {
 });
 
 
+let correctUser, wrongAnswerUser, noAnswerUser;
+
+const liveQuestion = {
+  cardId: 'c1',
+  userPoints: [
+    {
+      userId: '1',
+      points: 24,
+      timeToAnswer: 20
+    },
+    {
+      userId: '2',
+      points: 0,
+      timeToAnswer: 20
+    }
+  ]
+};
+
 beforeEach(async () => {
   await Scoreboard.insertMany(
     sampleScores()
   );
+  await addPointsToScoreboard(liveQuestion);
+
+  [ correctUser, wrongAnswerUser, noAnswerUser ] = await getUsers();
 });
 
 afterEach(async () => {
   await Scoreboard.remove();
 });
 
+describe('for users who answered the current question', () => {
 
-xit("should increase all stat categories' score by points for current question", async () => {
+  it("should increase all stat categories' score by points earned", async () => {
+    expectAllCategories(correctUser,     'score', 24);
+    expectAllCategories(wrongAnswerUser, 'score', 0);
+    expectAllCategories(noAnswerUser,    'score', 0);
+  });
+
+  it("should increment all stat categories' attempts", async () => {
+    expectAllCategories(correctUser,     'attempts', 1);
+    expectAllCategories(wrongAnswerUser, 'attempts', 1);
+    expectAllCategories(noAnswerUser,    'attempts', 0);
+  });
+  
+});
+
+describe('for users who answered the current question correctly', () => {
+
+  it("should increment all stat categories' correct field", async () => {
+    expectAllCategories(correctUser,     'correct', 1, 'exclude allTimeStats');
+    expectAllCategories(wrongAnswerUser, 'correct', 0, 'exclude allTimeStats');
+    expectAllCategories(noAnswerUser,    'correct', 0, 'exclude allTimeStats');
+  });
 
 });
 
-xit("should increment all stat categories' attempts for users who answered", async () => {
+describe('for all users in the database', () => {
+
+  it("should increment all stat categories' totalPossible for all users", async () => {
+    expectAllCategories(correctUser,     'totalPossible', 1);
+    expectAllCategories(wrongAnswerUser, 'totalPossible', 1);
+    expectAllCategories(noAnswerUser,    'totalPossible', 1);
+  });
+
+  it('should update allTimeStats.currentAnswerStreak', async () => {
+    expect(correctUser.allTimeStats.currentAnswerStreak    ).toEqual(1);
+    expect(wrongAnswerUser.allTimeStats.currentAnswerStreak).toEqual(1);
+    expect(noAnswerUser.allTimeStats.currentAnswerStreak   ).toEqual(0);
+  });
 
 });
 
-xit("should increment all stat categories' totalPossible for all users", async () => {
+it('should update allTimeStats.currentCorrectStreak for all users', async () => {
+  [ correctUser, wrongAnswerUser, noAnswerUser ] = await getUsers();
+  await setCorrectStreak(correctUser, 5);
+  await setCorrectStreak(wrongAnswerUser, 5);
 
+  await addPointsToScoreboard(liveQuestion);
+  [ correctUser, wrongAnswerUser, noAnswerUser ] = await getUsers();
+
+  expect(correctUser.allTimeStats.currentCorrectStreak    ).toEqual(6);
+  expect(wrongAnswerUser.allTimeStats.currentCorrectStreak).toEqual(0);
+  expect(noAnswerUser.allTimeStats.currentCorrectStreak   ).toEqual(0);
 });
 
-xit("should increment all stat categories' correct for users who answered correctly", async () => {
 
+it("should recalculate all stat categories' avgAnswerTime for users who answered", async () => {
+  [ correctUser, wrongAnswerUser, noAnswerUser ] = await getUsers();
+  await setOnUser(correctUser, 'avgAnswerTime', 10);
+  await setOnUser(correctUser, 'attempts', 1);
+
+  await setOnUser(wrongAnswerUser, 'avgAnswerTime', 30);
+  await setOnUser(wrongAnswerUser, 'attempts', 1);
+
+  await addPointsToScoreboard(liveQuestion);
+  [ correctUser, wrongAnswerUser, noAnswerUser ] = await getUsers();
+
+  expectAllCategories(correctUser,     'avgAnswerTime', 15);
+  expectAllCategories(wrongAnswerUser, 'avgAnswerTime', 25);
+  expectAllCategories(noAnswerUser,    'avgAnswerTime', 0);
 });
 
-xit("should recalculate all stat categories' avgAnswerTime for users who answered", async () => {
 
-});
+// helpers
+const CATEGORIES = [
+  'allTimeStats',
+  'yearlyStats',
+  'monthlyStats',
+  'weeklyStats',
+  'dailyStats'
+];
 
-xit('should update allTimeStats.currentAnswerStreak', async () => {
+async function getUsers() {
+  return await Scoreboard.find().sort({ userId: 'asc' }).lean().exec();
+}
 
-});
+async function setOnUser({ userId }, field, value) {
+  let update = {
+    $set: {}
+  };
 
-xit('should update allTimeStats.currentCorrectStreak', async () => {
+  CATEGORIES.forEach(category => {
+    update.$set[`${category}.${field}`] = value;
+  });
 
-});
+  await Scoreboard.updateOne({ userId }, update).exec();
+}
+
+async function setCorrectStreak({ userId }, value) {
+  return await Scoreboard
+    .updateOne(
+      { userId },
+      { $set:
+        { 'allTimeStats.currentCorrectStreak': value }
+      }
+    ).exec();
+}
+
+function expectAllCategories(user, field, value, excludeAllTimeStats) {
+  CATEGORIES.forEach(category => {
+    if (excludeAllTimeStats && category === 'allTimeStats')
+      return;
+
+    expect(user[category][field]).toEqual(value);
+  });
+}
 
 
 // Data initialization
 
-// TODO - Change to be relevant to this test
 function sampleScores() {
   return [
-    {
-      userId: '1',
-      handle: 'C_weekly_rank1',
-      weeklyStats: {
-        rank: 1,
-        score: 10
-      }
-    },
-    {
-      userId: '2',
-      handle: 'B_weekly_rank1',
-      weeklyStats: {
-        rank: 1,
-        score: 10
-      }
-    },
-    {
-      userId: '3',
-      handle: 'A_weekly_rank3',
-      weeklyStats: {
-        rank: 3,
-        score: 9 
-      }
-    },
-    {
-      userId: '4',
-      handle: 'C_allTime_rank1',
-      allTimeStats: {
-        rank: 1,
-        score: 10
-      }
-    },
-    {
-      userId: '5',
-      handle: 'B_allTime_rank1',
-      allTimeStats: {
-        rank: 1,
-        score: 10
-      }
-    },
-    {
-      userId: '6',
-      handle: 'A_allTime_rank3',
-      allTimeStats: {
-        rank: 3,
-        score: 9 
-      }
-    },
-    {
-      userId: '7',
-      handle: 'zeroAllTime',
-      allTimeStats: {
-        rank: 4,
-        score: 0 
-      }
-    },
-  ];
+    { userId: '1' },
+    { userId: '2' },
+    { userId: '3' }
+  ]
 }

@@ -26,16 +26,16 @@ export async function aggregateStats() {
     { $project: {
         _id: 0,
         orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'allTimeStats' ] },
-        userId:                         1,
+        userId:                       1,
         'allTimeStats.avgAnswerTime': 1,
-        'allTimeStats.score':           1,
-        'allTimeStats.rank':            1,
+        'allTimeStats.score':         1,
+        'allTimeStats.rank':          1,
         'monthlyStats.avgAnswerTime': 1,
-        'monthlyStats.score':           1,
-        'monthlyStats.rank':            1,
+        'monthlyStats.score':         1,
+        'monthlyStats.rank':          1,
         'weeklyStats.avgAnswerTime':  1,
-        'weeklyStats.score':            1,
-        'weeklyStats.rank':             1
+        'weeklyStats.score':          1,
+        'weeklyStats.rank':           1
       }
     },
     { $unwind: '$orderBy' },
@@ -79,10 +79,10 @@ export async function buildStatUpdates(newWeek, newMonth, newYear) {
   );
 
   const {
-    year: currentYear,
+    year:  currentYear,
     month: currentMonth,
-    week: currentWeek,
-    day: currentDay
+    week:  currentWeek,
+    day:   currentDay
   } = await tryCatch(
     Timestamp.findOne().lean().exec()
   );
@@ -281,103 +281,6 @@ export async function createUserObject(profile, noSideEffects) {
     avatar,
     profileBanner,
     following,
-    allTimeStats: {
-      attempts: 0,
-      correct: [],
-      incorrect: [],
-      unanswered: [],
-      totalPossible: 0,
-      rank: 0,
-      score: 0,
-      avgAnswerTime: 0,
-      currentAnswerStreak: 0,
-      currentCorrectStreak: 0,
-      longestAnswerStreak: 0,
-      longestCorrectStreak: 0
-    },
-    yearlyStats: {
-      attempts: 0,
-      correct: 0,
-      totalPossible: 0,
-      rank: 0,
-      score: 0,
-      avgAnswerTime: 0,
-      average: {
-        n: 0,
-        value: 0
-      },
-      highestScore: {
-        value: 0,
-        timestamp: 0
-      },
-      lowestAvgAnswerTime: {
-        value: Infinity,
-        timestamp: 0
-      },
-      history: []
-    },
-    monthlyStats: {
-      attempts: 0,
-      correct: 0,
-      totalPossible: 0,
-      rank: 0,
-      score: 0,
-      avgAnswerTime: 0,
-      average: {
-        n: 0,
-        value: 0
-      },
-      highestScore: {
-        value: 0,
-        timestamp: 0
-      },
-      lowestAvgAnswerTime: {
-        value: Infinity,
-        timestamp: 0
-      },
-      history: []
-    },
-    weeklyStats: {
-      attempts: 0,
-      correct: 0,
-      totalPossible: 0,
-      rank: 0,
-      score: 0,
-      avgAnswerTime: 0,
-      average: {
-        n: 0,
-        value: 0
-      },
-      highestScore: {
-        value: 0,
-        timestamp: 0
-      },
-      lowestAvgAnswerTime: {
-        value: Infinity,
-        timestamp: 0
-      },
-      history: []
-    },
-    dailyStats: {
-      attempts: 0,
-      correct: 0,
-      totalPossible: 0,
-      score: 0,
-      avgAnswerTime: 0,
-      average: {
-        n: 0,
-        value: 0
-      },
-      highestScore: {
-        value: 0,
-        timestamp: 0
-      },
-      lowestAvgAnswerTime: {
-        value: Infinity,
-        timestamp: 0
-      },
-      history: []
-    }
   };
 }
 

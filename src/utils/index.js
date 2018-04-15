@@ -187,6 +187,13 @@ export function isSpoiled(questionCard, spoilerText, liveAnswers) {
 export const send = (res) =>
   (data) => res.json(data);
 
+export function t(type, defaultVal) {
+  return {
+    type,
+    default: defaultVal
+  };
+}
+
 export function tryCatch(promise) {
  return promise
    .then(data => data)

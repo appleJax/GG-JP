@@ -431,6 +431,7 @@ function finishPointsUpdateOps(cachedUpdates, allUsers, cardId) {
           update: {
             $inc: {
               'allTimeStats.totalPossible': 1,
+              'yearlyStats.totalPossible':  1,
               'monthlyStats.totalPossible': 1,
               'weeklyStats.totalPossible':  1,
               'dailyStats.totalPossible':   1
@@ -462,27 +463,22 @@ function finishPointsUpdateOps(cachedUpdates, allUsers, cardId) {
       if (newCorrectStreak > longestCorrectStreak)
         update.updateOne.update.$set['allTimeStats.longestCorrectStreak'] = newCorrectStreak;
 
+      const categories = [
+        'allTimeStats',
+        'yearlyStats',
+        'monthlyStats',
+        'weeklyStats',
+        'dailyStats'
+      ];
       const newTimeToAnswer = update.updateOne.update.$set['allTimeStats.avgAnswerTime'];
-      update.updateOne.update.$set['allTimeStats.avgAnswerTime'] = average(
-        newTimeToAnswer,
-        currentUser.allTimeStats.avgAnswerTime,
-        currentUser.allTimeStats.attempts
-      );
-      update.updateOne.update.$set['monthlyStats.avgAnswerTime'] = average(
-        newTimeToAnswer,
-        currentUser.monthlyStats.avgAnswerTime,
-        currentUser.monthlyStats.attempts
-      );
-      update.updateOne.update.$set['weeklyStats.avgAnswerTime'] = average(
-        newTimeToAnswer,
-        currentUser.weeklyStats.avgAnswerTime,
-        currentUser.weeklyStats.attempts
-      );
-      update.updateOne.update.$set['dailyStats.avgAnswerTime'] = average(
-        newTimeToAnswer,
-        currentUser.dailyStats.avgAnswerTime,
-        currentUser.dailyStats.attempts
-      );
+
+      categories.forEach(category => {
+        update.updateOne.update.$set[`${category}.avgAnswerTime`] = average(
+          newTimeToAnswer,
+          currentUser[category].avgAnswerTime,
+          currentUser[category].attempts
+        );
+      });
     }
 
     ops.push(update);
@@ -584,14 +580,17 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
         update: {
           $inc: {
             'allTimeStats.score': points,
+            'yearlyStats.score':  points,
             'monthlyStats.score': points,
             'weeklyStats.score':  points,
             'dailyStats.score':   points,
             'allTimeStats.attempts': 1,
+            'yearlyStats.attempts':  1,
             'monthlyStats.attempts': 1,
             'weeklyStats.attempts':  1,
             'dailyStats.attempts':   1,
             'allTimeStats.totalPossible': 1,
+            'yearlyStats.totalPossible':  1,
             'monthlyStats.totalPossible': 1,
             'weeklyStats.totalPossible':  1,
             'dailyStats.totalPossible':   1,
@@ -619,6 +618,7 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
           timeToAnswer
         }
       };
+      op.updateOne.update.$inc['yearlyStats.correct']  = 1;
       op.updateOne.update.$inc['monthlyStats.correct'] = 1;
       op.updateOne.update.$inc['weeklyStats.correct']  = 1;
       op.updateOne.update.$inc['dailyStats.correct']   = 1;

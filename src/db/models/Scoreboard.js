@@ -1,4 +1,5 @@
 import Mongoose from 'mongoose';
+import { t } from 'Utils';
 
 const Schema = Mongoose.Schema;
 
@@ -8,49 +9,49 @@ const schema = new Schema({
   handle: String,
   avatar: String,
   profileBanner: String,
-  following: [String],
+  following: t( [String], [] ),
   allTimeStats: {
     _id: false,
-    attempts: Number,
+    attempts: t( Number, 0 ),
     correct: [{
       _id: false,
       cardId: String,
       points: Number,
       timeToAnswer: Number
     }],
-    incorrect: [String],
-    unanswered: [String],
-    totalPossible: Number,
-    rank: Number,
-    score: Number,
-    avgAnswerTime: Number,
-    currentAnswerStreak: Number,
-    currentCorrectStreak: Number,
-    longestAnswerStreak: Number,
-    longestCorrectStreak: Number
+    incorrect:  t( [String], []),
+    unanswered: t( [String], []),
+    totalPossible: t( Number, 0),
+    rank:  t( Number, 0 ),
+    score: t( Number, 0 ),
+    avgAnswerTime: t( Number, 0 ),
+    currentAnswerStreak:  t( Number, 0 ),
+    currentCorrectStreak: t( Number, 0 ),
+    longestAnswerStreak:  t( Number, 0 ),
+    longestCorrectStreak: t( Number, 0 )
   },
   yearlyStats: {
     _id: false,
-    attempts: Number,
-    correct: Number,
-    totalPossible: Number,
-    rank: Number,
-    score: Number,
-    avgAnswerTime: Number,
+    attempts: t( Number, 0 ),
+    correct: t( Number, 0 ),
+    totalPossible: t( Number, 0 ),
+    rank: t( Number, 0 ),
+    score: t( Number, 0 ),
+    avgAnswerTime: t( Number, 0 ),
     highestScore: {
       _id: false,
-      value: Number,
-      timestamp: Number
+      value: t( Number, 0 ),
+      timestamp: t( Number, 0 )
     },
     lowestAvgAnswerTime: {
       _id: false,
-      value: Number,
-      timestamp: Number
+      value: t( Number, Infinity ),
+      timestamp: t( Number, 0 )
     },
     average: {
       _id: false,
-      n: Number,
-      value: Number
+      n: t( Number, 0 ),
+      value: t( Number, 0 )
     },
     history: [{
       _id: false,
@@ -61,26 +62,26 @@ const schema = new Schema({
   },
   monthlyStats: {
     _id: false,
-    attempts: Number,
-    correct: Number,
-    totalPossible: Number,
-    rank: Number,
-    score: Number,
-    avgAnswerTime: Number,
+    attempts: t( Number, 0 ),
+    correct: t( Number, 0 ),
+    totalPossible: t( Number, 0 ),
+    rank: t( Number, 0 ),
+    score: t( Number, 0 ),
+    avgAnswerTime: t( Number, 0 ),
     highestScore: {
       _id: false,
-      value: Number,
-      timestamp: Number
+      value: t( Number, 0 ),
+      timestamp: t( Number, 0 )
     },
     lowestAvgAnswerTime: {
       _id: false,
-      value: Number,
-      timestamp: Number
+      value: t( Number, Infinity ),
+      timestamp: t( Number, 0 )
     },
     average: {
       _id: false,
-      n: Number,
-      value: Number
+      n: t( Number, 0 ),
+      value: t( Number, 0 )
     },
     history: [{
       _id: false,
@@ -91,26 +92,26 @@ const schema = new Schema({
   },
   weeklyStats: {
     _id: false,
-    attempts: Number,
-    correct: Number,
-    totalPossible: Number,
-    rank: Number,
-    score: Number,
-    avgAnswerTime: Number,
+    attempts: t( Number, 0 ),
+    correct: t( Number, 0 ),
+    totalPossible: t( Number, 0 ),
+    rank: t( Number, 0 ),
+    score: t( Number, 0 ),
+    avgAnswerTime: t( Number, 0 ),
     highestScore: {
       _id: false,
-      value: Number,
-      timestamp: Number
+      value: t( Number, 0 ),
+      timestamp: t( Number, 0 )
     },
     lowestAvgAnswerTime: {
       _id: false,
-      value: Number,
-      timestamp: Number
+      value: t( Number, Infinity ),
+      timestamp: t( Number, 0 )
     },
     average: {
       _id: false,
-      n: Number,
-      value: Number
+      n: t( Number, 0 ),
+      value: t( Number, 0 )
     },
     history: [{
       _id: false,
@@ -121,25 +122,25 @@ const schema = new Schema({
   },
   dailyStats: {
     _id: false,
-    attempts: Number,
-    correct: Number,
-    totalPossible: Number,
-    score: Number,
-    avgAnswerTime: Number,
+    attempts: t( Number, 0 ),
+    correct: t( Number, 0 ),
+    totalPossible: t( Number, 0 ),
+    score: t( Number, 0 ),
+    avgAnswerTime: t( Number, 0 ),
     highestScore: {
       _id: false,
-      value: Number,
-      timestamp: Number
+      value: t( Number, 0 ),
+      timestamp: t( Number, 0 )
     },
     lowestAvgAnswerTime: {
       _id: false,
-      value: Number,
-      timestamp: Number
+      value: t( Number, Infinity ),
+      timestamp: t( Number, 0 )
     },
     average: {
       _id: false,
-      n: Number,
-      value: Number
+      n: t( Number, 0 ),
+      value: t( Number, 0 )
     },
     history: [{
       _id: false,
