@@ -45,7 +45,7 @@ const schema = new Schema({
     },
     lowestAvgAnswerTime: {
       _id: false,
-      value: t( Number, Infinity ),
+      value: t( Number, 87000 ),
       timestamp: t( Number, 0 )
     },
     average: {
@@ -75,7 +75,7 @@ const schema = new Schema({
     },
     lowestAvgAnswerTime: {
       _id: false,
-      value: t( Number, Infinity ),
+      value: t( Number, 87000 ),
       timestamp: t( Number, 0 )
     },
     average: {
@@ -105,7 +105,7 @@ const schema = new Schema({
     },
     lowestAvgAnswerTime: {
       _id: false,
-      value: t( Number, Infinity ),
+      value: t( Number, 87000 ),
       timestamp: t( Number, 0 )
     },
     average: {
@@ -134,7 +134,7 @@ const schema = new Schema({
     },
     lowestAvgAnswerTime: {
       _id: false,
-      value: t( Number, Infinity ),
+      value: t( Number, 87000 ),
       timestamp: t( Number, 0 )
     },
     average: {

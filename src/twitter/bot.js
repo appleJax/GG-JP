@@ -169,6 +169,6 @@ function updateStats() {
   const now = new Date();
   const newWeek  = now.getUTCDay()  === 0;
   const newMonth = now.getUTCDate() === 1;
-  const newYear = resetMonthlyStats && now.getUTCMonth() === 0;
+  const newYear = newMonth && now.getUTCMonth() === 0;
   DB.updateStats(newWeek, newMonth, newYear);
 }

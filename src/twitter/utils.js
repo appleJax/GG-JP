@@ -99,7 +99,8 @@ export async function processDMs() {
   
   for (let i = missedDMs.length - 1; i >= 0; i--) {
     reply = missedDMs[i];
-    await tryCatch(evaluateResponse(reply));
+    if (reply)
+      await tryCatch(evaluateResponse(reply));
   }
 }
 
