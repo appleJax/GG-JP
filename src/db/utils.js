@@ -232,7 +232,10 @@ export function calculateNewStats(
     newHigh.timestamp = currentTimestamp;
   }
 
-  if (avgAnswerTime > 0 && avgAnswerTime <= lowestAvgAnswerTime.value) {
+  if (avgAnswerTime > 0 &&
+      lowestAvgAnswerTime.value === 0 ||
+      avgAnswerTime <= lowestAvgAnswerTime.value
+  ) {
     newLow.value = avgAnswerTime;
     newLow.timestamp = currentTimestamp;
   }
