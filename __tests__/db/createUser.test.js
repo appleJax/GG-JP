@@ -73,7 +73,7 @@ function sampleUser() {
         timestamp: 0
       },
       lowestAvgAnswerTime: {
-        value: Infinity,
+        value: 87000,
         timestamp: 0
       },
       history: []
@@ -94,7 +94,7 @@ function sampleUser() {
         timestamp: 0
       },
       lowestAvgAnswerTime: {
-        value: Infinity,
+        value: 87000,
         timestamp: 0
       },
       history: []
@@ -115,7 +115,7 @@ function sampleUser() {
         timestamp: 0
       },
       lowestAvgAnswerTime: {
-        value: Infinity,
+        value: 87000,
         timestamp: 0
       },
       history: []
@@ -135,7 +135,7 @@ function sampleUser() {
         timestamp: 0
       },
       lowestAvgAnswerTime: {
-        value: Infinity,
+        value: 87000,
         timestamp: 0
       },
       history: []
