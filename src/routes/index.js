@@ -1,3 +1,4 @@
+import routeAdminPanel from './admin';
 import routeAuth  from './auth';
 import routeApi   from './api';
 import addWebhook from './twitter';
@@ -19,6 +20,7 @@ export default (app) => {
 
   addWebhook(app);
   routeAuth(app);
+  routeAdminPanel(app);
   routeApi(app);
 
-}
+};

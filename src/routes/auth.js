@@ -6,6 +6,8 @@ export default (app) => {
   app.use(passport.initialize())
   app.use(passport.session())
 
+  // API
+
   app.get('/api/login', passport.authenticate('twitter'));
 
   app.get('/oauth_callback',
@@ -21,4 +23,4 @@ export default (app) => {
     req.session.destroy(console.error);
   });
 
-}
+};

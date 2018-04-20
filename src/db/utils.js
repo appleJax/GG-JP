@@ -360,9 +360,9 @@ export async function getScheduledDeck(hour) {
   return newScheduledDeck;
 }
 
-export async function getUser(userId) {
+export async function getUser(user) {
   return await tryCatch(
-    Scoreboard.findOne({ userId }).lean().exec()
+    Scoreboard.findOne(user).lean().exec()
   );
 }
 

@@ -1,6 +1,8 @@
 import urlencode from 'urlencode';
+import crypto from 'crypto';
 
 const {
+  ADMIN_PW,
   APP_URL,
   DM_URL,
   TWITTER_ACCOUNT
@@ -46,14 +48,6 @@ export function calculateTimeToAnswer(replyPostedAt, { questionPostedAt }) {
 
 export function contains(item, list) {
   return valid(list.indexOf(item));
-}
-
-export function parseDM(rawText) {
-  const text = rawText.replace(/\s+/g, '');
-  const cardId = (text.match(/QID([0-9]+)/i) || [,'notFound'])[1];
-  const userAnswer = text.replace(/QID[0-9]+/i, '')
-                         
-  return [ cardId, userAnswer ];
 }
 
 export function extractAnswer_OLD(text) {
@@ -172,6 +166,12 @@ export function getTimeTilNextTweet() {
 
 export const getTimeUntil = (hour) => _getTimeUntil(hour)
 
+export function isCorrect(password) {
+  const pw = Buffer.from(password);
+  const adminPw = Buffer.from(ADMIN_PW);
+  return crypto.timingSafeEqual(pw, adminPw);
+}
+
 export function isSpoiled(questionCard, spoilerText, liveAnswers) {
   const questionSpoilerText = getQuestionSpoilerText([ questionCard ]);
   const existingSpoilers = questionCard.answers.some(
@@ -182,6 +182,14 @@ export function isSpoiled(questionCard, spoilerText, liveAnswers) {
   );
 
   return existingSpoilers || willSpoil;
+}
+
+export function parseDM(rawText) {
+  const text = rawText.replace(/\s+/g, '');
+  const cardId = (text.match(/QID([0-9]+)/i) || [,'notFound'])[1];
+  const userAnswer = text.replace(/QID[0-9]+/i, '')
+                         
+  return [ cardId, userAnswer ];
 }
 
 export const send = (res) =>

@@ -10,9 +10,14 @@ const schema = new Schema({
   cardId: String,
   game: String,
   mainImageSlice: [Number],
+  mediaUrls: [{
+    image: String,
+    altText: String
+  }],
   otherVisibleContext: String,
   prevLineAltText: String,
   prevLineImages: [String],
+  questionAltText: String,
   questionId: String,
   questionImages: [String],
   questionText: String

@@ -1,18 +1,8 @@
 html, body {
   height: 100vh;
   margin: 0;
-  padding: 0;
+  max-width: 100vw;
   width: 100vw;
-}
-
-.upload-form {
-  margin: 20px;
-  text-align: center;
-}
-
-.upload-form__label {
-  display: block;
-  margin: 10px;
 }
 
 .btn {
@@ -34,4 +24,25 @@ html, body {
 .btn--submit:hover {
   background: #5396ff;
   cursor: pointer;
+}
+
+.card {
+  background: #ddd;
+  margin: 10px 0;
+  padding: 10px;
+}
+
+.container {
+  maxWidth: 100vw;
+  padding: 0 10px;
+}
+
+.upload-form {
+  margin: 20px;
+  text-align: center;
+}
+
+.upload-form__label {
+  display: block;
+  margin: 10px;
 }

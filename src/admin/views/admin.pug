@@ -1,0 +1,54 @@
+extends layout
+
+block content
+  h2 Tweet Queue:
+  each card in queue
+    .card
+      h3 Card ID:
+      p= card.cardId
+
+      h3 Game:
+      p= card.game
+
+      h3 Question Text:
+      each line in card.questionText.split('\n')
+        p= line
+
+      h3 Prevline Images:
+      each image in card.prevLineImages
+        img(src=`data:image/png;base64, ${image}` alt='prevLineImg')
+
+      h3 Prevline Alt Text:
+      p= card.prevLineAltText
+
+      h3 Question Images:
+      each image in card.questionImages
+        img(src=`data:image/png;base64, ${image}` alt='prevLineImg')
+
+      h3 Question Alt Text:
+      p= card.questionAltText
+
+      h3 Other Visible Context:
+      p= card.otherVisibleContext
+
+      h3 Answer Images:
+      each image in card.answerImages
+        img(src=`data:image/png;base64, ${image}` alt='prevLineImg')
+
+      h3 Answer Alt Text:
+      p= card.answerAltText
+
+      h3 Answers:
+      p= card.answers
+
+      
+
+  form(
+    enctype='multipart/form-data'
+    method='post'
+    action='/deck/new'
+    class='upload-form'
+  )
+    label(class='upload-form__label' for='file') Upload Anki Deck</br>(must be exported as json and zipped):
+    input(class='btn btn--input' name='zipfile' type='file')
+    button(class='btn btn--submit' type='submit') Add Deck

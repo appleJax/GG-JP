@@ -11,7 +11,10 @@ const app = express();
 app.use(session);
 
 app.set('port', (process.env.PORT || 3000));
-app.use(express.static(path.resolve(__dirname, '../dist')));
+app.set('view engine', 'pug');
+app.set('views', path.resolve('dist/views'));
+app.use(express.static(path.resolve('dist/public')));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 route(app);

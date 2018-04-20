@@ -31,7 +31,7 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(__dirname + '/dist'),
-    new CopyWebpackPlugin([ { from: __dirname + '/static' } ])
+    new CopyWebpackPlugin([ { from: __dirname + '/src/admin' } ])
   ],
   resolve: {
     alias: {

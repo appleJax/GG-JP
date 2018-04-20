@@ -21,6 +21,7 @@ const {
   NewCard,
   OldCard,
   LiveQuestion,
+  Queue,
   Schedule,
   Scoreboard,
   Timestamp
@@ -193,18 +194,7 @@ export default ({
                .exec()
     );
   },
-
-  async serveCards({ query: { ids } }) {
-    if (!ids || ids.length === 0)
-      return null;
-
-    const cards = await tryCatch(
-      getCards(ids, OldCard)
-    );
-
-    return cards;
-  },
-
+  
   async getLiveQuestions() {
     return await tryCatch(
       LiveQuestion.find().lean().exec()
@@ -220,6 +210,20 @@ export default ({
   async getOldCards() {
     return await tryCatch(
       OldCard.find().lean().exec()
+    );
+  },
+
+  async getQueue() {
+    const tweetQueue = await tryCatch(
+      Queue.findOne().lean().exec()
+    );
+
+    return await tryCatch(
+      NewCard
+        .find({ cardId: { $in: tweetQueue.queue }})
+        .select({ _id: 0, __v: 0 })
+        .lean()
+        .exec()
     );
   },
 
@@ -313,6 +317,17 @@ export default ({
     await tryCatch(LiveQuestion.remove({ cardId }).exec());
   },
 
+  async serveCards({ query: { ids } }) {
+    if (!ids || ids.length === 0)
+      return null;
+
+    const cards = await tryCatch(
+      getCards(ids, OldCard)
+    );
+
+    return cards;
+  },
+
   async serveLiveQuestions() {
     const liveQuestions = await tryCatch(
       LiveQuestion.find({})
@@ -347,7 +362,7 @@ export default ({
 
   async serveUser({ params: { userId }}) {
     return await tryCatch(
-      getUser(userId)
+      getUser({ userId })
     );
   },
 
