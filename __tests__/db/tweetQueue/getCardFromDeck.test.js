@@ -1,7 +1,7 @@
 const Mongoose = require('mongoose');
 const Models = require('Models').default;
 const { connectDB } = require('TestUtils')
-const { getRandomCard } = require('DB/ops');
+const { getCardFromDeck } = require('DB/tweetQueue');
 
 const {
   LiveQuestion,
@@ -26,8 +26,8 @@ it('should return a random card from NewCards', async () => {
   const scheduledDeck = { game: 'Scheduled Game' };
   const randomIds = [];
   for (let i = 0; i < 5; i++) {
-    const randomCard = await getRandomCard(scheduledDeck);
-    randomIds.push(randomCard.cardId);
+    const randomCardId = await getCardFromDeck(scheduledDeck);
+    randomIds.push(randomCardId);
   }
 
   const sampleIds = sampleNewCards().map(card => card.cardId);
@@ -41,9 +41,9 @@ it('should return a random card from NewCards', async () => {
 
 it('should return null if no matching cards exist', async () => {
   const scheduledDeck = { game: 'Not found' };
-  const randomCard = await getRandomCard(scheduledDeck);
+  const randomCardId = await getCardFromDeck(scheduledDeck);
 
-  expect(randomCard).toBeNull();
+  expect(randomCardId).toBeNull();
 });
 
 

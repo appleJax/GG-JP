@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-const { isSpoiled } = require('Utils');
+const { isSpoiled } = require('DB/tweetQueue');
 
 const card1 = {
   'answers' : [ '軽減' ],

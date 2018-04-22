@@ -132,33 +132,6 @@ export function getHour() {
   return utcHours
 }
 
-export const getLiveAnswers = (cards) =>
-  cards.reduce(
-    (allAnswers, card) =>
-      allAnswers.concat(card.answers)
-  , []);
-
-export const getQuestionSpoilerText = (cards) =>
-  cards.reduce(
-    (allText, card) =>
-      allText + ' ' + [
-        card.prevLineAltText,
-        card.questionAltText,
-        card.answerAltText,
-        card.otherVisibleContext
-      ].join(' ')
-  , '');
-
-export const getSpoilerText = (cards) =>
-  cards.reduce(
-    (allText, card) =>
-      allText + ' ' + [
-      card.answers,
-      card.mediaUrls.map(obj => obj.altText),
-      card.otherVisibleContext
-    ].join(' ')
-  , '');
-
 export function getTimeTilNextTweet() {
   const startTimes = [ 2, 8, 14, 20 ].map(_getTimeUntil);
   return Math.min(...startTimes);
@@ -170,18 +143,6 @@ export function isCorrect(password) {
   const pw = Buffer.from(password);
   const adminPw = Buffer.from(ADMIN_PW);
   return crypto.timingSafeEqual(pw, adminPw);
-}
-
-export function isSpoiled(questionCard, spoilerText, liveAnswers) {
-  const questionSpoilerText = getQuestionSpoilerText([ questionCard ]);
-  const existingSpoilers = questionCard.answers.some(
-    answer => spoilerText.includes(answer)
-  );
-  const willSpoil = liveAnswers.some(
-    answer => questionSpoilerText.includes(answer)
-  );
-
-  return existingSpoilers || willSpoil;
 }
 
 export function parseDM(rawText) {

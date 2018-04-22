@@ -1,6 +1,7 @@
-import DB               from 'DB/ops';
-import Twitter          from 'Config/twitter';
-import evaluateResponse from './evaluateResponse';
+import DB from 'DB/ops';
+import { getNextCardToTweet } from 'DB/tweetQueue';
+import Twitter from 'Config/twitter';
+//import evaluateResponse from './evaluateResponse';
 import {
   HOURS,
   addLink,
@@ -90,7 +91,7 @@ async function tweetRandomQuestion() {
     prevLineImages,
     prevLineAltText,
     answers
-  } = await tryCatch(DB.getRandomQuestion());
+  } = await tryCatch(getNextCardToTweet());
   if (!cardId) return;
 
   const {

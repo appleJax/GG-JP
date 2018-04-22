@@ -1,21 +1,17 @@
 import { processUpload } from 'Anki/processing';
-import models            from 'Models';
 import {
   aggregateStats,
   buildStatUpdates,
   buildRankUpdates,
-  getScheduledDeck,
   getUser
 } from 'DB/utils';
 import {
   average,
   formatFlashCards,
-  getLiveAnswers,
-  getSpoilerText,
-  isSpoiled,
   tryCatch
 } from 'Utils';
 
+import models from 'Models';
 const {
   DeckTitle,
   NewCard,
@@ -26,11 +22,6 @@ const {
   Scoreboard,
   Timestamp
 } = models;
-
-const {
-  MONGODB_URI: url,
-  MONGO_DB:    DB
-} = process.env;
 
 export default ({
 
@@ -227,25 +218,6 @@ export default ({
     );
   },
 
-  async getRandomQuestion(hour) {
-    const scheduledDeck = await tryCatch(
-      getScheduledDeck(hour)
-    );
-
-    const randomCard = await tryCatch(
-      getRandomCard(scheduledDeck)
-    );
-
-    if (!randomCard) {
-      console.error('No appropriate cards available.');
-      return;
-    }
-
-    await tryCatch(LiveQuestion.create(randomCard));
-    await tryCatch(NewCard.deleteOne(randomCard).exec());
-    return randomCard;
-  },
-
   async getScores(req) {
     const {
       query: {
@@ -409,6 +381,20 @@ export default ({
 
 }) // dbOps export
 
+export async function getRecentAnswers() {
+  return await tryCatch(
+    OldCard
+      .find()
+      .sort({ answerPostedAt: 'desc' })
+      .limit(12)
+      .select({
+        alreadyAnswered: 0,
+        userPoints:      0
+      })
+      .lean()
+      .exec()
+  );
+}
 
 
 // private functions
@@ -522,65 +508,6 @@ async function getCards(ids, model) {
 
   const cards = formatFlashCards(data);
   return cards;
-}
-
-
-// Exported for testing
-export async function getRandomCard(scheduledDeck) {
-  let randomCard = await tryCatch(
-    NewCard.aggregate([
-      { $match: scheduledDeck },
-      { $sample: { size: 1 }}
-    ])
-    .then(cards => Promise.resolve(cards[0]))
-  );
-  if (randomCard == null) {
-    console.error('Empty deck. Please Add More Cards to DB.');
-    return null;
-  }
-
-  const liveCards = await tryCatch(LiveQuestion.find().lean().exec());
-  const recentCards = await tryCatch(getRecentAnswers());
-  const spoilerText = getSpoilerText(liveCards.concat(recentCards));
-  const liveAnswers = getLiveAnswers(liveCards);
-
-  let spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
-  let tries = 0;
-  while(spoiled) {
-    if (tries > 20) {
-      console.error('All new cards contain spoilers. Please try again later.');
-      return null;
-    }
-    if (tries > 10)
-      scheduledDeck = {};
-
-    randomCard = await tryCatch(
-      NewCard.aggregate([
-        { $match: scheduledDeck },
-        { $sample: { size: 1 }}
-      ])
-      .then(cards => Promise.resolve(cards[0]))
-    );
-    spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
-    tries++;
-  }
-
-  return randomCard;
-}
-
-async function getRecentAnswers() {
-  return await tryCatch(
-    OldCard
-      .find()
-      .sort({ answerPostedAt: 'desc' })
-      .limit(12)
-      .select({
-        alreadyAnswered: 0,
-        userPoints:      0
-      })
-      .lean()
-      .exec()
-  );
 }
 
 function initialPointsUpdates({ userPoints = [], cardId = '' }) {

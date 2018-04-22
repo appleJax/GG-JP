@@ -1,7 +1,7 @@
 const Mongoose = require('mongoose');
 const Models = require('Models').default;
 const { connectDB } = require('TestUtils')
-const { updateScheduledDeck } = require('DB/utils');
+const { updateScheduledDeck } = require('DB/tweetQueue');
 
 const {
   DeckTitle,

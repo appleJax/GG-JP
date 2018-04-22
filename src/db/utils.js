@@ -2,7 +2,6 @@ import models from 'Models'
 import { getFollowing } from 'Twitter/utils'
 import {
   average,
-  getHour,
   tryCatch
 } from 'Utils'
 
@@ -15,11 +14,6 @@ const {
   Scoreboard,
   Timestamp
 } = models;
-
-const {
-  MONGODB_URI: url,
-  MONGO_DB:    DB
-} = process.env;
 
 export async function aggregateStats() {
   return await tryCatch(Scoreboard.aggregate([
@@ -333,81 +327,8 @@ export async function findOrCreateUser(userId, twitterUser, noSideEffects) {
   return user;
 }
 
-export async function getScheduledDeck(hour) {
-  hour = hour || getHour();
-  const timeslot = await tryCatch(
-    Schedule.findOne({ time: hour }).lean().exec()
-  );
-
-  if (!timeslot) {
-    console.log('No timeslot found in schedule for:', hour);
-    console.log('Picking card from random deck...');
-    return {};
-  }
-
-  const scheduledDeck = timeslot.deck;
-  const availableCards = await tryCatch(
-    NewCard.find({ game: scheduledDeck }).count().exec()
-  );
-
-  if (availableCards > 0)
-    return { game: scheduledDeck };
-
-  const newScheduledDeck = await tryCatch(
-    updateScheduledDeck(hour, scheduledDeck)
-  );
-
-  return newScheduledDeck;
-}
-
 export async function getUser(user) {
   return await tryCatch(
     Scoreboard.findOne(user).lean().exec()
   );
-}
-
-
-// private functions
-// (exported for testing)
-export async function updateScheduledDeck(hour, scheduledDeck) {
-  await tryCatch(
-    DeckTitle.updateOne(
-      { fullTitle: scheduledDeck },
-      { $set: { finished: true } }
-    ).exec()
-  );
-
-  let allDecks = await tryCatch(
-    DeckTitle.find({
-      totalCards: { $gt: 0 },
-      finished:   { $ne: true }
-    }).lean().exec()
-  );
-  allDecks = allDecks.map(doc => doc.fullTitle);
-
-  let alreadyScheduled = await tryCatch(
-    Schedule.find().lean().exec()
-  )
-  alreadyScheduled = alreadyScheduled.map(doc => doc.deck);
-
-  for (let i = 0; i < allDecks.length; i++) {
-    const currentTitle = allDecks[i];
-    if (alreadyScheduled.find(title => title === currentTitle))
-      continue;
-
-    const availableCards = await tryCatch(
-      NewCard.find({ game: currentTitle }).count().exec()
-    );
-
-    if (availableCards > 0) {
-      await tryCatch(
-        Schedule.updateOne(
-          { time: hour },
-          { $set: { deck: currentTitle } }
-        ).exec()
-      );
-      return { game: currentTitle };
-    }
-  }
-  return {};
 }
