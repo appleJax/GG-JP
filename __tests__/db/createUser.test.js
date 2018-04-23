@@ -42,6 +42,9 @@ function sampleUser() {
   return {
     userId: USER_ID,
     name: USER_NAME,
+    handle: '',
+    avatar: '',
+    profileBanner: '',
     following: [],
     allTimeStats: {
       attempts: 0,

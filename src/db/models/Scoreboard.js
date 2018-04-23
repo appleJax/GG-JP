@@ -5,20 +5,22 @@ const Schema = Mongoose.Schema;
 
 const schema = new Schema({
   userId: String,
-  name: String,
-  handle: String,
-  avatar: String,
-  profileBanner: String,
+  name: t( String, '' ),
+  handle: t( String, '' ),
+  avatar: t( String, '' ),
+  profileBanner: t( String, '' ),
   following: t( [String], [] ),
   allTimeStats: {
     _id: false,
     attempts: t( Number, 0 ),
-    correct: [{
-      _id: false,
-      cardId: String,
-      points: Number,
-      timeToAnswer: Number
-    }],
+    correct: t(
+      [{
+        _id: false,
+        cardId: String,
+        points: Number,
+        timeToAnswer: Number
+      }], []
+    ),
     incorrect:  t( [String], []),
     unanswered: t( [String], []),
     totalPossible: t( Number, 0),
@@ -53,12 +55,14 @@ const schema = new Schema({
       n: t( Number, 0 ),
       value: t( Number, 0 )
     },
-    history: [{
-      _id: false,
-      score: Number,
-      avgAnswerTime: Number,
-      timestamp: Number
-    }]
+    history: t(
+      [{
+        _id: false,
+        score: Number,
+        avgAnswerTime: Number,
+        timestamp: Number
+      }], []
+    )
   },
   monthlyStats: {
     _id: false,
@@ -83,12 +87,14 @@ const schema = new Schema({
       n: t( Number, 0 ),
       value: t( Number, 0 )
     },
-    history: [{
-      _id: false,
-      score: Number,
-      avgAnswerTime: Number,
-      timestamp: Number
-    }]
+    history: t(
+      [{
+        _id: false,
+        score: Number,
+        avgAnswerTime: Number,
+        timestamp: Number
+      }], []
+    )
   },
   weeklyStats: {
     _id: false,
@@ -113,12 +119,14 @@ const schema = new Schema({
       n: t( Number, 0 ),
       value: t( Number, 0 )
     },
-    history: [{
-      _id: false,
-      score: Number,
-      avgAnswerTime: Number,
-      timestamp: Number
-    }]
+    history: t(
+      [{
+        _id: false,
+        score: Number,
+        avgAnswerTime: Number,
+        timestamp: Number
+      }], []
+    )
   },
   dailyStats: {
     _id: false,
@@ -142,12 +150,14 @@ const schema = new Schema({
       n: t( Number, 0 ),
       value: t( Number, 0 )
     },
-    history: [{
-      _id: false,
-      score: Number,
-      avgAnswerTime: Number,
-      timestamp: Number
-    }]
+    history: t(
+      [{
+        _id: false,
+        score: Number,
+        avgAnswerTime: Number,
+        timestamp: Number
+      }], []
+    )
   }
 });
 

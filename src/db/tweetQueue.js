@@ -295,7 +295,7 @@ function getSpoilerText(cards) {
     (allText, card) =>
       allText + ' ' + [
         ...card.answers,
-        ...card.mediaUrls.map(obj => obj.altText),
+        ...(card.mediaUrls || []).map(obj => obj.altText),
         card.otherVisibleContext
       ].join(' ')
     , '');

@@ -1,37 +1,42 @@
 import Mongoose from 'mongoose';
+import { t } from 'Utils';
 
 const Schema = Mongoose.Schema;
 
 const schema = new Schema({
-  alreadyAnswered: [String],
+  alreadyAnswered: t( [String], [] ),
   answerAltText: String,
   answerId: String,
-  answerImages: [String],
+  answerImages: t( [String], [] ),
   answerPostedAt: Number,
-  answers: [String],
+  answers: t( [String], [] ),
   answerText: String,
   cardId: String,
   game: String,
-  mainImageSlice: [Number],
-  mediaUrls: [{
-    _id: false,
-    altText: String,
-    image: String
-  }],
+  mainImageSlice: t( [Number], [] ),
+  mediaUrls: t(
+    [{
+      _id: false,
+      altText: String,
+      image: String
+    }], []
+  ),
   otherVisibleContext: String,
   prevLineAltText: String,
-  prevLineImages: [String],
+  prevLineImages: t( [String], [] ),
   questionAltText: String,
   questionId: String,
-  questionImages: [String],
+  questionImages: t( [String], [] ),
   questionPostedAt: Number,
   questionText: String,
-  userPoints: [{
-    _id: false,
-    userId: String,
-    points: Number,
-    timeToAnswer: Number
-  }]
+  userPoints: t(
+    [{
+      _id: false,
+      userId: String,
+      points: Number,
+      timeToAnswer: Number
+    }], []
+  )
 });
 
 export default Mongoose.model('liveQuestions', schema);
