@@ -56,13 +56,17 @@ it('should ensure the queue has QUEUE_SIZE elements', async () => {
 });
 
 it('should not queue a new card if a unique card cannot be found', async () => {
+  const queueSizeBefore = await getQueueSize();
+  await NewCard.remove();
+  await NewCard.create({
+    cardId: '1',
+    game: 'sample game'
+  });
   await updateTweetQueue();
-  await updateTweetQueue();
+  const queueSizeAfter = await getQueueSize();
 
-  const queueSize = await getQueueSize();
-
-  const queue = await Queue.findOne().lean().exec();
-  expect(queueSize).toEqual(QUEUE_SIZE - 1);
+  expect(queueSizeBefore).toEqual(1);
+  expect(queueSizeAfter).toEqual(0);
 });
 
 it('should not affect the NewCard collection', async () => {

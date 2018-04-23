@@ -43,10 +43,8 @@ export async function getCardForTimeslot(hour) {
     getCardFromDeck(scheduledDeck)
   );
 
-  if (!randomCardId) {
+  if (!randomCardId)
     console.error('No appropriate cards available.');
-    return null;
-  }
 
   return randomCardId;
 }
@@ -56,7 +54,8 @@ export async function getCardFromDeck(scheduledDeck) {
   let randomCard = await tryCatch(
     pullCard(scheduledDeck)
   );
-  if (randomCard == null) {
+
+  if (empty(randomCard)) {
     console.error('Empty deck. Please Add More Cards to DB.');
     return null;
   }
@@ -169,7 +168,8 @@ async function SpoilChecker() {
 
   return {
     check: (randomCard) => {
-     return queuedCards.find(card => card.cardId === randomCard.cardId) ||
+     return empty(randomCard) ||
+            queuedCards.find(card => card.cardId === randomCard.cardId) ||
             isSpoiled(randomCard, spoilerText, liveAnswers);
     }
   };
@@ -233,7 +233,7 @@ export async function updateTweetQueue() {
       getCardForTimeslot(timeslot)
     );
 
-    if (!nextCardId)
+    if (empty(nextCardId))
       break;
     
     tweetQueue.unshift({
@@ -256,6 +256,10 @@ export async function updateTweetQueue() {
 
 
 // utility functions
+
+function empty(obj) {
+  return !obj || Object.keys(obj).length === 0;
+}
 
 function getLastTimeslot(tweetQueue) {
  return (tweetQueue[0] && tweetQueue[0].time) || -1;
