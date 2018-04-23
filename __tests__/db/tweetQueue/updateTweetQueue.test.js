@@ -61,6 +61,7 @@ it('should not queue a new card if a unique card cannot be found', async () => {
 
   const queueSize = await getQueueSize();
 
+  const queue = await Queue.findOne().lean().exec();
   expect(queueSize).toEqual(QUEUE_SIZE - 1);
 });
 
@@ -135,6 +136,10 @@ function sampleNewCards() {
     {
       cardId: '14-2',
       game: 'Game at 14'
+    },
+    {
+      cardId: '1',
+      game: 'sample game'
     }
   ];
 }

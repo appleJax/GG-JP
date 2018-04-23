@@ -5,6 +5,7 @@ const { getCardForTimeslot } = require('DB/tweetQueue');
 
 const {
   NewCard,
+  Queue,
   Schedule
 } = Models;
 
@@ -22,6 +23,10 @@ beforeEach(async () => {
     { time: 8, deck: 'Game at 8'}
   ]);
 
+  await Queue.create({
+    queue: []
+  });
+
   await NewCard.insertMany(
     sampleNewCards()
   );
@@ -29,6 +34,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await NewCard.remove();
+  await Queue.remove();
   await Schedule.remove();
 });
 

@@ -13,6 +13,7 @@ const {
 // exported for testing
 export const QUEUE_SIZE = 6;
 const NO_CARD = {};
+const RANDOM_DECK = {};
 
 export async function getNextCardToTweet() {
   const nextCardId = await tryCatch(
@@ -30,92 +31,6 @@ export async function getNextCardToTweet() {
   await tryCatch(NewCard.deleteOne({ cardId: nextCardId }).exec());
 
   return nextCard;
-}
-
-// exported for testing
-export async function updateTweetQueue() {
-  const tweetQueue = await tryCatch(
-    Queue.findOne().lean().then(obj => obj.queue)
-  );
-
-  const queuedIds = tweetQueue.map(obj => obj.cardId);
-  const lastTimeslot = getLastTimeslot(tweetQueue);
-  let timeslot = getNextTimeslot(lastTimeslot);
-  let tries = 0;
-  
-  while (tweetQueue.length <= QUEUE_SIZE) {
-    if (++tries > 25)
-      break;
-    
-    const nextCardId = await tryCatch(
-      getCardForTimeslot(timeslot)
-    );
-
-    if (queuedIds.includes(nextCardId))
-      continue;
-    
-    tweetQueue.unshift({
-      cardId: nextCardId,
-      time: timeslot
-    });
-
-    queuedIds.push(nextCardId);
-    timeslot = getNextTimeslot(timeslot);
-  }
-
-  if (tweetQueue.length === 0)
-    return null;
-
-  const nextCardToTweet = tweetQueue.pop().cardId;
-
-  await tryCatch(
-    Queue.updateOne({}, { $set: { queue: tweetQueue } }).exec()
-  );
-
-  return nextCardToTweet;
-}
-
-// exported for testing
-export async function getCardFromDeck(scheduledDeck) {
-  let randomCard = await tryCatch(
-    NewCard.aggregate([
-      { $match: scheduledDeck },
-      { $sample: { size: 1 }}
-    ])
-    .then(cards => Promise.resolve(cards[0]))
-  );
-  if (randomCard == null) {
-    console.error('Empty deck. Please Add More Cards to DB.');
-    return null;
-  }
-
-  const liveCards = await tryCatch(LiveQuestion.find().lean().exec());
-  const recentCards = await tryCatch(getRecentAnswers());
-  const spoilerText = getSpoilerText(liveCards.concat(recentCards));
-  const liveAnswers = getLiveAnswers(liveCards);
-
-  let spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
-  let tries = 0;
-  while(spoiled) {
-    if (tries > 20) {
-      console.error('All new cards contain spoilers. Please try again later.');
-      return null;
-    }
-    if (tries > 10)
-      scheduledDeck = {};
-
-    randomCard = await tryCatch(
-      NewCard.aggregate([
-        { $match: scheduledDeck },
-        { $sample: { size: 1 }}
-      ])
-      .then(cards => Promise.resolve(cards[0]))
-    );
-    spoiled = isSpoiled(randomCard, spoilerText, liveAnswers);
-    tries++;
-  }
-
-  return randomCard.cardId;
 }
 
 // exported for testing
@@ -137,6 +52,56 @@ export async function getCardForTimeslot(hour) {
 }
 
 // exported for testing
+export async function getCardFromDeck(scheduledDeck) {
+  let randomCard = await tryCatch(
+    pullCard(scheduledDeck)
+  );
+  if (randomCard == null) {
+    console.error('Empty deck. Please Add More Cards to DB.');
+    return null;
+  }
+
+  const Spoilers = await SpoilChecker();
+  let spoiled = Spoilers.check(randomCard);
+
+  let tries = 0;
+  while(spoiled) {
+    if (tries > 20) {
+      console.error('All new cards contain spoilers. Please try again later.');
+      return null;
+    }
+    if (tries++ > 10)
+      scheduledDeck = {};
+
+    randomCard = await tryCatch(
+      pullCard(scheduledDeck)
+    );
+
+    spoiled = Spoilers.check(randomCard);
+  }
+
+  return randomCard.cardId;
+}
+
+async function getQueuedCards() {
+  const queuedIds = await tryCatch(
+    Queue.findOne().lean().then(obj => obj.queue.map(card => card.cardId))
+  );
+
+  const queuedCards = [];
+
+  for (let i = 0; i < queuedIds.length; i++) {
+    const nextCard = await tryCatch(
+      NewCard.findOne({ cardId: queuedIds[i] }).lean().exec()
+    );
+
+    queuedCards.push(nextCard);
+  }
+
+  return queuedCards;
+}
+
+// exported for testing
 export async function getScheduledDeck(hour) {
   hour = hour || getHour();
   const timeslot = await tryCatch(
@@ -146,7 +111,7 @@ export async function getScheduledDeck(hour) {
   if (!timeslot) {
     console.log('No timeslot found in schedule for:', hour);
     console.log('Picking card from random deck...');
-    return {};
+    return RANDOM_DECK;
   }
 
   const scheduledDeck = timeslot.deck;
@@ -162,6 +127,52 @@ export async function getScheduledDeck(hour) {
   );
 
   return newScheduledDeck;
+}
+
+async function pullCard(deck) {
+  return await tryCatch(
+    NewCard.aggregate([
+      { $match: deck },
+      { $sample: { size: 1 }}
+    ])
+    .then(cards => Promise.resolve(cards[0]))
+  );
+}
+
+async function saveQueue(tweetQueue) {
+  return await tryCatch(
+    Queue.update({}, { $set: { queue: tweetQueue } }).exec()
+  );
+}
+
+async function SpoilChecker() {
+  const liveCards = await tryCatch(
+    LiveQuestion.find().lean().exec()
+  );
+  const recentCards = await tryCatch(getRecentAnswers());
+  const queuedCards = await tryCatch(getQueuedCards());
+  const queueCount = queuedCards.length;
+
+  const spoilerText = getSpoilerText(
+    [ ...queuedCards,
+      ...liveCards,
+      ...recentCards.slice(0, 12 - queueCount)
+    ]
+  );
+
+  const liveCardSlice = Math.max(0, 4 - queueCount);
+  const willBeLive = [
+    ...queuedCards.slice(0, 4),
+    ...liveCards.slice(0, liveCardSlice)
+  ];
+  const liveAnswers = getLiveAnswers(willBeLive);
+
+  return {
+    check: (randomCard) => {
+     return queuedCards.find(card => card.cardId === randomCard.cardId) ||
+            isSpoiled(randomCard, spoilerText, liveAnswers);
+    }
+  };
 }
 
 // exported for testing
@@ -208,6 +219,41 @@ export async function updateScheduledDeck(hour, scheduledDeck) {
   return {};
 }
 
+// exported for testing
+export async function updateTweetQueue() {
+  const tweetQueue = await tryCatch(
+    Queue.findOne().lean().then(obj => obj.queue)
+  );
+
+  const lastTimeslot = getLastTimeslot(tweetQueue);
+  let timeslot = getNextTimeslot(lastTimeslot);
+  
+  while (tweetQueue.length <= QUEUE_SIZE) {
+    const nextCardId = await tryCatch(
+      getCardForTimeslot(timeslot)
+    );
+
+    if (!nextCardId)
+      break;
+    
+    tweetQueue.unshift({
+      cardId: nextCardId,
+      time: timeslot
+    });
+
+    await saveQueue(tweetQueue);
+    timeslot = getNextTimeslot(timeslot);
+  }
+
+  if (tweetQueue.length === 0)
+    return null;
+
+  const nextCardToTweet = tweetQueue.pop().cardId;
+  await saveQueue(tweetQueue);
+
+  return nextCardToTweet;
+}
+
 
 // utility functions
 
@@ -244,8 +290,8 @@ function getSpoilerText(cards) {
   return cards.reduce(
     (allText, card) =>
       allText + ' ' + [
-        card.answers,
-        card.mediaUrls.map(obj => obj.altText),
+        ...card.answers,
+        ...card.mediaUrls.map(obj => obj.altText),
         card.otherVisibleContext
       ].join(' ')
     , '');

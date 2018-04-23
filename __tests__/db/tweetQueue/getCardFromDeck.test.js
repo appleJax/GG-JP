@@ -6,20 +6,33 @@ const { getCardFromDeck } = require('DB/tweetQueue');
 const {
   LiveQuestion,
   NewCard,
-  OldCard
+  OldCard,
+  Queue
 } = Models;
 
 beforeAll(async () => {
   await connectDB();
-
-  await NewCard.insertMany(
-    sampleNewCards()
-  );
 });
 
 afterAll(async (done) => {
-  await NewCard.remove();
   await Mongoose.disconnect(done);
+});
+
+beforeEach(async () => {
+  await NewCard.insertMany(
+    sampleNewCards()
+  );
+
+  await Queue.create({
+    queue: []
+  })
+});
+
+afterEach(async () => {
+  await LiveQuestion.remove();
+  await NewCard.remove();
+  await OldCard.remove();
+  await Queue.remove();
 });
 
 it('should return a random card from NewCards', async () => {

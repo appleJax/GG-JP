@@ -205,17 +205,21 @@ export default ({
   },
 
   async getQueue() {
-    const tweetQueue = await tryCatch(
-      Queue.findOne().lean().exec()
+    const queuedIds = await tryCatch(
+      Queue.findOne().lean().then(obj => obj.queue.map(card => card.cardId))
     );
 
-    return await tryCatch(
-      NewCard
-        .find({ cardId: { $in: tweetQueue.queue }})
-        .select({ _id: 0, __v: 0 })
-        .lean()
-        .exec()
-    );
+    const queuedCards = [];
+
+    for (let i = 0; i < queuedIds.length; i++) {
+      const nextCard = await tryCatch(
+        NewCard.findOne({ cardId: queuedIds[i] }).lean().exec()
+      );
+
+      queuedCards.unshift(nextCard);
+    }
+
+    return queuedCards;
   },
 
   async getScores(req) {
