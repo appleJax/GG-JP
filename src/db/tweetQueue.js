@@ -33,14 +33,40 @@ export async function getNextCardToTweet() {
   return nextCard;
 }
 
+
+export async function replaceQueueCard(req) {
+  const {
+    body: {
+      cardId
+    }
+  } = req;
+
+  // console.log('Card Id:', cardId);
+  const tweetQueue = await getTweetQueue();
+
+  const index = tweetQueue.findIndex(entry => entry.cardId === cardId);
+  const timeslot = tweetQueue[index].time;
+
+  const newCardId = await tryCatch(
+    getCardForTimeslot(timeslot, index + 1)
+  );
+
+  tweetQueue[index].cardId = newCardId;
+
+  await saveQueue(tweetQueue);
+}
+
+// private functions
+
+
 // exported for testing
-export async function getCardForTimeslot(hour) {
+export async function getCardForTimeslot(hour, queuePosition = 0) {
   const scheduledDeck = await tryCatch(
     getScheduledDeck(hour)
   );
 
   const randomCardId = await tryCatch(
-    getCardFromDeck(scheduledDeck)
+    getCardFromDeck(scheduledDeck, queuePosition)
   );
 
   if (!randomCardId)
@@ -50,7 +76,7 @@ export async function getCardForTimeslot(hour) {
 }
 
 // exported for testing
-export async function getCardFromDeck(scheduledDeck) {
+export async function getCardFromDeck(scheduledDeck, queuePosition) {
   let randomCard = await tryCatch(
     pullCard(scheduledDeck)
   );
@@ -60,7 +86,7 @@ export async function getCardFromDeck(scheduledDeck) {
     return null;
   }
 
-  const Spoilers = await SpoilChecker();
+  const Spoilers = await SpoilChecker(queuePosition);
   let spoiled = Spoilers.check(randomCard);
 
   let tries = 0;
@@ -83,9 +109,7 @@ export async function getCardFromDeck(scheduledDeck) {
 }
 
 async function getQueuedCards() {
-  const queuedIds = await tryCatch(
-    Queue.findOne().lean().then(obj => obj.queue.map(card => card.cardId))
-  );
+  const queuedIds = await getQueuedIds();
 
   const queuedCards = [];
 
@@ -99,6 +123,19 @@ async function getQueuedCards() {
 
   return queuedCards;
 }
+
+async function getQueuedIds() {
+  return await getTweetQueue().then(
+    queue => queue.map(card => card.cardId)
+  );
+}
+
+async function getTweetQueue() {
+  return await tryCatch(
+    Queue.findOne().lean().then(obj => obj.queue)
+  );
+}
+
 
 // exported for testing
 export async function getScheduledDeck(hour) {
@@ -144,24 +181,24 @@ async function saveQueue(tweetQueue) {
   );
 }
 
-async function SpoilChecker() {
+async function SpoilChecker(queuePosition) {
   const liveCards = await tryCatch(
     LiveQuestion.find().lean().exec()
   );
   const recentCards = await tryCatch(getRecentAnswers());
   const queuedCards = await tryCatch(getQueuedCards());
-  const queueCount = queuedCards.length;
+  const offset = queuedCards.length - queuePosition;
 
   const spoilerText = getSpoilerText(
-    [ ...queuedCards,
+    [ ...queuedCards.slice(queuePosition),
       ...liveCards,
-      ...recentCards.slice(0, 12 - queueCount)
+      ...recentCards.slice(0, 12 - offset)
     ]
   );
 
-  const liveCardSlice = Math.max(0, 4 - queueCount);
+  const liveCardSlice = Math.max(0, 4 - offset);
   const willBeLive = [
-    ...queuedCards.slice(0, 4),
+    ...queuedCards.slice(queuePosition, queuePosition + 4),
     ...liveCards.slice(0, liveCardSlice)
   ];
   const liveAnswers = getLiveAnswers(willBeLive);
@@ -221,9 +258,7 @@ export async function updateScheduledDeck(hour, scheduledDeck) {
 
 // exported for testing
 export async function updateTweetQueue() {
-  const tweetQueue = await tryCatch(
-    Queue.findOne().lean().then(obj => obj.queue)
-  );
+  const tweetQueue = await getTweetQueue();
 
   const lastTimeslot = getLastTimeslot(tweetQueue);
   let timeslot = getNextTimeslot(lastTimeslot);
@@ -266,7 +301,7 @@ function getLastTimeslot(tweetQueue) {
 }
 
 function getLiveAnswers(cards) {
-  return cards.reduce(
+  return cards.filter(Boolean).reduce(
     (allAnswers, card) =>
       allAnswers.concat(card.answers)
     , []);
@@ -291,7 +326,7 @@ function getQuestionSpoilerText(cards) {
 }
 
 function getSpoilerText(cards) {
-  return cards.reduce(
+  return cards.filter(Boolean).reduce(
     (allText, card) =>
       allText + ' ' + [
         ...card.answers,

@@ -98,7 +98,7 @@ it('should return null if tweetQueue is empty and cannot be refilled', async () 
   expect(nextCardId).toBeNull();
 });
 
-// helper
+// helpers
 
 async function getQueueSize() {
   return await Queue.findOne().then(obj => obj.queue.length);

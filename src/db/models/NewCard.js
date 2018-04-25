@@ -4,7 +4,7 @@ import { t } from 'Utils';
 const Schema = Mongoose.Schema;
 
 const schema = new Schema({
-  answerAltText: String,
+  answerAltText: t( String, '' ),
   answerImages: t( [String], [] ),
   answers: t( [String], [] ),
   answerText: String,
@@ -17,10 +17,10 @@ const schema = new Schema({
       altText: String
     }], []
   ),
-  otherVisibleContext: String,
-  prevLineAltText: String,
+  otherVisibleContext: t( String, '' ),
+  prevLineAltText: t( String, '' ),
   prevLineImages: t( [String], [] ),
-  questionAltText: String,
+  questionAltText: t( String, '' ),
   questionId: String,
   questionImages: t( [String], [] ),
   questionText: String

@@ -5,9 +5,20 @@ html, body {
   width: 100vw;
 }
 
+h4 {
+  margin: 10px 5px 10px 0;
+}
+
 .btn {
+  border: none;
   border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2) inset;
+  color: white;
   padding: 10px;
+}
+
+.btn:hover {
+  cursor: pointer;
 }
 
 .btn--input {
@@ -16,14 +27,18 @@ html, body {
 
 .btn--submit {
   background: #4386fa;
-  border: none;
-  box-shadow: 0 0 10px #1356ca inset;
-  color: white;
 }
 
 .btn--submit:hover {
   background: #5396ff;
-  cursor: pointer;
+}
+
+.btn--replace {
+  background: #f44;
+}
+
+.btn--replace:hover {
+  background: #f00;
 }
 
 .card {
@@ -35,6 +50,10 @@ html, body {
 .container {
   maxWidth: 100vw;
   padding: 0 10px;
+}
+
+.inline {
+  display: inline-block;
 }
 
 .upload-form {

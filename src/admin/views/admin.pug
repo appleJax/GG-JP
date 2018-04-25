@@ -1,45 +1,64 @@
 extends layout
 
 block content
-  h2 Tweet Queue:
+  h3 Tweet Queue:
   each card in queue
     .card
-      h3 Card ID:
-      p= card.cardId
+      h4(class='inline') Card ID:
+      p(class='inline')= card.cardId
+      br
 
-      h3 Game:
-      p= card.game
+      h4(class='inline') Game:
+      p(class='inline')= card.game
+      br
 
-      h3 Question Text:
-      each line in card.questionText.split('\n')
-        p= line
+      h4 Question Text:
+      blockquote
+        each line in card.questionText.split('\n')
+          p= line
 
-      h3 Prevline Images:
+      h4 Prevline Images:
       each image in card.prevLineImages
         img(src=`data:image/png;base64, ${image}` alt='prevLineImg')
 
-      h3 Prevline Alt Text:
+      h4 Prevline Alt Text:
       p= card.prevLineAltText
 
-      h3 Question Images:
+      h4 Question Images:
       each image in card.questionImages
         img(src=`data:image/png;base64, ${image}` alt='prevLineImg')
 
-      h3 Question Alt Text:
+      h4 Question Alt Text:
       p= card.questionAltText
 
-      h3 Other Visible Context:
+      h4 Other Visible Context:
       p= card.otherVisibleContext
 
-      h3 Answer Images:
+      h4 Answer Images:
       each image in card.answerImages
         img(src=`data:image/png;base64, ${image}` alt='prevLineImg')
 
-      h3 Answer Alt Text:
+      h4 Answer Alt Text:
       p= card.answerAltText
 
-      h3 Answers:
+      h4 Answers:
       p= card.answers
+
+      form(
+        method='post'
+        action='/queue-card/replace'
+      )
+        input(
+          type='hidden'
+          name='cardId'
+          value=card.cardId
+        )
+        input(
+          class='btn btn--replace'
+          type='submit'
+          value='Replace This Card'
+        )
+      
 
       
 

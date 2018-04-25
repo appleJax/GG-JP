@@ -2,6 +2,7 @@ import passport from 'Config/passport';
 import authorization from 'express-authorization';
 import multer from 'multer';
 import DB from 'DB/ops';
+import { replaceQueueCard } from 'DB/tweetQueue';
 import { tryCatch } from 'Utils';
 
 const upload = multer({ dest: 'uploads/' });
@@ -53,6 +54,12 @@ export default (app) => {
     authorization.ensureRequest.isPermitted('admin'),
     DB.adjustScore
   );
+
+  app.post('/queue-card/replace',
+    authorization.ensureRequest.isPermitted('admin'),
+    (req, res) => replaceQueueCard(req).then(_ => res.redirect('/admin'))
+  );
+
 
 }
 

@@ -9,7 +9,7 @@ const {
   Queue
 } = Models;
 
-const NEXT_CARD_ID = 'c1'
+const NEXT_CARD_ID = 'c1';
 
 beforeAll(async () => {
   await connectDB();
