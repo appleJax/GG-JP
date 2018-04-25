@@ -1,7 +1,10 @@
 import passport from 'Config/passport';
 import authorization from 'express-authorization';
+import multer from 'multer';
 import DB from 'DB/ops';
 import { tryCatch } from 'Utils';
+
+const upload = multer({ dest: 'uploads/' });
 
 
 export default (app) => {

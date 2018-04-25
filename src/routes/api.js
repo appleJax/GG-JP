@@ -1,9 +1,6 @@
+import DB from 'DB/ops';
 import { cache } from 'Config/redis';
-import DB        from 'DB/ops';
-import multer    from 'multer';
 import { getTimeTilNextTweet, send } from 'Utils';
-
-const upload = multer({ dest: 'uploads/' });
 
 
 export default (app) => {

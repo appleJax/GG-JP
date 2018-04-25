@@ -27,9 +27,9 @@ export async function getFollowing(userId) {
   );
 }
 
-  //
-  // post a tweet with media
-  //
+//
+// post a tweet with media
+//
 export async function postMedia(
   status,
   mainImages,
@@ -238,35 +238,32 @@ async function updateLastReadDM(timestamp) {
 // RETURNS:
 // media_id which is necessary for
 // attaching media to a tweet
-//
-function uploadMedia(b64Image, altText) {
-  return tryCatch(new Promise((resolve, reject) => {
+export async function uploadMedia(b64Image, altText) {
+  return await
     // first we must post the media to Twitter
-    Twitter.post('media/upload', { media_data: b64Image }, (err, data, response) => {
-      if (err) {
-        console.error(err);
-        reject(new Error("Media upload failed."));
-        return;
-      }
+    Twitter.post(
+      'media/upload',
+      { media_data: b64Image }
+    ).then(({ data }) => {
 
       // now we can assign alt text to the media, for use by screen readers and
       // other text-based presentations and interpreters
       const mediaIdStr = data.media_id_string;
-      if (!altText) {
-        resolve(mediaIdStr);
-        return;
-      }
+      if (!altText) return mediaIdStr;
 
-      const meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
+      const meta_params = {
+        media_id: mediaIdStr,
+        alt_text: { text: altText }
+      };
 
-      Twitter.post('media/metadata/create', meta_params, (err, data, response) => {
-        if (err) {
-          console.error(err);
-          reject(new Error("Media upload succeeded, media creation failed."));
-        }
-        // now we can reference the media and post a tweet (media will attach to the tweet)
-        resolve(mediaIdStr);
-      });
-    });
-  }));
+      return Twitter.post(
+        'media/metadata/create',
+        meta_params
+      ).then((_) =>
+        // now we can reference the media and post a tweet
+        // (media will attach to the tweet)
+        mediaIdStr
+      ).catch(console.error);
+
+    }).catch(console.error);
 }
