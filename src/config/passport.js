@@ -16,9 +16,7 @@ passport.use(
   new LocalStrategy(
     async (username, password, done) => {
       if (isCorrect(password)) {
-        const user = await tryCatch(
-          getUser({ handle: username })
-        );
+        const user = await getUser({ handle: username });
         if (user && user.permissions.includes('admin'))
           return done(null, user);
       }
