@@ -140,8 +140,12 @@ export function getTimeTilNextTweet() {
 export const getTimeUntil = (hour) => _getTimeUntil(hour)
 
 export function isCorrect(password) {
-  const pw = Buffer.from(password);
-  const adminPw = Buffer.from(ADMIN_PW);
+  const pw = new Buffer(256);
+  pw.write(password);
+
+  const adminPw = new Buffer(256);
+  adminPw.write(ADMIN_PW);
+
   return crypto.timingSafeEqual(pw, adminPw);
 }
 

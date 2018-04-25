@@ -46,6 +46,7 @@ function sampleUser() {
     avatar: '',
     profileBanner: '',
     following: [],
+    permissions: [],
     allTimeStats: {
       attempts: 0,
       correct: [],

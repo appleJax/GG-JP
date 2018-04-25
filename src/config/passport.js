@@ -19,7 +19,7 @@ passport.use(
         const user = await tryCatch(
           getUser({ handle: username })
         );
-        if (user.permissions.includes('admin'))
+        if (user && user.permissions.includes('admin'))
           return done(null, user);
       }
       return done(null, false, { message: 'Not Authorized' });

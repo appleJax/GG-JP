@@ -8,10 +8,6 @@ const upload = multer({ dest: 'uploads/' });
 
 export default (app) => {
 
-  app.get('/api/cards/old', (req, res) =>
-    DB.getOldCards().then(send(res))
-  );
-
   app.get('/api/cards', (req, res) =>
     DB.serveCards(req).then(send(res))
   );
@@ -64,21 +60,8 @@ export default (app) => {
     res.json({ millis: getTimeTilNextTweet() })
   );
 
-
-  // TODO - add authentication to following endpoints
-
-  app.post('/deck/new',
-    upload.single('zipfile'), (req, res) =>
-      DB.addDeck(req).then(_ => res.redirect('/'))
-  );
-
-  app.post('/scores/edit', DB.adjustScore);
-
-  app.get('/cards/new', (req, res) =>
-    DB.getNewCards().then(send(res))
-  );
-
 }
+
 
 function browserCache(req, res, next) {
   res.set('Cache-Control', `max-age=${untilNextTweet()}`);

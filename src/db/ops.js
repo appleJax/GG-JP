@@ -192,18 +192,6 @@ export default ({
     );
   },
 
-  async getNewCards() {
-    return await tryCatch(
-      NewCard.find().lean().exec()
-    );
-  },
-
-  async getOldCards() {
-    return await tryCatch(
-      OldCard.find().lean().exec()
-    );
-  },
-
   async getQueue() {
     const queuedIds = await tryCatch(
       Queue.findOne().lean().then(obj => obj.queue.map(card => card.cardId))

@@ -82,11 +82,15 @@ export function parseAnkiJson(filePath) {
     [ altAnswers,
       engMeaning,
       expression,
+      prevLineAltText,
+      otherVisibleContext,
       notes
     ] = [
       altAnswers,
       engMeaning,
       expression,
+      prevLineAltText,
+      otherVisibleContext,
       notes
     ].map(stripHtml);
 

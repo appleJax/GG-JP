@@ -10,6 +10,7 @@ const schema = new Schema({
   avatar: t( String, '' ),
   profileBanner: t( String, '' ),
   following: t( [String], [] ),
+  permissions: t( [String], [] ),
   allTimeStats: {
     _id: false,
     attempts: t( Number, 0 ),

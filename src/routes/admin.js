@@ -40,6 +40,17 @@ export default (app) => {
     }
   );
 
+  app.post('/deck/new',
+    authorization.ensureRequest.isPermitted('admin'),
+    upload.single('zipfile'), (req, res) =>
+      DB.addDeck(req).then(_ => res.redirect('/admin'))
+  );
+
+  app.post('/scores/edit',
+    authorization.ensureRequest.isPermitted('admin'),
+    DB.adjustScore
+  );
+
 }
 
 function redirectAdmin(req, res, next) {

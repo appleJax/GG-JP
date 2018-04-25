@@ -6,7 +6,8 @@ const schema = new Schema({
   year:  Number,
   month: Number,
   week:  Number,
-  day:   Number
+  day:   Number,
+  lastReadDirectMessage: Number
 });
 
 export default Mongoose.model('timestamps', schema);

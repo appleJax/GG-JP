@@ -178,6 +178,7 @@ function sampleUsers() {
   return [
     {
       userId: '1',
+      permissions: [],
       yearlyStats: sampleStats,
       monthlyStats: sampleStats,
       weeklyStats:  sampleStats,
@@ -185,6 +186,7 @@ function sampleUsers() {
     },
     {
       userId: '2',
+      permissions: [],
       yearlyStats: sampleStats,
       monthlyStats: sampleStats,
       weeklyStats:  sampleStats,
