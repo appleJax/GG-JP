@@ -6,25 +6,21 @@ import evaluateResponse from './evaluateResponse';
 const { Timestamp } = models;
 const { TWITTER_ACCOUNT } = process.env;
 
-export async function fetchTwitterUser(userId) {
+export function fetchTwitterUser(userId) {
   const params = { user_id: userId };
 
-  return await tryCatch(
-    Twitter.get('users/show', params)
-    .then(({ data }) => data)
-  );
+  return Twitter.get('users/show', params)
+    .then(({ data }) => data);
 }
 
-export async function getFollowing(userId) {
+export function getFollowing(userId) {
   const params = {
     user_id: userId,
     stringify_ids: true
   };
 
-  return await tryCatch(
-    Twitter.get('friends/ids', params)
-    .then(({ data }) => data.ids)
-  );
+  return Twitter.get('friends/ids', params)
+    .then(({ data }) => data.ids);
 }
 
 //
@@ -85,7 +81,7 @@ export async function postMedia(
 
       return {
         tweetId:  data.id_str,
-        postedAt: new Date(data.created_at).getTime(),
+        postedAt: toTimestamp(data.created_at),
         mediaUrls
       };
     })
@@ -219,7 +215,11 @@ function getMostRecentTimestamp(events) {
 }
 
 function toTimestamp(timeString) {
-  return new Date(+timeString).getTime();
+  const attempt = new Date(timeString).getTime();
+
+  return isNaN(attempt)
+    ? new Date(+timeString).getTime()
+    : attempt;
 }
 
 async function updateLastReadDM(timestamp) {
@@ -236,10 +236,9 @@ async function updateLastReadDM(timestamp) {
 // RETURNS:
 // media_id which is necessary for
 // attaching media to a tweet
-export async function uploadMedia(b64Image, altText) {
-  return await
+export function uploadMedia(b64Image, altText) {
     // first we must post the media to Twitter
-    Twitter.post(
+  return Twitter.post(
       'media/upload',
       { media_data: b64Image }
     ).then(({ data }) => {
