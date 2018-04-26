@@ -13,6 +13,7 @@ const schema = new Schema({
   mainImageSlice: t( [Number], [] ),
   mediaUrls: t(
     [{
+      _id: false,
       image: String,
       altText: String
     }], []

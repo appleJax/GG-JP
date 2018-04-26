@@ -74,24 +74,22 @@ export async function postMedia(
     include_ext_alt_text: true
   };
 
-  return await tryCatch(
-    Twitter.post('statuses/update', params)
-      .then(({ data }) => {
-        const mediaUrls = data.extended_entities.media.map(
-          obj => ({
-            image: obj.media_url_https,
-            altText: obj.ext_alt_text
-          })
-        );
+  return Twitter.post('statuses/update', params)
+    .then(({ data }) => {
+      const mediaUrls = data.extended_entities.media.map(
+        obj => ({
+          image: obj.media_url_https,
+          altText: obj.ext_alt_text
+        })
+      );
 
-        return {
-          tweetId:  data.id_str,
-          postedAt: toTimestamp(data.created_at),
-          mediaUrls
-        };
-      })
-      .catch(console.error)
-  );
+      return {
+        tweetId:  data.id_str,
+        postedAt: new Date(data.created_at).getTime(),
+        mediaUrls
+      };
+    })
+    .catch(console.error);
 }
 
 export async function processDMs() {

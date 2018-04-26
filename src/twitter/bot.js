@@ -14,7 +14,6 @@ import {
   processDMs
 } from 'Twitter/utils';
 
-
 const { TWITTER_ACCOUNT } = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;
@@ -24,8 +23,8 @@ const POLL_DM_INTERVAL = 90*1000;
 export default ({
 
   // tweet() {
-  //   tweetRandomQuestion();
-  //   pollDMs();
+    // tweetRandomQuestion();
+    // pollDMs();
   // },
 
   // listen() {
