@@ -81,7 +81,7 @@ export async function postMedia(
 
       return {
         tweetId:  data.id_str,
-        postedAt: toTimestamp(data.created_at),
+        postedAt: new Date(data.created_at).getTime(),
         mediaUrls
       };
     })
@@ -155,9 +155,10 @@ async function evaluateDMs(directMessages) {
 // exported for testing
 export async function fetchDMs(twitterClient = Twitter) {
   const params = { count: 50 };
-  const { lastReadDirectMessage } = await tryCatch(
-    Timestamp.findOne().lean().exec()
+  const lastReadDM = await tryCatch(
+    Timestamp.findOne().lean().then(doc => doc.lastReadDM)
   );
+
   let directMessages = [];
   let firstRequest = true;
   let lastTimestamp = 0;
@@ -176,7 +177,7 @@ export async function fetchDMs(twitterClient = Twitter) {
     if (firstRequest) {
       const mostRecentTimestamp = getMostRecentTimestamp(events);
 
-      if (mostRecentTimestamp > lastReadDirectMessage)
+      if (mostRecentTimestamp > lastReadDM)
         await updateLastReadDM(mostRecentTimestamp);
       else return [];
     }
@@ -186,7 +187,7 @@ export async function fetchDMs(twitterClient = Twitter) {
     params.cursor = nextCursor;
     firstRequest = false;
 
-  } while (params.cursor && lastTimestamp > lastReadDirectMessage)
+  } while (params.cursor && lastTimestamp > lastReadDM)
 
   return directMessages;
 }
@@ -215,17 +216,13 @@ function getMostRecentTimestamp(events) {
 }
 
 function toTimestamp(timeString) {
-  const attempt = new Date(timeString).getTime();
-
-  return isNaN(attempt)
-    ? new Date(+timeString).getTime()
-    : attempt;
+  return new Date(+timeString).getTime();
 }
 
 async function updateLastReadDM(timestamp) {
   return await tryCatch(
     Timestamp.update({},
-      { $set: { lastReadDirectMessage: timestamp }}
+      { $set: { lastReadDM: timestamp }}
     ).exec()
   );
 }
@@ -236,7 +233,7 @@ async function updateLastReadDM(timestamp) {
 // RETURNS:
 // media_id which is necessary for
 // attaching media to a tweet
-export function uploadMedia(b64Image, altText) {
+function uploadMedia(b64Image, altText) {
     // first we must post the media to Twitter
   return Twitter.post(
       'media/upload',

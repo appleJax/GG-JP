@@ -8,9 +8,7 @@ const {
 } = models;
 
 beforeAll(async () => {
-  console.log('Connecting DB...')
   await connectDB();
-  console.log('Connected!!!')
 });
 
 afterAll(async (done) => {
@@ -22,7 +20,6 @@ let mockGet, mockTwitter;
 
 beforeEach(async () => {
   await Timestamp.create(sampleTimestamps());
-  console.log('Timestamp Entry created!')
 
   mockGet = jest.fn()
     .mockReturnValueOnce(
@@ -36,8 +33,6 @@ beforeEach(async () => {
     .mockReturnValue({
       get: mockGet
     });
-
-  console.log('BeforeEach complete!')
 });
 
 afterEach(async () => {
@@ -45,14 +40,11 @@ afterEach(async () => {
 });
 
 
-describe('if first DM of fetched results is newer than lastReadDirectMessage', () => {
+describe('if first DM of fetched results is newer than lastReadDM', () => {
 
-  it('should update lastReadDirectMessage timestamp', async () => {
-    console.log('Test 1 running...')
+  it('should update lastReadDM timestamp', async () => {
     const lastReadDMBefore = await fetchLastReadDM();
-    console.log('Test 1 running...')
     await fetchDMs(mockTwitter());
-    console.log('Test 1 running...')
     const lastReadDMAfter = await fetchLastReadDM();
 
     expect(lastReadDMBefore).toBe(1);
@@ -61,7 +53,7 @@ describe('if first DM of fetched results is newer than lastReadDirectMessage', (
 
 });
 
-describe('if last DM of fetched results is newer than lastReadDirectMessage', () => {
+describe('if last DM of fetched results is newer than lastReadDM', () => {
 
   it('should return more than one page of DM results', async () => {
     const directMessages = await fetchDMs(mockTwitter())
@@ -72,7 +64,7 @@ describe('if last DM of fetched results is newer than lastReadDirectMessage', ()
 
 });
 
-describe('if last DM of fetched results is older than lastReadDirectMessage', () => {
+describe('if last DM of fetched results is older than lastReadDM', () => {
 
   it('should return one page of DM results', async () => {
     await setLastReadDM(6);
@@ -83,7 +75,7 @@ describe('if last DM of fetched results is older than lastReadDirectMessage', ()
 
 });
 
-describe('if first fetched DM is the same as lastReadDirectMessage', () => {
+describe('if first fetched DM is the same as lastReadDM', () => {
 
   it('should return an empty array', async () => {
     await setLastReadDM(8);
@@ -101,12 +93,12 @@ async function fetchLastReadDM() {
   return await Timestamp
     .findOne()
     .lean()
-    .then(doc => doc.lastReadDirectMessage);
+    .then(doc => doc.lastReadDM);
 }
 
 async function setLastReadDM(timestamp) {
   return await Timestamp.update({},
-    { $set: { lastReadDirectMessage: timestamp }}
+    { $set: { lastReadDM: timestamp }}
   ).exec();
 }
 
@@ -143,6 +135,6 @@ function sampleTimestamps() {
     month: 0,
     week: 0,
     day: 0,
-    lastReadDirectMessage: 1
+    lastReadDM: 1
   };
 }
