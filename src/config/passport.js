@@ -8,8 +8,9 @@ import {
 } from 'DB/utils';
 
 const {
-    TWITTER_API_KEY,
-    TWITTER_API_SECRET
+  BOT_URL,
+  TWITTER_API_KEY,
+  TWITTER_API_SECRET
 } = process.env
 
 passport.use(

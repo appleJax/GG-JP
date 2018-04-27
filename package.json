@@ -5,6 +5,7 @@
   "scripts": {
     "build": "webpack --config webpack.dev.js",
     "deploy": "webpack -p --config webpack.prod.js",
+    "stage": "webpack -p --config webpack.staging.js",
     "server": "node --require dotenv/config ./dist/server.js",
     "devstart": "npm run build && npm run server",
     "start": "node ./dist/server.js",

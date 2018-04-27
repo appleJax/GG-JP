@@ -14,7 +14,10 @@ import {
   processDMs
 } from 'Twitter/utils';
 
-const { TWITTER_ACCOUNT } = process.env;
+const {
+  BOT_URL,
+  TWITTER_ACCOUNT
+} = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;
 const QUESTION_INTERVAL = 6*HOURS;

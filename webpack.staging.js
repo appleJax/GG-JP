@@ -1,4 +1,5 @@
 const merge = require('webpack-merge');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const common = require('./webpack.common');
 const webpack = require('webpack');
 const {
@@ -11,18 +12,13 @@ const {
   TWITTER_TOKEN_SECRET,
   ORIGIN_URL,
   UI_URL
-} = require('./.env.js').dev;
+} = require('./.env.js').staging;
 
 module.exports = merge(common, {
-  devtool: 'inline-source-map',
   plugins: [
-    new webpack.BannerPlugin({
-      banner: 'require("source-map-support").install();',
-      raw: true,
-      entryOnly: false
-    }),
+    new UglifyJSPlugin(),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV':             JSON.stringify('dev'),
+      'process.env.NODE_ENV':             JSON.stringify('staging'),
       'process.env.BOT_URL':              JSON.stringify(BOT_URL),
       'process.env.DM_URL':               JSON.stringify(DM_URL),
       'process.env.TWITTER_ACCOUNT':      JSON.stringify(TWITTER_ACCOUNT),

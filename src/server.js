@@ -21,7 +21,7 @@ route(app);
 
 // twitterBot.tweet();
 
-if (process.env.NODE_ENV === 'production')
+if (process.env.NODE_ENV !== 'dev')
   twitterBot.start();
 
 const PORT = app.get('port');

@@ -1,5 +1,6 @@
 import passport from 'Config/passport';
 
+const { UI_URL } = process.env;
 
 export default (app) => {
 
