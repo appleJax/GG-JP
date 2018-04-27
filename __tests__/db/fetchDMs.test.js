@@ -1,14 +1,16 @@
 const Mongoose = require('mongoose');
-const Models = require('Models').default;
-const { connectDB } = require('TestUtils')
+const models = require('Models').default;
+const { connectDB } = require('TestUtils');
 const { fetchDMs } = require('Twitter/utils');
 
 const {
   Timestamp
-} = Models;
+} = models;
 
 beforeAll(async () => {
+  console.log('Connecting DB...')
   await connectDB();
+  console.log('Connected!!!')
 });
 
 afterAll(async (done) => {
@@ -20,6 +22,7 @@ let mockGet, mockTwitter;
 
 beforeEach(async () => {
   await Timestamp.create(sampleTimestamps());
+  console.log('Timestamp Entry created!')
 
   mockGet = jest.fn()
     .mockReturnValueOnce(
@@ -33,6 +36,8 @@ beforeEach(async () => {
     .mockReturnValue({
       get: mockGet
     });
+
+  console.log('BeforeEach complete!')
 });
 
 afterEach(async () => {
@@ -43,8 +48,11 @@ afterEach(async () => {
 describe('if first DM of fetched results is newer than lastReadDirectMessage', () => {
 
   it('should update lastReadDirectMessage timestamp', async () => {
+    console.log('Test 1 running...')
     const lastReadDMBefore = await fetchLastReadDM();
+    console.log('Test 1 running...')
     await fetchDMs(mockTwitter());
+    console.log('Test 1 running...')
     const lastReadDMAfter = await fetchLastReadDM();
 
     expect(lastReadDMBefore).toBe(1);
@@ -99,7 +107,7 @@ async function fetchLastReadDM() {
 async function setLastReadDM(timestamp) {
   return await Timestamp.update({},
     { $set: { lastReadDirectMessage: timestamp }}
-  );
+  ).exec();
 }
 
 function returnValue(contents) {

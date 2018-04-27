@@ -1,6 +1,6 @@
 const Mongoose = require('mongoose');
 const Models = require('Models').default;
-const { connectDB } = require('TestUtils')
+const { connectDB } = require('TestUtils');
 const { getAnswerCard } = require('DB/ops').default;
 
 const {
@@ -12,19 +12,26 @@ beforeAll(async () => {
 });
 
 afterAll(async (done) => {
-  await LiveQuestion.remove();
   await Mongoose.disconnect(done);
 });
 
 const CARD_ID = 'c1';
+const QUESTION_TEXT = 'text';
 
-it('should return the requested card from LiveQuestions', async () => {
+beforeEach(async () => {
   await LiveQuestion.create({
     cardId: CARD_ID,
-    questionText: 'text'
+    questionText: QUESTION_TEXT
   });
+});
 
+afterEach(async () => {
+  await LiveQuestion.remove();
+});
+
+it('should return the requested card from LiveQuestions', async () => {
   const answerCard = await getAnswerCard(CARD_ID);
 
-  expect(answerCard.questionText).toEqual('text');
+  expect(answerCard.cardId).toEqual(CARD_ID);
+  expect(answerCard.questionText).toEqual(QUESTION_TEXT);
 });

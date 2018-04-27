@@ -1,6 +1,6 @@
 const Mongoose = require('mongoose');
 const Models = require('Models').default;
-const { connectDB } = require('TestUtils')
+const { connectDB } = require('TestUtils');
 const { updateTimestamps } = require('DB/ops');
 
 const {
