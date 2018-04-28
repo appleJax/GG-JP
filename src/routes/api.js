@@ -28,10 +28,10 @@ export default (app) => {
     (req, res) => DB.serveRecentAnswers().then(send(res))
   );
 
-  app.get('/api/scores',
+  app.get('/api/stats',
     browserCache,
     cache.route(untilNextTweet()),
-    (req, res) => DB.getScores(req).then(send(res))
+    (req, res) => DB.getStats(req).then(send(res))
   );
 
   app.get('/api/user/:userId',

@@ -1,7 +1,7 @@
 const Mongoose = require('mongoose');
 const Models = require('Models').default;
 const { connectDB } = require('TestUtils')
-const { getScores } = require('DB/ops').default;
+const { getStats } = require('DB/ops').default;
 
 const {
   Scoreboard
@@ -9,15 +9,20 @@ const {
 
 beforeAll(async () => {
   await connectDB();
+});
 
+afterAll(async (done) => {
+  await Mongoose.disconnect(done);
+});
+
+beforeEach(async () => {
   await Scoreboard.insertMany(
     sampleScores()
   );
 });
 
-afterAll(async (done) => {
+afterEach(async () => {
   await Scoreboard.remove();
-  await Mongoose.disconnect(done);
 });
 
 
@@ -29,7 +34,7 @@ it(`should return scores > 0 for the requested view
       view: 'allTimeStats'
     }
   };
-  const stats = await getScores(req);
+  const stats = await getStats(req);
   const userHandles = stats.users.map(stat => stat.handle);
   const expectedHandles = [
     'B_allTime_rank1',
@@ -49,7 +54,7 @@ it('should return a number of results <= pageSize', async () => {
       pageSize: 2
     }
   };
-  const stats = await getScores(req);
+  const stats = await getStats(req);
   const userHandles = stats.users.map(stat => stat.handle);
   const expectedHandles = [
     'B_allTime_rank1',
@@ -69,7 +74,7 @@ it('should return the correct page of results', async () => {
       page: 2
     }
   };
-  const stats = await getScores(req);
+  const stats = await getStats(req);
   const userHandles = stats.users.map(stat => stat.handle);
   const expectedHandles = [
     'A_allTime_rank3'
@@ -87,7 +92,7 @@ it('should return the scores whose handles satisfy the search', async () => {
       search: 'C'
     }
   };
-  const stats = await getScores(req);
+  const stats = await getStats(req);
   const userHandles = stats.users.map(stat => stat.handle);
   const expectedHandles = [
     'C_allTime_rank1'
@@ -97,8 +102,34 @@ it('should return the scores whose handles satisfy the search', async () => {
   expect(stats.total).toEqual(1);
 });
 
+it(`should return (given page + 1)
+    if loggedInUser is provided and not found on the given page
+  `, async () => {
+
+  const req = {
+    query: {
+      loggedInUser: '3',
+      page: 2,
+      pageSize: 1
+    }
+  };
+
+  const loggedIn = await getStats(req);
+
+  req.query.loggedInUser = '';
+  const notLoggedIn = await getStats(req);
+
+  const loggedInIds = loggedIn.users.map(user => user.userId);
+  const notLoggedInIds = notLoggedIn.users.map(user => user.userId);
+
+  expect(loggedInIds).toEqual(['3']);
+  expect(notLoggedInIds).toEqual(['1']);
+
+});
+
 
 it(`should have defaults:
+    loggedInUser = ''
     page = 1
     pageSize = 100
     view = 'weeklyStats
@@ -107,7 +138,7 @@ it(`should have defaults:
   const req = {
     query: {}
   };
-  const stats = await getScores(req);
+  const stats = await getStats(req);
   const userHandles = stats.users.map(stat => stat.handle);
   const expectedHandles = [
     'B_weekly_rank1',
@@ -130,7 +161,7 @@ it('should return EMPTY if no scores found', async () => {
       search: 'not-a-real-handle'
     }
   };
-  const stats = await getScores(req);
+  const stats = await getStats(req);
 
   expect(stats).toEqual(EMPTY);
 });

@@ -210,9 +210,10 @@ export default ({
     return queuedCards;
   },
 
-  async getScores(req) {
+  async getStats(req) {
     const {
       query: {
+        loggedInUser = '',
         page = 1,
         pageSize = 100,
         view = 'weeklyStats',
@@ -220,23 +221,34 @@ export default ({
       }
     } = req;
 
+    const pageNum = Number(page);
+    const pageSizeNum = Number(pageSize);
+
     const match = {
       handle: { $regex: search, $options: 'i' },
       [`${view}.score`]: { $gt: 0 }
     };
-    const skipCount = (Number(page) - 1) * Number(pageSize);
+    const skipCount = (pageNum - 1) * pageSizeNum;
+    const sortBy = {
+      [`${view}.rank`]: 'asc',
+      handle: 'asc'
+    };
 
-    const users = await tryCatch(
-      Scoreboard.find(match)
-      .sort({
-        [`${view}.rank`]: 'asc',
-        handle: 'asc'
-      })
-      .skip(skipCount)
-      .limit(Number(pageSize))
-      .lean()
-      .exec()
+    let users = await fetchStats(
+      match,
+      sortBy,
+      skipCount,
+      pageSizeNum
     );
+
+    if (loggedInUser && !users.find(user => user.userId === loggedInUser)) {
+      users = await fetchStats(
+        match,
+        sortBy,
+        skipCount + pageSizeNum,
+        pageSizeNum
+      );
+    }
 
     if (users.length === 0)
       return { users: [], total: 0 };
@@ -244,6 +256,7 @@ export default ({
     const total = await tryCatch(
       Scoreboard.find(match).count().exec()
     );
+
     return { users, total };
   },
 
@@ -407,6 +420,18 @@ export async function addPointsToScoreboard(liveQuestion) {
 
   await tryCatch(Scoreboard.bulkWrite(ops));
   await tryCatch(recalculateRank());
+}
+
+async function fetchStats(match, sortBy, skipCount, pageSize) {
+  return await tryCatch(
+    Scoreboard
+      .find(match)
+      .sort(sortBy)
+      .skip(skipCount)
+      .limit(pageSize)
+      .lean()
+      .exec()
+  );
 }
 
 function finishPointsUpdateOps(cachedUpdates, allUsers, cardId) {

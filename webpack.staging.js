@@ -18,7 +18,7 @@ module.exports = merge(common, {
   plugins: [
     new UglifyJSPlugin(),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV':             JSON.stringify('staging'),
+      'process.env.NODE_ENV':             JSON.stringify('production'),
       'process.env.BOT_URL':              JSON.stringify(BOT_URL),
       'process.env.DM_URL':               JSON.stringify(DM_URL),
       'process.env.TWITTER_ACCOUNT':      JSON.stringify(TWITTER_ACCOUNT),
