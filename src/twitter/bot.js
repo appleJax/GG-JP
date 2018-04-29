@@ -53,8 +53,9 @@ export default ({
 async function scheduleActions() {
   await pollDMs();
   const liveQuestions = await tryCatch(DB.getLiveQuestions());
-  if (liveQuestions.length > 0)
+  if (liveQuestions.length > 0) {
     tweetOrScheduleAnswers(liveQuestions);
+  }
 
   const timeUntilTweet = getTimeTilNextTweet();
   const timeUntilMidnight = getTimeUntil(0);
@@ -144,6 +145,7 @@ async function tweetAnswer(cardId, questionId) {
   );
 
   // EFFECTS:
+  // - fetches/processes DM replies
   // - adds mediaUrl to card
   // - removes base64 image from card
   // - adds userPoints to scoreboard

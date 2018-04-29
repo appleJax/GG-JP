@@ -5,6 +5,7 @@ import {
   buildRankUpdates,
   getUser
 } from 'DB/utils';
+import { processDMs } from 'Twitter/utils';
 import {
   average,
   formatFlashCards,
@@ -278,15 +279,12 @@ export default ({
   },
 
   async processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls) {
-    const currentQuestion = await tryCatch(
-      LiveQuestion.findOneAndUpdate(
-        { cardId },
-        { $push:  { mediaUrls: { $each: mediaUrls } },
-          $set:   { answerId, answerPostedAt },
-          $unset: { answerImages: '', answerAltText: '' }
-        },
-        { new: true, lean: true }
-      ).exec()
+    await processDMs();
+    const currentQuestion = await finalizeLiveQuestion(
+      answerId,
+      answerPostedAt,
+      cardId,
+      mediaUrls
     );
 
     await tryCatch(addPointsToScoreboard(currentQuestion));
@@ -307,19 +305,20 @@ export default ({
 
   async serveLiveQuestions() {
     const liveQuestions = await tryCatch(
-      LiveQuestion.find({})
-                  .select({
-                    _id:                 0,
-                    answers:             0,
-                    answerAltText:       0,
-                    answerImages:        0,
-                    answerText:          0,
-                    otherVisibleContext: 0,
-                    userPoints:          0
-                  })
-                  .sort({ questionPostedAt: 'desc' })
-                  .lean()
-                  .exec()
+      LiveQuestion
+      .find({})
+      .select({
+        _id:                 0,
+        answers:             0,
+        answerAltText:       0,
+        answerImages:        0,
+        answerText:          0,
+        otherVisibleContext: 0,
+        userPoints:          0
+      })
+      .sort({ questionPostedAt: 'desc' })
+      .lean()
+      .exec()
     );
 
     return (liveQuestions.length > 0)
@@ -431,6 +430,19 @@ async function fetchStats(match, sortBy, skipCount, pageSize) {
       .limit(pageSize)
       .lean()
       .exec()
+  );
+}
+
+async function finalizeLiveQuestion(answerId, answerPostedAt, cardId, mediaUrls) {
+  return await tryCatch(
+    LiveQuestion.findOneAndUpdate(
+      { cardId },
+      { $push:  { mediaUrls: { $each: mediaUrls } },
+        $set:   { answerId, answerPostedAt },
+        $unset: { answerImages: '', answerAltText: '' }
+      },
+      { new: true, lean: true }
+    ).exec()
   );
 }
 

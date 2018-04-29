@@ -19,7 +19,8 @@ const sampleTimestamps = {
   year: 0,
   month: 0,
   week: 0,
-  day: 0
+  day: 0,
+  lastReadDM: 0
 }
 
 let oldTimestamps, update, newTimestamps;
@@ -99,7 +100,8 @@ it('should update all timestamps whose params are truthy', async () => {
     day: update,
     week: update,
     month: update,
-    year: update
+    year: update,
+    lastReadDM: 0
   }
 
   expect(oldTimestamps).toEqual(sampleTimestamps);

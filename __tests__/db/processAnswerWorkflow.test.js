@@ -5,7 +5,8 @@ const { processAnswerWorkflow } = require('DB/ops').default;
 
 const {
   LiveQuestion,
-  OldCard
+  OldCard,
+  Timestamp
 } = Models;
 
 beforeAll(async () => {
@@ -43,11 +44,13 @@ const updatedCard = {
 
 beforeEach(async () => {
   await LiveQuestion.create(sampleCard);
+  await Timestamp.create({});
 });
 
 afterEach(async () => {
   await LiveQuestion.remove();
   await OldCard.remove();
+  await Timestamp.remove();
 });
 
 
