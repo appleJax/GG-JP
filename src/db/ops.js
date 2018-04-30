@@ -428,7 +428,7 @@ export async function addPointsToScoreboard(liveQuestion) {
     Scoreboard.find().exec()
   );
 
-  const ops = finishPointsUpdateOps(cachedUpdates, allUsers, liveQuestion.cardId);
+  const ops = finishPointsUpdates(cachedUpdates, allUsers, liveQuestion.cardId);
 
   if (ops.length === 0)
     return;
@@ -462,7 +462,7 @@ async function finalizeLiveQuestion(answerId, answerPostedAt, cardId, mediaUrls)
   );
 }
 
-function finishPointsUpdateOps(cachedUpdates, allUsers, cardId) {
+function finishPointsUpdates(cachedUpdates, allUsers, cardId) {
   const ops = [];
   let i = 0;
   let end = allUsers.length;

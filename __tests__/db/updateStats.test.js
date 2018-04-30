@@ -1,4 +1,3 @@
-
 const Mongoose = require('mongoose');
 const Models = require('Models').default;
 const { connectDB } = require('TestUtils')
@@ -85,58 +84,61 @@ afterEach(async () => {
   await Timestamp.remove();
 });
 
+let updatedUsers;
 
 it('should always update daily Stats', async () => {
   await updateStats(false, false, false);
+  updatedUsers = await fetchUsers();
 
-  await isNotUpdated('yearlyStats');
-  await isNotUpdated('monthlyStats');
-  await isNotUpdated('weeklyStats');
-  await isUpdated('dailyStats');
+  isNotUpdated('yearlyStats');
+  isNotUpdated('monthlyStats',);
+  isNotUpdated('weeklyStats');
+  isUpdated('dailyStats');
 });
 
 it('should update weeklyStats when newWeek param is true', async () => {
   await updateStats(true, false, false);
+  updatedUsers = await fetchUsers();
 
-  await isNotUpdated('yearlyStats');
-  await isNotUpdated('monthlyStats');
-  await isUpdated('weeklyStats');
-  await isUpdated('dailyStats');
+  isNotUpdated('yearlyStats');
+  isNotUpdated('monthlyStats');
+  isUpdated('weeklyStats');
+  isUpdated('dailyStats');
 });
 
 it('should update monthlyStats when newMonth param is true', async () => {
   await updateStats(false, true, false);
+  updatedUsers = await fetchUsers();
 
-  await isNotUpdated('yearlyStats');
-  await isUpdated('monthlyStats');
-  await isNotUpdated('weeklyStats');
-  await isUpdated('dailyStats');
+  isNotUpdated('yearlyStats');
+  isUpdated('monthlyStats');
+  isNotUpdated('weeklyStats');
+  isUpdated('dailyStats');
 });
 
 it('should update yearlyStats when newYear param is true', async () => {
   await updateStats(false, false, true);
+  updatedUsers = await fetchUsers();
 
-  await isUpdated('yearlyStats');
-  await isNotUpdated('monthlyStats');
-  await isNotUpdated('weeklyStats');
-  await isUpdated('dailyStats');
+  isUpdated('yearlyStats');
+  isNotUpdated('monthlyStats');
+  isNotUpdated('weeklyStats');
+  isUpdated('dailyStats');
 });
 
 it('should update yearlyStats, monthlyStats and weeklyStats when all params are true', async () => {
   await updateStats(true, true, true);
+  updatedUsers = await fetchUsers();
 
-  await isUpdated('yearlyStats');
-  await isUpdated('monthlyStats');
-  await isUpdated('weeklyStats');
-  await isUpdated('dailyStats');
+  isUpdated('yearlyStats');
+  isUpdated('monthlyStats');
+  isUpdated('weeklyStats');
+  isUpdated('dailyStats');
 });
 
 // helpers
 
 async function isUpdated(stats) {
-  const users = await fetchUsers();
-  const updatedUsers = await fetchUsers();
-
   return updatedUsers.forEach(user => {
     const updated = (stats === 'dailyStats')
       ? updatedStatsNoRank
@@ -147,9 +149,6 @@ async function isUpdated(stats) {
 }
 
 async function isNotUpdated(stats) {
-  const users = await fetchUsers();
-  const updatedUsers = await fetchUsers();
-
   return updatedUsers.forEach(user => {
     const original = (stats === 'dailyStats')
       ? sampleStatsNoRank

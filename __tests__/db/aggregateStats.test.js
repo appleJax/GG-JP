@@ -20,6 +20,7 @@ afterAll(async (done) => {
   await Mongoose.disconnect(done);
 });
 
+
 it('should group users by stat categories', async () => {
   const groups = subject.map(stat => stat._id).sort();
   expect(groups).toEqual(['allTimeStats', 'monthlyStats', 'weeklyStats']);
@@ -36,9 +37,9 @@ it('should subgroup categories by scores, descending', async () => {
 });
 
 it('should contain user objects within each score object', async () => {
-  const user1 = getUsersForScore('allTimeStats', 9);
-  const user2 = getUsersForScore('monthlyStats', 4);
-  const user3 = getUsersForScore('weeklyStats',  2);
+  const user1 = getUserForScore('allTimeStats', 9);
+  const user2 = getUserForScore('monthlyStats', 4);
+  const user3 = getUserForScore('weeklyStats',  2);
 
   expect(user1.userId).toEqual('1');
   expect(user2.userId).toEqual('2');
@@ -48,15 +49,19 @@ it('should contain user objects within each score object', async () => {
 // helpers
 
 function getScoreGroups(category) {
-  return subject.filter(
+  return subject.find(
     stat => stat._id === category
-  )[0].scores.map(obj => obj.score);
+  ).scores.map(
+    obj => obj.score
+  );
 }
 
-function getUsersForScore(category, score) {
-  return subject.filter(
+function getUserForScore(category, score) {
+  return subject.find(
     stat => stat._id === category
-  )[0].scores.filter(scoreObj => scoreObj.score === score)[0].users[0];
+  ).scores.find(
+    scoreObj => scoreObj.score === score
+  ).users[0];
 }
 
 function sampleScoreboard() {

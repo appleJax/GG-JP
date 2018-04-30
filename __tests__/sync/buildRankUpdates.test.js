@@ -35,7 +35,7 @@ describe(`
     ).toEqual([1, 1, 3, 4, 5]);
   });
 
-  test('no update if ranking is unchanged', () => {
+  test('no update if rank is unchanged', () => {
     expect(
       ranks(users, 'weeklyStats')
     ).toEqual([undefined, 2, undefined, 4, 5]);
