@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Language Quiz Bot for Video Game Text",
   "scripts": {
-    "build": "webpack --config webpack.dev.js",
+    "build": "webpack --config webpack/webpack.dev.js",
     "deploy": "webpack -p --config webpack.prod.js",
     "stage": "webpack -p --config webpack.staging.js",
     "server": "node --require dotenv/config ./dist/server.js",

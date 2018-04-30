@@ -23,8 +23,8 @@ export default (app) => {
   );
 
   app.get('/api/recent',
-    browserCache,
-    cache.route(untilNextTweet()),
+    // browserCache,
+    // cache.route(untilNextTweet()),
     (req, res) => DB.serveRecentAnswers().then(send(res))
   );
 
