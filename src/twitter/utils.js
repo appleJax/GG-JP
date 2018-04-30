@@ -4,13 +4,26 @@ import { tryCatch }     from 'Utils';
 import evaluateResponse from './evaluateResponse';
 
 const { Timestamp } = models;
-const { TWITTER_ACCOUNT } = process.env;
+const {
+  APP_URL,
+  TWITTER_ACCOUNT
+} = process.env;
 
 export function fetchTwitterUser(userId) {
   const params = { user_id: userId };
 
   return Twitter.get('users/show', params)
     .then(({ data }) => data);
+}
+
+export function formatTopTenTweet(topTen, category) {
+  const timePeriod = toTimePeriod(category);
+  let status = `Congrats to last ${timePeriod}'s Top Ten!`;
+  topTen.forEach(user =>
+    status += `\n${user[category].rank}. @${user.handle}`
+  );
+  status += `\nLeaderboard: ${APP_URL}/stats`;
+  return status;
 }
 
 export function getFollowing(userId) {
@@ -86,6 +99,13 @@ export async function postMedia(
       };
     })
     .catch(console.error);
+}
+
+export function postTweet(status) {
+  return Twitter.post(
+    'statuses/update',
+    { status }
+  ).catch(console.error);
 }
 
 export async function processDMs() {
@@ -213,6 +233,12 @@ function getMostRecentTimestamp(events) {
     toTimestamp(
       events[0].created_timestamp
     );
+}
+
+function toTimePeriod(category) {
+  return category === 'weeklyStats'
+    ? 'week'
+    : 'month';
 }
 
 function toTimestamp(timeString) {

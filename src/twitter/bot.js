@@ -10,7 +10,9 @@ import {
   tryCatch
 } from 'Utils';
 import {
+  formatTopTenTweet,
   postMedia,
+  postTweet,
   processDMs
 } from 'Twitter/utils';
 
@@ -146,10 +148,10 @@ async function tweetAnswer(cardId, questionId) {
 
   // EFFECTS:
   // - fetches/processes DM replies
-  // - adds mediaUrl to card
-  // - removes base64 image from card
+  // - removes base64 answer images from card
+  // - adds mediaUrls to card
   // - adds userPoints to scoreboard
-  // - moves card from liveQuestions to oldCards
+  // - moves card from LiveQuestion to OldCard
   DB.processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls);
 }
 
@@ -171,10 +173,22 @@ async function pollDMs() {
 //   });
 // }
 
-function updateStats() {
+async function tweetTopTen(category = 'monthlyStats') {
+  const topTen = await DB.fetchTopTen(category);
+  const status = formatTopTenTweet(topTen, category);
+
+  postTweet(status)
+}
+
+async function updateStats() {
   const now = new Date();
   const newWeek  = now.getUTCDay()  === 0;
   const newMonth = now.getUTCDate() === 1;
   const newYear = newMonth && now.getUTCMonth() === 0;
-  DB.updateStats(newWeek, newMonth, newYear);
+
+  await tryCatch(
+    DB.updateStats(newWeek, newMonth, newYear)
+  );
+  if (newWeek)  await tryCatch(tweetTopTen('weeklyStats'));
+  if (newMonth) await tryCatch(tweetTopTen('monthlyStats'));
 }

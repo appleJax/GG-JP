@@ -123,6 +123,22 @@ export default ({
     );
   },
 
+  async fetchTopTen(stats) {
+    const category = `${stats}.rank`;
+    return await tryCatch(
+      Scoreboard
+      .find({ [category]: { $gt: 0, $lte: 10 } })
+      .select({
+        _id: 0,
+        handle: 1,
+        [category]: 1
+      })
+      .sort({ [category]: 'asc' })
+      .lean()
+      .exec()
+    );
+  },
+
   async getAnswerCard(cardId) {
     return await tryCatch(
       LiveQuestion.findOne({ cardId }).lean().exec()
