@@ -186,9 +186,10 @@ async function updateStats() {
   const newMonth = now.getUTCDate() === 1;
   const newYear = newMonth && now.getUTCMonth() === 0;
 
+  if (newWeek)  await tryCatch(tweetTopTen('weeklyStats'));
+  if (newMonth) await tryCatch(tweetTopTen('monthlyStats'));
+
   await tryCatch(
     DB.updateStats(newWeek, newMonth, newYear)
   );
-  if (newWeek)  await tryCatch(tweetTopTen('weeklyStats'));
-  if (newMonth) await tryCatch(tweetTopTen('monthlyStats'));
 }
