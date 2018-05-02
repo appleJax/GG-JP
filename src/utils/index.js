@@ -108,7 +108,11 @@ export function formatQuestionText(
 
 export function formatFlashCards(cards) {
   return cards.map(card => {
-    card.questionText = card.questionText.split('\n')[0];
+    const lines = card.questionText.split('\n');
+    card.questionText = lines[0];
+    if (lines[1].startsWith('Hint')) {
+      card.questionText += '\n' + lines[1];
+    }
     card.questionMediaUrls = card.mediaUrls.slice(...card.mainImageSlice);
     card.answerMediaUrls = card.mediaUrls.slice(card.mainImageSlice[1]);
     return card;
