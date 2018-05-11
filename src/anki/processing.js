@@ -3,13 +3,15 @@ import { PNG } from 'pngjs2';
 import path from 'path';
 import unzip from 'unzip-stream';
 import {
-  formatQuestionAltText,
-  formatQuestionText,
   formatAnswerAltText,
   formatAnswerText,
-  getAnswers,
-  tryCatch
-} from 'Utils';
+  formatQuestionAltText,
+  formatQuestionText,
+  getAnswers
+} from 'Anki/utils';
+import { tryCatch } from 'Utils';
+
+
 const UPLOADS_PATH = path.resolve(__dirname, '../uploads');
 
 

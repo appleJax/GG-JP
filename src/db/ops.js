@@ -134,6 +134,7 @@ export default ({
         [category]: 1
       })
       .sort({ [category]: 'asc' })
+      .limit(10)
       .lean()
       .exec()
     );
