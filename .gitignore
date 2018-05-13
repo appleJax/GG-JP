@@ -3,7 +3,7 @@
 .env.js
 .vscode
 __DBScripts
-app.yaml
+*.yaml
 node_modules
 coverage
 dist
