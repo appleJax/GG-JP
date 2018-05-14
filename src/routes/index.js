@@ -14,6 +14,8 @@ export default (app) => {
 
   // CORS
   app.use((req, res, next) => {
+    // For admin use, to upload decks to the production db from localhost
+    // if (true) {
     if (req.secure) {
       res.header('Access-Control-Allow-Origin', `https://${ORIGIN_URL}`);
       res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');

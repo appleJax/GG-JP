@@ -3,6 +3,14 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
 
+const {
+  ADMIN_PW,
+  REDIS_HOST,
+  REDIS_PORT,
+  REDIS_PW,
+  SESSION_SECRET
+} = require('./.env.js').common;
+
 module.exports = {
   entry: [
     '@babel/polyfill',
@@ -31,7 +39,14 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(__dirname + '/dist'),
-    new CopyWebpackPlugin([ { from: __dirname + '/src/admin' } ])
+    new CopyWebpackPlugin([ { from: __dirname + '/src/admin' } ]),
+    new webpack.DefinePlugin({
+      'process.env.ADMIN_PW':       JSON.stringify(ADMIN_PW),
+      'process.env.REDIS_HOST':     JSON.stringify(REDIS_HOST),
+      'process.env.REDIS_PORT':     JSON.stringify(REDIS_PORT),
+      'process.env.REDIS_PW':       JSON.stringify(REDIS_PW),
+      'process.env.SESSION_SECRET': JSON.stringify(SESSION_SECRET)
+    })
   ],
   resolve: {
     alias: {
