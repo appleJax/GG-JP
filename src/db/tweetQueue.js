@@ -256,8 +256,7 @@ export async function updateScheduledDeck(hour, scheduledDeck) {
   return {};
 }
 
-// exported for testing
-export async function updateTweetQueue() {
+export async function fillTweetQueue() {
   const tweetQueue = await getTweetQueue();
 
   const lastTimeslot = getLastTimeslot(tweetQueue);
@@ -279,6 +278,14 @@ export async function updateTweetQueue() {
     await saveQueue(tweetQueue);
     timeslot = getNextTimeslot(timeslot);
   }
+}
+
+// exported for testing
+export async function updateTweetQueue() {
+  await tryCatch(
+    fillTweetQueue()
+  );
+  const tweetQueue = await getTweetQueue();
 
   if (tweetQueue.length === 0)
     return null;

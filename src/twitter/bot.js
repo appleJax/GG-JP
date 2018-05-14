@@ -1,5 +1,8 @@
 import DB from 'DB/ops';
-import { getNextCardToTweet } from 'DB/tweetQueue';
+import {
+  fillTweetQueue,
+  getNextCardToTweet
+} from 'DB/tweetQueue';
 import Twitter from 'Config/twitter';
 //import evaluateResponse from './evaluateResponse';
 import {
@@ -54,6 +57,7 @@ export default ({
 
 async function scheduleActions() {
   await pollDMs();
+  await tryCatch(fillTweetQueue());
   const liveQuestions = await tryCatch(DB.getLiveQuestions());
   if (liveQuestions.length > 0) {
     tweetOrScheduleAnswers(liveQuestions);
