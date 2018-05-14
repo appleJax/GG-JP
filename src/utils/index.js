@@ -1,14 +1,9 @@
-import urlencode from 'urlencode';
 import crypto from 'crypto';
 
 const {
   ADMIN_PW,
-  APP_URL,
-  DM_URL,
   TWITTER_ACCOUNT
 } = process.env;
-
-const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
 
 // Normal +6 ... DST +5
 const UTC_OFFSET = 5;

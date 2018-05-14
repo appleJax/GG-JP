@@ -10,6 +10,8 @@ const {
   Schedule
 } = models;
 
+const TWEET_TIMES = [ 2, 8, 14, 20 ];
+
 // exported for testing
 export const QUEUE_SIZE = 6;
 const NO_CARD = {};
@@ -304,7 +306,15 @@ function empty(obj) {
 }
 
 function getLastTimeslot(tweetQueue) {
- return (tweetQueue[0] && tweetQueue[0].time) || -1;
+  let hour = (tweetQueue && tweetQueue[0] && tweetQueue[0].time); 
+  if (!hour) {
+    hour = getHour();
+    while (TWEET_TIMES.indexOf(hour) === -1) {
+      if (--hour <= 0) hour = 23;
+    }
+  }
+
+  return hour;
 }
 
 function getLiveAnswers(cards) {

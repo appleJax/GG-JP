@@ -1,3 +1,11 @@
+import urlencode from 'urlencode';
+
+const {
+  APP_URL,
+  DM_URL,
+} = process.env;
+
+const WEBLOOKUP_URL = 'https://ejje.weblio.jp/content/';
 
 export function formatAnswerAltText(expression) {
   return expression.replace(/\{\{.*?\:\:(.+?)\:\:.*?\}\}/g, '$1');
