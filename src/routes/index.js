@@ -9,16 +9,17 @@ export default (app) => {
 
   // CORS
   app.use((req, res, next) => {
-    if (!req.secure) {
+    if (req.secure) {
+      res.header('Access-Control-Allow-Origin', `https://${ORIGIN_URL}`);
+      res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+      res.header('Access-Control-Allow-Credentials', true);
+      res.header('Access-Control-Max-Age', '86400'); // 24 hours
+      res.header('Access-Control-Allow-Headers',
+                'Origin, X-Requested-With, Content-Type, Accept');
+      next();
+    } else {
       res.redirect('https://' + req.headers.host + req.url)
     }
-    res.header('Access-Control-Allow-Origin', `https://${ORIGIN_URL}`);
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Max-Age', '86400'); // 24 hours
-    res.header('Access-Control-Allow-Headers',
-               'Origin, X-Requested-With, Content-Type, Accept');
-    next();
   });
 
   addWebhook(app);
