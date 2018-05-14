@@ -7,6 +7,11 @@ const { ORIGIN_URL } = process.env;
 
 export default (app) => {
 
+  // Enable reverse proxy support in Express. This causes the
+  // the "X-Forwarded-Proto" header field to be trusted so its
+  // value can be used to determine the protocol.
+  app.enable('trust proxy');
+
   // CORS
   app.use((req, res, next) => {
     if (req.secure) {

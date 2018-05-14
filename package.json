@@ -4,8 +4,8 @@
   "description": "Language Quiz Bot for Video Game Text",
   "scripts": {
     "build": "webpack --config webpack.dev.js",
-    "deploy": "webpack -p --config webpack.prod.js && gcloud app deploy app.yaml --version=20180513t222651",
-    "stage": "webpack -p --config webpack.staging.js && gcloud app deploy app_staging.yaml --version=20180513t224921",
+    "deploy": "webpack -p --config webpack.prod.js && gcloud app deploy app.yaml --project=gamegogakuen-jp --version=main",
+    "stage": "webpack -p --config webpack.staging.js && gcloud app deploy app_staging.yaml --project=gamegogakuen-jp-staging --version=main",
     "server": "node --require dotenv/config ./dist/server.js",
     "devstart": "npm run build && npm run server",
     "start": "node ./dist/server.js",
