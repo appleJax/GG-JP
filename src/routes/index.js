@@ -9,8 +9,10 @@ export default (app) => {
 
   // CORS
   app.use((req, res, next) => {
-    const protocol = ((req.get('Origin') || '').match(/^[a-z]+:\/\//i) || [])[0];
-    res.header('Access-Control-Allow-Origin', `${protocol || 'https://'}${ORIGIN_URL}`);
+    if (!req.secure) {
+      res.redirect('https://' + req.headers.host + req.url)
+    }
+    res.header('Access-Control-Allow-Origin', `https://${ORIGIN_URL}`);
     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Max-Age', '86400'); // 24 hours
