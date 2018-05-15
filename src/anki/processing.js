@@ -60,7 +60,7 @@ export function optimizeImages(dirPath) {
 
 export function parseAnkiJson(filePath) {
   const contents = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  const game = contents.name;
+  const game = contents.name.replace(/\:\:.+/, '');
   return contents.notes.map(card => {
     let [
       cardId,
