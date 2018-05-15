@@ -57,7 +57,7 @@ export default ({
 
 async function scheduleActions() {
   await pollDMs();
-  await tryCatch(fillTweetQueue());
+  await tryCatch(fillTweetQueue(5));
   const liveQuestions = await tryCatch(DB.getLiveQuestions());
   if (liveQuestions.length > 0) {
     tweetOrScheduleAnswers(liveQuestions);

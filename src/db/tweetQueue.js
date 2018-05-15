@@ -13,7 +13,6 @@ const {
 const TWEET_TIMES = [ 2, 8, 14, 20 ];
 
 // exported for testing
-export const QUEUE_SIZE = 6;
 const NO_CARD = {};
 const RANDOM_DECK = {};
 
@@ -258,13 +257,13 @@ export async function updateScheduledDeck(hour, scheduledDeck) {
   return {};
 }
 
-export async function fillTweetQueue() {
+export async function fillTweetQueue(queueSize) {
   const tweetQueue = await getTweetQueue();
 
   const lastTimeslot = getLastTimeslot(tweetQueue);
   let timeslot = getNextTimeslot(lastTimeslot);
   
-  while (tweetQueue.length <= QUEUE_SIZE) {
+  while (tweetQueue.length <= queueSize) {
     const nextCardId = await tryCatch(
       getCardForTimeslot(timeslot)
     );
@@ -285,7 +284,7 @@ export async function fillTweetQueue() {
 // exported for testing
 export async function updateTweetQueue() {
   await tryCatch(
-    fillTweetQueue()
+    fillTweetQueue(6)
   );
   const tweetQueue = await getTweetQueue();
 
