@@ -57,7 +57,7 @@ export default async function evaluateResponse({
       await tryCatch(
         DB.cachePoints(
           cardId,
-          { userId, points, timeToAnswer }
+          { answer: userAnswer, userId, points, timeToAnswer }
         )
       );
     }
@@ -66,7 +66,7 @@ export default async function evaluateResponse({
     await tryCatch(
       DB.cachePoints(
         cardId,
-        { userId, points: 0, timeToAnswer }
+        { answer: userAnswer, userId, points: 0, timeToAnswer }
       )
     );
   }

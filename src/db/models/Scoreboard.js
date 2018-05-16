@@ -28,6 +28,11 @@ const schema = new Schema({
     rank:  t( Number, 0 ),
     score: t( Number, 0 ),
     avgAnswerTime: t( Number, 0 ),
+    bestRank: {
+      _id: false,
+      value: t( Number, 0 ),
+      timestamp: t( Number, 0 )
+    },
     currentAnswerStreak:  t( Number, 0 ),
     currentCorrectStreak: t( Number, 0 ),
     longestAnswerStreak:  t( Number, 0 ),
@@ -41,6 +46,11 @@ const schema = new Schema({
     rank: t( Number, 0 ),
     score: t( Number, 0 ),
     avgAnswerTime: t( Number, 0 ),
+    bestRank: {
+      _id: false,
+      value: t( Number, 0 ),
+      timestamp: t( Number, 0 )
+    },
     highestScore: {
       _id: false,
       value: t( Number, 0 ),
@@ -59,6 +69,7 @@ const schema = new Schema({
     history: t(
       [{
         _id: false,
+        rank: Number,
         score: Number,
         avgAnswerTime: Number,
         timestamp: Number
@@ -73,6 +84,11 @@ const schema = new Schema({
     rank: t( Number, 0 ),
     score: t( Number, 0 ),
     avgAnswerTime: t( Number, 0 ),
+    bestRank: {
+      _id: false,
+      value: t( Number, 0 ),
+      timestamp: t( Number, 0 )
+    },
     highestScore: {
       _id: false,
       value: t( Number, 0 ),
@@ -91,6 +107,7 @@ const schema = new Schema({
     history: t(
       [{
         _id: false,
+        rank: Number,
         score: Number,
         avgAnswerTime: Number,
         timestamp: Number
@@ -105,6 +122,11 @@ const schema = new Schema({
     rank: t( Number, 0 ),
     score: t( Number, 0 ),
     avgAnswerTime: t( Number, 0 ),
+    bestRank: {
+      _id: false,
+      value: t( Number, 0 ),
+      timestamp: t( Number, 0 )
+    },
     highestScore: {
       _id: false,
       value: t( Number, 0 ),
@@ -123,6 +145,7 @@ const schema = new Schema({
     history: t(
       [{
         _id: false,
+        rank: Number,
         score: Number,
         avgAnswerTime: Number,
         timestamp: Number

@@ -1,9 +1,10 @@
 import Mongoose from 'mongoose';
+import { t } from 'Utils';
 
 const Schema = Mongoose.Schema;
 
 const schema = new Schema({
-  alreadyAnswered: [String],
+  alreadyAnswered: t( [String], [] ),
   answerAltText: String,
   answerId: String,
   answerPostedAt: Number,
@@ -12,20 +13,23 @@ const schema = new Schema({
   cardId: String,
   game: String,
   questionText: String,
-  mainImageSlice: [Number],
-  mediaUrls: [{
-    _id: false,
-    altText: String,
-    image: String
-  }],
-  otherVisibleContext: String,
+  mainImageSlice: t( [Number], [] ),
+  mediaUrls: t(
+    [{
+      _id: false,
+      altText: String,
+      image: String
+    }], []
+  ),
+  otherVisibleContext: t( String, '' ),
   questionId: String,
   questionPostedAt: Number,
   userPoints: [{
     _id: false,
-    userId: String,
+    answer: String,
     points: Number,
-    timeToAnswer: Number
+    timeToAnswer: Number,
+    userId: String
   }]
 });
 

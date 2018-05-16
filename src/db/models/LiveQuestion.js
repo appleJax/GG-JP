@@ -5,7 +5,7 @@ const Schema = Mongoose.Schema;
 
 const schema = new Schema({
   alreadyAnswered: t( [String], [] ),
-  answerAltText: String,
+  answerAltText: t( String, '' ),
   answerId: String,
   answerImages: t( [String], [] ),
   answerPostedAt: Number,
@@ -21,10 +21,10 @@ const schema = new Schema({
       image: String
     }], []
   ),
-  otherVisibleContext: String,
-  prevLineAltText: String,
+  otherVisibleContext: t( String, '' ),
+  prevLineAltText: t( String, '' ),
   prevLineImages: t( [String], [] ),
-  questionAltText: String,
+  questionAltText: t( String, '' ),
   questionId: String,
   questionImages: t( [String], [] ),
   questionPostedAt: Number,
@@ -32,9 +32,10 @@ const schema = new Schema({
   userPoints: t(
     [{
       _id: false,
-      userId: String,
+      answer: String,
       points: Number,
-      timeToAnswer: Number
+      timeToAnswer: Number,
+      userId: String
     }], []
   )
 });

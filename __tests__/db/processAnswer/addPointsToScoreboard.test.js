@@ -7,7 +7,8 @@ const { connectDB } = require('TestUtils')
 const { addPointsToScoreboard } = require('DB/ops');
 
 const {
-  Scoreboard
+  Scoreboard,
+  Timestamp
 } = Models;
 
 beforeAll(async () => {
@@ -41,6 +42,7 @@ beforeEach(async () => {
   await Scoreboard.insertMany(
     sampleScores()
   );
+  await Timestamp.create({ day: 123456 });
   await addPointsToScoreboard(liveQuestion);
 
   [ correctUser, wrongAnswerUser, noAnswerUser ] = await getUsers();
@@ -48,6 +50,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await Scoreboard.remove();
+  await Timestamp.remove();
 });
 
 describe('for users who answered the current question', () => {

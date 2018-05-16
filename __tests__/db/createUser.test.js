@@ -56,6 +56,10 @@ function sampleUser() {
       rank: 0,
       score: 0,
       avgAnswerTime: 0,
+      bestRank: {
+        value: 0,
+        timestamp: 0
+      },
       currentAnswerStreak: 0,
       currentCorrectStreak: 0,
       longestAnswerStreak: 0,
@@ -71,6 +75,10 @@ function sampleUser() {
       average: {
         n: 0,
         value: 0
+      },
+      bestRank: {
+        value: 0,
+        timestamp: 0
       },
       highestScore: {
         value: 0,
@@ -93,6 +101,10 @@ function sampleUser() {
         n: 0,
         value: 0
       },
+      bestRank: {
+        value: 0,
+        timestamp: 0
+      },
       highestScore: {
         value: 0,
         timestamp: 0
@@ -113,6 +125,10 @@ function sampleUser() {
       average: {
         n: 0,
         value: 0
+      },
+      bestRank: {
+        value: 0,
+        timestamp: 0
       },
       highestScore: {
         value: 0,

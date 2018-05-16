@@ -19,11 +19,15 @@ export async function aggregateStats() {
   return await tryCatch(Scoreboard.aggregate([
     { $project: {
         _id: 0,
-        orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'allTimeStats' ] },
+        orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'yearlyStats', 'allTimeStats' ] },
         userId:                       1,
         'allTimeStats.avgAnswerTime': 1,
         'allTimeStats.score':         1,
         'allTimeStats.rank':          1,
+        'allTimeStats.bestRank':      1,
+        'yearlyStats.avgAnswerTime':  1,
+        'yearlyStats.score':          1,
+        'yearlyStats.rank':           1,
         'monthlyStats.avgAnswerTime': 1,
         'monthlyStats.score':         1,
         'monthlyStats.rank':          1,
@@ -38,17 +42,20 @@ export async function aggregateStats() {
         { orderBy: '$orderBy',
           score:
           { $cond: {
-            if: { $eq: ['$orderBy', 'weeklyStats' ] },
-            then: '$weeklyStats.score',
-            else:
-            { $cond: {
-                if: { $eq: ['$orderBy', 'monthlyStats'] },
-                then: '$monthlyStats.score',
-                else: '$allTimeStats.score'
-                }
-              }
-            }
-          }
+              if: { $eq: ['$orderBy', 'weeklyStats' ] },
+              then: '$weeklyStats.score',
+              else:
+              { $cond: {
+                  if: { $eq: ['$orderBy', 'monthlyStats'] },
+                  then: '$monthlyStats.score',
+                  else: 
+                  { $cond: {
+                      if: { $eq: ['$orderBy', 'yearlyStats'] },
+                      then: '$yearlyStats.score',
+                      else: '$allTimeStats.score'
+                  }}
+              }}
+          }}
         },
         users: { $push: '$$CURRENT' }
       }
@@ -122,13 +129,14 @@ export async function buildStatUpdates(newWeek, newMonth, newYear) {
   return bulkUpdateOps;
 }
 
-export function buildRankUpdates(stats) {
+export function buildRankUpdates(stats, currentTimestamp) {
   if (!stats || stats.length === 0)
     return [];
 
   const usersToUpdate = {};
   const currentRanks = {
     allTimeStats: 0,
+    yearlyStats:  0,
     monthlyStats: 0,
     weeklyStats:  0
   };
@@ -160,6 +168,20 @@ export function buildRankUpdates(stats) {
         if (previousRank !== currentRank) {
           const cachedUpdate = usersToUpdate[user.userId] || {};
           cachedUpdate[category] = currentRank;
+
+          if (category === 'allTimeStats') {
+            const oldBestRank = user.allTimeStats.bestRank.value; 
+            if (
+              currentRank > 0 &&
+              (oldBestRank === 0 || currentRank <= oldBestRank)
+            ) {
+              cachedUpdate.bestRank = {
+                value: currentRank,
+                timestamp: currentTimestamp
+              };
+            }
+          }
+
           usersToUpdate[user.userId] = cachedUpdate;
         }
       }); // users.forEach
@@ -189,6 +211,10 @@ export function buildRankUpdates(stats) {
         op.updateOne.update.$set[`${category}.rank`] = newRank;
     });
 
+    const newBestRank = userUpdates.bestRank;
+    if (newBestRank)
+      op.updateOne.update.$set['allTimeStats.bestRank'] = newBestRank;
+
     if (Object.keys(op.updateOne.update.$set).length > 0)
       bulkUpdateOps.push(op);
 
@@ -197,8 +223,9 @@ export function buildRankUpdates(stats) {
   return bulkUpdateOps;
 }
 
-export function calculateNewStats(
-  { score,
+export function calculateNewStats(oldStats, currentTimestamp, addRank) {
+  const {
+    score,
     average: {
       n,
       value: oldAverage
@@ -207,10 +234,7 @@ export function calculateNewStats(
     highestScore,
     lowestAvgAnswerTime,
     history
-  },
-  currentTimestamp,
-  addRank
-) {
+  } = oldStats;
 
   const newDataPoint = {
     score,
@@ -245,11 +269,28 @@ export function calculateNewStats(
       value: average(score, oldAverage, n)
     },
     highestScore: newHigh,
-    lowestAvgAnswerTime: newLow,
-    history: history.concat(newDataPoint)
+    lowestAvgAnswerTime: newLow
   };
 
-  if (addRank) newStats.rank = 0;
+  if (addRank) {
+    newStats.rank = 0;
+
+    const { bestRank, rank } = oldStats;
+    const newBestRank = bestRank;
+
+    if (
+      rank > 0 &&
+      (bestRank.value === 0 || rank <= bestRank.value)
+    ) {
+      newBestRank.value = rank;
+      newBestRank.timestamp = currentTimestamp;
+    }
+
+    newStats.bestRank = newBestRank;
+    newDataPoint.rank = oldStats.rank;
+  }
+
+  newStats.history = history.concat(newDataPoint);
 
   return newStats;
 }

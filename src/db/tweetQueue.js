@@ -11,10 +11,11 @@ const {
 } = models;
 
 const TWEET_TIMES = [ 2, 8, 14, 20 ];
-
-// exported for testing
 const NO_CARD = {};
 const RANDOM_DECK = {};
+
+// exported for testing
+export const QUEUE_SIZE = 6;
 
 export async function getNextCardToTweet() {
   const nextCardId = await tryCatch(
@@ -284,7 +285,7 @@ export async function fillTweetQueue(queueSize) {
 // exported for testing
 export async function updateTweetQueue() {
   await tryCatch(
-    fillTweetQueue(6)
+    fillTweetQueue(QUEUE_SIZE)
   );
   const tweetQueue = await getTweetQueue();
 

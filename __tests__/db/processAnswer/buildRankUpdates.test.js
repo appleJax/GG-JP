@@ -4,7 +4,10 @@
 
 const { buildRankUpdates } = require('DB/utils');
 
-const updateOps = buildRankUpdates(sampleStats());
+const NEW_TIMESTAMP = 123456;
+const NEW_BEST_RANK_VALUE = 1;
+
+const updateOps = buildRankUpdates(sampleStats(), NEW_TIMESTAMP);
 
 const users = [
   getUser('1', updateOps),
@@ -23,9 +26,15 @@ describe(`
   e.g. if two players tie for 2nd, the next rank will be 4
 `, () => {
 
-  test('basic ranking by score, avgAnswerTime', () => {
+  test('basic ranking by score', () => {
     expect(
       ranks(users, 'allTimeStats')
+    ).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  test('if score is tied, ranks by avgAnswerTime', () => {
+    expect(
+      ranks(users, 'yearlyStats')
     ).toEqual([1, 2, 3, 4, 5]);
   });
 
@@ -42,6 +51,15 @@ describe(`
   });
 
 }); // describe
+
+test('allTimeStats.bestRank is updated if new rank is better than previous bestRank', () => {
+  const newBestRank = getBestRank(users[0]);
+  const expectedBestRank = {
+    value: NEW_BEST_RANK_VALUE,
+    timestamp: NEW_TIMESTAMP
+  };
+  expect(newBestRank).toEqual(expectedBestRank);
+});
 
 
 // helpers
@@ -60,6 +78,10 @@ function rank(category) {
   return (user) => user.$set[`${category}.rank`]
 }
 
+function getBestRank(user) {
+  return user.$set['allTimeStats.bestRank'];
+}
+
 function sampleStats() {
   return [
     // stat1
@@ -70,11 +92,87 @@ function sampleStats() {
             { userId: '1',
               allTimeStats: {
                 avgAnswerTime: 100,
+                rank: 0,
+                bestRank: {
+                  value: 0,
+                  timestamp: 1
+                }
+              }
+            }
+          ] // users
+        },
+        { score: 90,
+          users: [
+            { userId: '2',
+              allTimeStats: {
+                avgAnswerTime: 20,
+                rank: 0,
+                bestRank: {
+                  value: 1,
+                  timestamp: 1
+                }
+              }
+            }
+          ] // users
+        },
+        { score: 80,
+          users: [
+            { userId: '3',
+              allTimeStats: {
+                avgAnswerTime: 20,
+                rank: 0,
+                bestRank: {
+                  value: 1,
+                  timestamp: 1
+                }
+              }
+            }
+          ] // users
+        },
+        { score: 70,
+          users: [
+            { userId: '4',
+              allTimeStats: {
+                avgAnswerTime: 20,
+                rank: 0,
+                bestRank: {
+                  value: 1,
+                  timestamp: 1
+                }
+              }
+            }
+          ] // users
+        },
+        { score: 60,
+          users: [
+            { userId: '5',
+              allTimeStats: {
+                avgAnswerTime: 10,
+                rank: 0,
+                bestRank: {
+                  value: 1,
+                  timestamp: 1
+                }
+              }
+            }
+          ] // users
+        }
+      ] // scores
+    },
+
+    // stat2
+    { _id: 'yearlyStats',
+      scores: [
+        { score: 100,
+          users: [
+            { userId: '1',
+              yearlyStats: {
+                avgAnswerTime: 100,
                 rank: 0
               }
             },
             { userId: '2',
-              allTimeStats: {
+              yearlyStats: {
                 avgAnswerTime: 200,
                 rank: 0
               }
@@ -84,19 +182,19 @@ function sampleStats() {
         { score: 50,
           users: [
             { userId: '3',
-              allTimeStats: {
+              yearlyStats: {
                 avgAnswerTime: 100,
                 rank: 0
               }
             },
             { userId: '4',
-              allTimeStats: {
+              yearlyStats: {
                 avgAnswerTime: 200,
                 rank: 0
               }
             },
             { userId: '5',
-              allTimeStats: {
+              yearlyStats: {
                 avgAnswerTime: 300,
                 rank: 0
               }
@@ -106,7 +204,7 @@ function sampleStats() {
       ] // scores
     },
 
-    // stat2
+    // stat3
     { _id: 'monthlyStats',
       scores: [
         { score: 100,
@@ -150,7 +248,7 @@ function sampleStats() {
       ] // scores
     },
 
-    // stat3
+    // stat4
     { _id: 'weeklyStats',
       scores: [
         { score: 100,

@@ -16,62 +16,6 @@ afterAll(async (done) => {
   await Mongoose.disconnect(done);
 });
 
-const sampleStatsNoRank = {
-  attempts:        9,
-  correct:         9,
-  totalPossible:   9,
-  score:          20,
-  avgAnswerTime: 9,
-  average: {
-    n:      1,
-    value: 10
-  },
-  highestScore: {
-    value: 21,
-    timestamp: 0
-  },
-  lowestAvgAnswerTime: {
-    value: 1,
-    timestamp: 0
-  },
-  history: []
-};
-
-const sampleStats = {
-  ...sampleStatsNoRank,
-  rank: 9
-}
-
-const updatedStatsNoRank = {
-  attempts:        0,
-  correct:         0,
-  totalPossible:   0,
-  score:           0,
-  avgAnswerTime: 0,
-  average: {
-    n:      2,
-    value: 15
-  },
-  highestScore: {
-    value: 21,
-    timestamp: 0
-  },
-  lowestAvgAnswerTime: {
-    value: 1,
-    timestamp: 0
-  },
-  history: [{
-    score: 20,
-    avgAnswerTime: 9,
-    timestamp: 123456
-  }]
-};
-
-const updatedStats = {
-  ...updatedStatsNoRank,
-  rank: 0
-};
-
 beforeEach(async () => {
   await Scoreboard.create(sampleUsers());
   await Timestamp.create(sampleTimestamps());
@@ -141,8 +85,8 @@ it('should update yearlyStats, monthlyStats and weeklyStats when all params are 
 async function isUpdated(stats) {
   return updatedUsers.forEach(user => {
     const updated = (stats === 'dailyStats')
-      ? updatedStatsNoRank
-      : updatedStats
+      ? updatedStatsNoRank()
+      : updatedStats()
     
     expect(user[stats]).toEqual(updated);
   });
@@ -151,8 +95,8 @@ async function isUpdated(stats) {
 async function isNotUpdated(stats) {
   return updatedUsers.forEach(user => {
     const original = (stats === 'dailyStats')
-      ? sampleStatsNoRank
-      : sampleStats
+      ? sampleStatsNoRank()
+      : sampleStats()
     
     expect(user[stats]).toEqual(original);
   });
@@ -178,18 +122,18 @@ function sampleUsers() {
     {
       userId: '1',
       permissions: [],
-      yearlyStats: sampleStats,
-      monthlyStats: sampleStats,
-      weeklyStats:  sampleStats,
-      dailyStats:   sampleStatsNoRank
+      yearlyStats: sampleStats(),
+      monthlyStats: sampleStats(),
+      weeklyStats:  sampleStats(),
+      dailyStats:   sampleStatsNoRank()
     },
     {
       userId: '2',
       permissions: [],
-      yearlyStats: sampleStats,
-      monthlyStats: sampleStats,
-      weeklyStats:  sampleStats,
-      dailyStats:   sampleStatsNoRank
+      yearlyStats: sampleStats(),
+      monthlyStats: sampleStats(),
+      weeklyStats:  sampleStats(),
+      dailyStats:   sampleStatsNoRank()
     }
   ];
 }
@@ -200,5 +144,83 @@ function sampleTimestamps() {
     month: 123456,
     week: 123456,
     day: 123456 
-  }
+  };
+}
+
+function sampleStatsNoRank() {
+  return {
+    attempts:        9,
+    correct:         9,
+    totalPossible:   9,
+    score:          20,
+    avgAnswerTime: 9,
+    average: {
+      n:      1,
+      value: 10
+    },
+    highestScore: {
+      value: 21,
+      timestamp: 0
+    },
+    lowestAvgAnswerTime: {
+      value: 1,
+      timestamp: 0
+    },
+    history: []
+  };
+}
+
+function sampleStats(){
+  return {
+    ...sampleStatsNoRank(),
+    rank: 9,
+    bestRank: {
+      value: 10,
+      timestamp: 0
+    }
+  };
+}
+
+function updatedStatsNoRank() {
+  return {
+    attempts:        0,
+    correct:         0,
+    totalPossible:   0,
+    score:           0,
+    avgAnswerTime: 0,
+    average: {
+      n:      2,
+      value: 15
+    },
+    highestScore: {
+      value: 21,
+      timestamp: 0
+    },
+    lowestAvgAnswerTime: {
+      value: 1,
+      timestamp: 0
+    },
+    history: [{
+      score: 20,
+      avgAnswerTime: 9,
+      timestamp: 123456
+    }]
+  };
+}
+
+function updatedStats() {
+  return {
+    ...updatedStatsNoRank(),
+    rank: 0,
+    bestRank: {
+      value: 9,
+      timestamp: 123456
+    },
+    history: [{
+      rank: 9,
+      score: 20,
+      avgAnswerTime: 9,
+      timestamp: 123456
+    }]
+  };
 }

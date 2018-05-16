@@ -9,6 +9,7 @@ const {
 
 beforeAll(async () => {
   await connectDB();
+  await Timestamp.remove();
 });
 
 afterAll(async (done) => {

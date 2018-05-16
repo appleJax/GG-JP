@@ -627,7 +627,10 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
 // Exported for testing
 export async function recalculateRank() {
   const stats = await aggregateStats();
-  const bulkUpdateOps = buildRankUpdates(stats);
+  const { day: currentTimestamp } = await tryCatch(
+    Timestamp.findOne().lean().exec()
+  );
+  const bulkUpdateOps = buildRankUpdates(stats, currentTimestamp);
 
   if (bulkUpdateOps.length === 0)
     return;
@@ -650,14 +653,11 @@ export async function updateTimestamps(newWeek, newMonth, newYear) {
     $set: { day: newTimestamp }
   };
 
-  if (newWeek)
-    update.$set.week = newTimestamp;
+  if (newWeek)  update.$set.week = newTimestamp;
 
-  if (newMonth)
-    update.$set.month = newTimestamp;
+  if (newMonth) update.$set.month = newTimestamp;
 
-  if (newYear)
-    update.$set.year = newTimestamp;
+  if (newYear)  update.$set.year = newTimestamp;
 
   await tryCatch(
     Timestamp.update({}, update).exec()
