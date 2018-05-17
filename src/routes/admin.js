@@ -3,6 +3,7 @@ import authorization from 'express-authorization';
 import multer from 'multer';
 import DB from 'DB/ops';
 import { replaceQueueCard } from 'DB/tweetQueue';
+import { issueAnswerCorrection } from 'Admin/utils';
 import { tryCatch } from 'Utils';
 
 const upload = multer({ dest: 'uploads/' });
@@ -58,6 +59,11 @@ export default (app) => {
   app.post('/queue-card/replace',
     authorization.ensureRequest.isPermitted('admin'),
     (req, res) => replaceQueueCard(req).then(_ => res.redirect('/admin'))
+  );
+
+  app.post('/corrections',
+    authorization.ensureRequest.isPermitted('admin'),
+    (req, res) => issueAnswerCorrection(req).then(_ => res.redirect('/admin'))
   );
 
 

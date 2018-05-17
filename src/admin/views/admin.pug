@@ -1,6 +1,28 @@
 extends layout
 
 block content
+  form(
+    enctype='multipart/form-data'
+    method='post'
+    action='/deck/new'
+    class='upload-form'
+  )
+    label(class='upload-form__label' for='file') Upload Anki Deck</br>(must be exported as json and zipped):
+    input(class='btn btn--input' name='zipfile' type='file')
+    button(class='btn btn--submit' type='submit') Add Deck
+
+  form(
+    enctype='multipart/form-data'
+    method='post'
+    action='/corrections'
+    class='upload-form'
+  )
+    label(class='upload-form__label') Issue Card Correction: 
+    input(name='cardId' class='login--input' type='text' placeholder='card ID')
+    input(name='wrongAnswer' class='login--input' type='text' placeholder='wrong answer')
+    input(name='newHint' class='login--input' type='text' placeholder='new hint')
+    input(class='btn btn--submit' type='submit' value='Issue Correction')
+
   h3 Tweet Queue:
   each card in queue
     .card
@@ -58,16 +80,3 @@ block content
           type='submit'
           value='Replace This Card'
         )
-      
-
-      
-
-  form(
-    enctype='multipart/form-data'
-    method='post'
-    action='/deck/new'
-    class='upload-form'
-  )
-    label(class='upload-form__label' for='file') Upload Anki Deck</br>(must be exported as json and zipped):
-    input(class='btn btn--input' name='zipfile' type='file')
-    button(class='btn btn--submit' type='submit') Add Deck

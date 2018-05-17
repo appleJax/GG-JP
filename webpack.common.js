@@ -40,6 +40,7 @@ module.exports = {
   ],
   resolve: {
     alias: {
+      Admin:   __dirname + '/src/admin',
       Anki:    __dirname + '/src/anki',
       Config:  __dirname + '/src/config',
       DB:      __dirname + '/src/db',
