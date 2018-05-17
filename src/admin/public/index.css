@@ -90,12 +90,16 @@ nav {
   font-size: 1em;
 }
 
-.upload-form {
+.qid-label {
+  display: inline-block;
+}
+
+.form {
   margin: 20px;
   text-align: center;
 }
 
-.upload-form__label {
+.form__label {
   display: block;
   margin: 10px;
 }

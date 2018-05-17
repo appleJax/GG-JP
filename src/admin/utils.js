@@ -9,13 +9,22 @@ const { LiveQuestion } = Models;
 export async function issueAnswerCorrection(req) {
   const { 
     body: {
-      cardId,
-      wrongAnswer,
-      newHint
+      cardId: rawCardId,
+      wrongAnswer: rawWrongAnswer,
+      newHint: rawNewHint
     }
   } = req;
 
+  const cardId = rawCardId.replace(/QID/i, '').trim();
+  const wrongAnswer = rawWrongAnswer.trim();
+  const newHint = rawNewHint.trim();
+
   const cardToCorrect = await getLiveQuestion(cardId);
+  if (!cardToCorrect) {
+    console.error('Card Correction Requested - Card Not Found');
+    return;
+  }
+
   const usersToNotify = getUsersToNotify(cardToCorrect, wrongAnswer);
 
   await sendCorrectionDMs(usersToNotify, cardId, wrongAnswer, newHint);
@@ -84,7 +93,7 @@ function updateLiveQuestion(newHint, wrongAnswer, cardToCorrect, userIds) {
     userId => userIds.indexOf(userId) === -1
   );
   const newUserPoints = cardToCorrect.userPoints.filter(
-    submission => submission.answer !== wrongAnswer.trim()
+    submission => submission.answer !== wrongAnswer
   );
 
   return tryCatch(
@@ -121,7 +130,7 @@ function getUsersToNotify(liveQuestion, wrongAnswer) {
   return liveQuestion
     .userPoints
     .filter(
-      submission => submission.answer === wrongAnswer.trim()
+      submission => submission.answer === wrongAnswer
     ).map(
       submission => submission.userId
     );
