@@ -28,10 +28,11 @@ const ANSWER_INTERVAL = 24*HOURS;
 const QUESTION_INTERVAL = 6*HOURS;
 const POLL_DM_INTERVAL = 90*1000;
 
+
 export default ({
 
   // tweet() {
-    // tweetRandomQuestion();
+  //   tweetRandomQuestion();
     // pollDMs();
   // },
 
@@ -50,7 +51,6 @@ export default ({
 
   start() {
     //openStream();
-    // tweetRandomQuestion();
     scheduleActions();
   }
 

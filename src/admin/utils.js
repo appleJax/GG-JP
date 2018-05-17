@@ -15,37 +15,41 @@ export async function issueAnswerCorrection(req) {
     }
   } = req;
 
-  const cardToCorrect = await tryCatch(
-    LiveQuestion
-      .findOne({ cardId })
-      .select({
-        _id: 0,
-        questionId: 1,
-        questionText: 1,
-        userPoints: 1
-      })
-      .lean()
-      .exec()
-  );
-  
-  const usersToNotify = cardToCorrect
-    .userPoints
-    .filter(
-      submission => submission.answer === wrongAnswer.trim()
-    ).map(
-      submission => submission.userId
-    );
+  const cardToCorrect = await getLiveQuestion(cardId);
+  const usersToNotify = getUsersToNotify(cardToCorrect, wrongAnswer);
 
-  const correctionTextDM = 'Thank you for helping to make GameGogakuen even better! ' +
-    `Your guess for QID${cardId} (${wrongAnswer}) was a perfectly possible answer, ` +
-    'but it is not the word that the game used, and we failed to catch it in the hints beforehand.' +
-    'We are giving you a 2nd guess to try and salvage some points rather than leave you with no points. ' +
-    `The question's hint should have been "${newHint}". ` +
-    'Thanks again for playing!';
+  await sendCorrectionDMs(usersToNotify, cardId, wrongAnswer, newHint);
+  await postCorrectionReply(newHint, cardToCorrect.questionId, cardId);
+  await updateLiveQuestion(newHint, wrongAnswer, cardToCorrect, usersToNotify);
+}
+
+
+// private functions
+
+function postCorrectionReply(newHint, questionId, cardId) {
+  const correctionStatus = `@${TWITTER_ACCOUNT} NOTE: After this question (QID${cardId}) went live, we were made aware of another possible answer that wasn't ruled out.` +
+    `\nA better hint would have been "${newHint}"`;
+
+  const params = {
+    status: correctionStatus,
+    in_reply_to_status_id: questionId
+  };
+
+  return tryCatch(
+    Twitter.post('statuses/update', params)
+  );
+}
+
+async function sendCorrectionDMs(userIds, cardId, wrongAnswer, newHint) {
+  const correctionTextDM = `Your guess for QID${cardId} (${wrongAnswer}) was perfectly possible given the criteria, ` +
+    "but it's not the word the game used, and we failed to rule it out in the hints beforehand." +
+    "\n\nTo make up for it, we're giving you another guess so that you might still get some points." +
+    `\n\nA better hint would have been "${newHint}".` +
+    '\n\nThank you for helping us! Good luck guessing again!'
 
   let currentUser;
-  for (let i = 0; i < usersToNotify.length; i++) {
-    currentUser = usersToNotify[i];
+  for (let i = 0; i < userIds.length; i++) {
+    currentUser = userIds[i];
 
     const params = {
       event: {
@@ -53,10 +57,10 @@ export async function issueAnswerCorrection(req) {
         message_create: {
           target: {
             recipient_id: currentUser
+          },
+          message_data: {
+            text: correctionTextDM
           }
-        },
-        message_data: {
-          text: correctionTextDM
         }
       }
     }
@@ -64,19 +68,9 @@ export async function issueAnswerCorrection(req) {
       Twitter.post('direct_messages/events/new', params)
     );
   }
+}
 
-  const correctionStatus = `@${TWITTER_ACCOUNT} NOTE: We have been notified of an error after this tweet went live.` +
-    `\nThe hint should have been as follows: "${newHint}"`;
-
-  const params = {
-    status: correctionStatus,
-    in_reply_to_status_id: cardToCorrect.questionId
-  };
-
-  await tryCatch(
-    Twitter.post('statuses/update', params)
-  );
-
+function updateLiveQuestion(newHint, wrongAnswer, cardToCorrect, userIds) {
   const newHintLine = `Hint: ${newHint}`;
   let newQuestionText = cardToCorrect.questionText.split('\n');
   const replaceHintIfPresent = newQuestionText[1].startsWith('Hint:')
@@ -86,18 +80,49 @@ export async function issueAnswerCorrection(req) {
   newQuestionText.splice(1, replaceHintIfPresent, newHintLine);
   newQuestionText = newQuestionText.join('\n');
 
+  const newAlreadyAnswered = cardToCorrect.alreadyAnswered.filter(
+    userId => userIds.indexOf(userId) === -1
+  );
   const newUserPoints = cardToCorrect.userPoints.filter(
     submission => submission.answer !== wrongAnswer.trim()
   );
 
-  await tryCatch(
+  return tryCatch(
     LiveQuestion.updateOne(
-      { cardId },
+      { cardId: cardToCorrect.cardId },
       { $set: {
+          alreadyAnswered: newAlreadyAnswered,
           questionText: newQuestionText,
           userPoints: newUserPoints
         }
       }
     ).exec()
   );
+}
+
+function getLiveQuestion(cardId) {
+  return tryCatch(
+    LiveQuestion
+      .findOne({ cardId })
+      .select({
+        _id: 0,
+        alreadyAnswered: 1,
+        cardId:          1,
+        questionId:      1,
+        questionText:    1,
+        userPoints:      1
+      })
+      .lean()
+      .exec()
+  );
+}
+
+function getUsersToNotify(liveQuestion, wrongAnswer) {
+  return liveQuestion
+    .userPoints
+    .filter(
+      submission => submission.answer === wrongAnswer.trim()
+    ).map(
+      submission => submission.userId
+    );
 }

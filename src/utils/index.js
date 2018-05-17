@@ -85,9 +85,10 @@ export function isCorrect(password) {
 
 export function parseDM(rawText) {
   const text = rawText.replace(/\s+/g, '');
-  const cardId = (text.match(/QID([0-9]+)/i) || [,'notFound'])[1];
+  if (!text.match(/^QID/i)) return [ 'Not Found', 'Do Not Count' ];
+
+  const cardId = (text.match(/QID([0-9]+)/i) || [,'Not Found'])[1];
   const userAnswer = text.replace(/QID[0-9]+/i, '')
-                         
   return [ cardId, userAnswer ];
 }
 
