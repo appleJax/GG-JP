@@ -23,6 +23,9 @@ export default async function evaluateResponse({
 }) {
   const [ cardId, userAnswer ] = parseDM(text);
 
+  if (!cardId || !userAnswer)
+    return;
+
   const liveQuestions = await tryCatch(DB.getLiveQuestions());
   const foundQuestion = liveQuestions.find(
     questionCard => questionCard.cardId === cardId
