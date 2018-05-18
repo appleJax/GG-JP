@@ -57,7 +57,9 @@ describe('if last DM of fetched results is newer than lastReadDM', () => {
 
   it('should return more than one page of DM results', async () => {
     const directMessages = await fetchDMs(mockTwitter())
-    const expectedDMs = firstPage().concat(lastPage());
+    const expectedDMs = firstPage().concat(lastPage()).filter(
+      keepDMsNewerThan(1)
+    );
 
     expect(directMessages).toEqual(expectedDMs);
   });
@@ -67,10 +69,13 @@ describe('if last DM of fetched results is newer than lastReadDM', () => {
 describe('if last DM of fetched results is older than lastReadDM', () => {
 
   it('should return one page of DM results', async () => {
-    await setLastReadDM(6);
+    const LAST_READ = 6;
+    await setLastReadDM(LAST_READ);
     const directMessages = await fetchDMs(mockTwitter())
 
-    expect(directMessages).toEqual(firstPage());
+    const expectedDMs = firstPage().filter(keepDMsNewerThan(LAST_READ));
+
+    expect(directMessages).toEqual(expectedDMs);
   });
 
 });
@@ -94,6 +99,10 @@ async function fetchLastReadDM() {
     .findOne()
     .lean()
     .then(doc => doc.lastReadDM);
+}
+
+function keepDMsNewerThan(time) {
+  return (msg) => msg.created_timestamp > time;
 }
 
 async function setLastReadDM(timestamp) {

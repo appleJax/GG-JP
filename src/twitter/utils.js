@@ -118,44 +118,6 @@ export async function processDMs() {
   );
 }
 
-// export function retrieveAndCountMissedReplies(liveQuestions) {
-//   return tryCatch(new Promise(async (resolve, reject) => {
-//     const lastQuestionPosted = getLastQuestionPosted(liveQuestions);
-//     const params = {
-//       q: `@${TWITTER_ACCOUNT}`,
-//       count: 100,
-//       since_id: lastQuestionPosted
-//     };
-
-//     let missedReplies = [];
-//     let nextResults;
-//     do {
-//       const {
-//         data: {
-//           statuses,
-//           search_metadata
-//         }
-//       } = await tryCatch(Twitter.get('search/tweets', params));
-
-//       missedReplies = missedReplies.concat(statuses);
-//       nextResults = search_metadata.next_results;
-
-//       if (nextResults)
-//         params.max_id = nextResults.match(/max_id=(\d+)/)[1]
-
-//     } while (nextResults)
-
-//     let reply;
-//     let i = missedReplies.length - 1;
-//     for (; i >= 0; i--) {
-//       reply = missedReplies[i];
-//       await tryCatch(evaluateResponse(reply, liveQuestions));
-//     }
-
-//     resolve();
-//   }));
-// }
-
 
 // private functions
 
@@ -209,7 +171,9 @@ export async function fetchDMs(twitterClient = Twitter) {
 
   } while (params.cursor && lastTimestamp > lastReadDM)
 
-  return directMessages;
+  return directMessages.filter(msg =>
+    toTimestamp(msg.created_timestamp) > lastReadDM
+  );
 }
 
 function getLastTimestamp(events) {
