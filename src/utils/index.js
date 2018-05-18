@@ -11,11 +11,21 @@ const UTC_OFFSET = 5;
 
 export const HOURS = 3600000;
 
-export function addLink(answerText, questionId) {
+export function addLinkAndResults(answerText, questionId, userPoints) {
+  const results = calculateReplyResults(userPoints);
   const questionLink = `Question: twitter.com/${TWITTER_ACCOUNT}/status/${questionId}`;
+
   const lines = answerText.split('\n');
-  lines.splice(-1, 0, questionLink);
-  return lines.join('\n');
+  lines.splice(-1, 0, questionLink, results);
+
+  let status = lines.join('\n');
+
+  if (status.length > 280) {
+    lines.splice(3, 1);
+    status = lines.join('\n');
+  }
+
+  return status;
 }
 
 export function average(newValue, oldAverage, n) {
@@ -128,6 +138,16 @@ function _getTimeUntil(hour) {
     millisUntilTime += 24*HOURS;
 
   return millisUntilTime;
+}
+
+function calculateReplyResults(userPoints) {
+  const total = userPoints.length;
+  const correct = userPoints.filter(entry => entry.points > 0).length;
+  const percentCorrect = total > 0
+    ? Math.round(correct / total * 100)
+    : 0;
+
+  return `正解率: ${percentCorrect}% (${correct}/${total})`;
 }
 
 function valid(index) {

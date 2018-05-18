@@ -15,14 +15,17 @@ export async function issueAnswerCorrection(req) {
     }
   } = req;
 
+  if (!rawCardId || !rawWrongAnswer || !rawNewHint) {
+    throw new Error('Form fields must not be empty. Please try again.');
+  }
+
   const cardId = rawCardId.replace(/QID/i, '').trim();
   const wrongAnswer = rawWrongAnswer.trim();
   const newHint = rawNewHint.trim();
 
   const cardToCorrect = await getLiveQuestion(cardId);
-  if (!cardToCorrect) {
-    console.error('Card Correction Requested - Card Not Found');
-    return;
+  if (!cardToCorrect) { 
+    throw new Error(`QID${cardId} was not found in live questions. Please check the QID and try again.`);
   }
 
   const usersToNotify = getUsersToNotify(cardToCorrect, wrongAnswer);
@@ -50,7 +53,7 @@ function postCorrectionReply(newHint, questionId, cardId) {
 }
 
 async function sendCorrectionDMs(userIds, cardId, wrongAnswer, newHint) {
-  const correctionTextDM = `Your guess for QID${cardId} (${wrongAnswer}) was perfectly possible given the criteria, ` +
+  const correctionTextDM = `Your guess for QID${cardId} (${wrongAnswer}) was perfectly possible given the context and criteria, ` +
     "but it's not the word the game used, and we failed to rule it out in the hints beforehand." +
     "\n\nTo make up for it, we're giving you another guess so that you might still get some points." +
     `\n\nA better hint would have been "${newHint}".` +

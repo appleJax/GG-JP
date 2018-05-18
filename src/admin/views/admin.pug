@@ -1,6 +1,9 @@
 extends layout
 
 block content
+  if flash
+    div(class=`banner banner--${flash.type}`)= flash.message
+
   form(
     enctype='multipart/form-data'
     method='post'

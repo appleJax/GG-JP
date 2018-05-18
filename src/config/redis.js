@@ -27,7 +27,7 @@ const RedisStore = withRedis(expressSession);
 export const session = expressSession({
   store: new RedisStore({ client: redisClient }),
   secret: SESSION_SECRET,
-  resave: false,
+  resave: true,
   saveUninitialized: false,
   cookie: { maxAge: 604800000 } // one week
 })

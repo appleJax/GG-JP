@@ -229,10 +229,11 @@ function getLastQuestionPosted(liveQuestions) {
 }
 
 function getMostRecentTimestamp(events) {
-  return events[0] &&
-    toTimestamp(
-      events[0].created_timestamp
-    );
+  return !events || !events[0]
+    ? 0
+    : toTimestamp(
+        events[0].created_timestamp
+      );
 }
 
 function toTimePeriod(category) {

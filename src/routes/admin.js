@@ -7,9 +7,20 @@ import { issueAnswerCorrection } from 'Admin/utils';
 import { tryCatch } from 'Utils';
 
 const upload = multer({ dest: 'uploads/' });
-
+const ensureAdmin = authorization.ensureRequest.isPermitted('admin');
 
 export default (app) => {
+
+  // if there's a flash message in the session request,
+  // make it available in the response, then delete it
+  app.use((req, res, next) => {
+    if (req.session) {
+      res.locals.flash = req.session.flash;
+      delete req.session.flash;
+      next();
+    } else next();
+  });
+
 
   // Admin Panel
 
@@ -36,41 +47,89 @@ export default (app) => {
   });
 
   app.get('/admin',
-    authorization.ensureRequest.isPermitted('admin'),
-    async (req, res) => {
-      const tweetQueue = await tryCatch(
-        DB.getQueue()
-      );
-      res.render('admin', { adminUser: true, queue: tweetQueue });
-    }
+    ensureAdmin,
+    serveAdminPage
   );
 
   app.post('/deck/new',
-    authorization.ensureRequest.isPermitted('admin'),
+    ensureAdmin,
     upload.single('zipfile'), (req, res) =>
-      DB.addDeck(req).then(_ => res.redirect('/admin'))
+      DB.addDeck(req).then(_ => {
+        req.session.flash = {
+          type: 'success',
+          message: 'Deck uploaded successfully.'
+        };
+        res.redirect('/admin');
+      })
+      .catch(err => {
+        req.session.flash = {
+          type: 'error',
+          message: err.message || 'Something went wrong. Please try again.'
+        };
+        res.redirect('/admin');
+      })
   );
 
   app.post('/scores/edit',
-    authorization.ensureRequest.isPermitted('admin'),
+    ensureAdmin,
     DB.adjustScore
   );
 
   app.post('/queue-card/replace',
-    authorization.ensureRequest.isPermitted('admin'),
-    (req, res) => replaceQueueCard(req).then(_ => res.redirect('/admin'))
+    ensureAdmin,
+    (req, res) =>
+      replaceQueueCard(req)
+      .then(_ => {
+        req.session.flash = {
+          type: 'success',
+          message: `QID${req.body.cardId} successfully replaced.`
+        };
+        res.redirect('/admin')
+      })
+      .catch(err => {
+        req.session.flash = {
+          type: 'error',
+          message: err.message || 'Something went wrong. Please try again.'
+        };
+        res.redirect('/admin')
+      })
   );
 
   app.post('/corrections',
-    authorization.ensureRequest.isPermitted('admin'),
-    (req, res) => issueAnswerCorrection(req).then(_ => res.redirect('/admin'))
+    ensureAdmin,
+    (req, res, next) =>
+      issueAnswerCorrection(req)
+      .then(_ => {
+        req.session.flash = {
+          type: 'success',
+          message: `QID${req.body.cardId} successfully corrected.`
+        };
+        res.redirect('/admin');
+      })
+      .catch(err => {
+        req.session.flash = {
+          type: 'error',
+          message: err.message || 'Something went wrong. Please try again.'
+        };
+        res.redirect('/admin');
+      })
   );
 
+}; // export default
 
-}
 
 function redirectAdmin(req, res, next) {
   if (authorization.considerSubject(req.user).isPermitted('admin'))
     res.redirect('/admin');
   else next();
+}
+
+function serveAdminPage(req, res) {
+  DB.getQueue().then(tweetQueue => {
+    res.render('admin', {
+      adminUser: true,
+      queue: tweetQueue,
+      flash: res.locals.flash
+    })
+  })
 }

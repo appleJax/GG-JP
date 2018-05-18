@@ -13,13 +13,13 @@ export function formatAnswerAltText(expression) {
 
 export function formatAnswerText(answers, cardId, engMeaning, webLookup) {
   const s = answers.length > 1 ? 's' : '';
-  let answerText = `Answer${s}: ${answers.join(', ')}`;
-  answerText += `\nEnglish: "${engMeaning}"`;
+  let answerText = `答え: ${answers.join(', ')}`;
+  answerText += `\n英語: "${engMeaning}"`;
 
   if (webLookup)
-    answerText += '\nLookup: ' + WEBLOOKUP_URL + urlencode(webLookup);
+    answerText += '\n辞典: ' + WEBLOOKUP_URL + urlencode(webLookup);
 
-  answerText += `\nLeaderboard: ${APP_URL}/stats`;
+  answerText += `\nランキング: ${APP_URL}/stats`;
   answerText += `\nQID${cardId}`;
   return answerText;
 }
