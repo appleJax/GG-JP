@@ -4,27 +4,31 @@ block content
   if flash
     div(class=`banner banner--${flash.type}`)= flash.message
 
-  form(
-    enctype='multipart/form-data'
-    method='post'
-    action='/deck/new'
-    class='form'
-  )
-    label(class='form__label' for='file') Upload Anki Deck</br>(must be exported as json and zipped):
-    input(class='btn btn--input' name='zipfile' type='file')
-    button(class='btn btn--submit' type='submit') Add Deck
+  #new-deck-container
+    form(
+      enctype='multipart/form-data'
+      method='post'
+      action='/deck/new'
+      id='new-deck-form'
+      class='form'
+    )
+      label(class='form__label' for='file') Upload Anki Deck</br>(must be exported as json and zipped):
+      input(class='btn btn--input' name='zipfile' type='file')
+      button(id='new-deck-submit' class='btn btn--submit' type='submit') Add Deck
 
-  form(
-    method='post'
-    action='/corrections'
-    class='form'
-  )
-    label(class='form__label') Issue Card Correction: 
-    label(class='qid-label') QID 
-    input(name='cardId' class='login--input' type='text' placeholder='12345')
-    input(name='wrongAnswer' class='login--input' type='text' placeholder='wrong answer')
-    input(name='newHint' class='login--input' type='text' placeholder='new hint')
-    input(class='btn btn--submit' type='submit' value='Issue Correction')
+  #corrections-container
+    form(
+      method='post'
+      action='/corrections'
+      id='corrections-form'
+      class='form'
+    )
+      label(class='form__label') Issue Card Correction: 
+      label(class='qid-label') QID 
+      input(name='cardId' class='login--input' type='text' placeholder='12345')
+      input(name='wrongAnswer' class='login--input' type='text' placeholder='wrong answer')
+      input(name='newHint' class='login--input' type='text' placeholder='new hint')
+      input(id='corrections-submit' class='btn btn--submit' type='submit' value='Issue Correction')
 
   h3 Tweet Queue:
   each card in queue
@@ -83,3 +87,5 @@ block content
           type='submit'
           value='Replace This Card'
         )
+
+      script(src='/index.js')
