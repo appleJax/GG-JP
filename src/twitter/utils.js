@@ -18,11 +18,11 @@ export function fetchTwitterUser(userId) {
 
 export function formatTopTenTweet(topTen, category) {
   const timePeriod = toTimePeriod(category);
-  let status = `Congrats to last ${timePeriod}'s Top Ten!`;
+  let status = `Congrats to this past ${timePeriod}'s Top Ten!\n`;
   topTen.forEach(user =>
     status += `\n${user[category].rank}. @${user.handle}`
   );
-  status += `\nLeaderboard: ${APP_URL}/stats`;
+  status += `\n\nランキング: ${APP_URL}/stats`;
   return status;
 }
 

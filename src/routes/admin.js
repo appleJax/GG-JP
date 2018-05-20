@@ -3,7 +3,7 @@ import authorization from 'express-authorization';
 import multer from 'multer';
 import DB from 'DB/ops';
 import { replaceQueueCard } from 'DB/tweetQueue';
-import { issueAnswerCorrection } from 'Admin/utils';
+import { addAltAnswer, issueAnswerCorrection } from 'Admin/utils';
 import { tryCatch } from 'Utils';
 
 const upload = multer({ dest: 'uploads/' });
@@ -103,6 +103,26 @@ export default (app) => {
         req.session.flash = {
           type: 'success',
           message: `QID${req.body.cardId} successfully corrected.`
+        };
+        res.redirect('/admin');
+      })
+      .catch(err => {
+        req.session.flash = {
+          type: 'error',
+          message: err.message || 'Something went wrong. Please try again.'
+        };
+        res.redirect('/admin');
+      })
+  );
+
+  app.post('/add-alt-answer',
+    ensureAdmin,
+    (req, res, next) =>
+      addAltAnswer(req)
+      .then(_ => {
+        req.session.flash = {
+          type: 'success',
+          message: `"${req.body.altAnswer}" successfully added as an alternate answer to QID${req.body.cardId}`
         };
         res.redirect('/admin');
       })

@@ -1,37 +1,47 @@
 extends layout
 
 block content
-  if flash
-    div(class=`banner banner--${flash.type}`)= flash.message
+  .banner-container
+    div(class=`banner banner--${flash && flash.type}`)= flash && flash.message
 
-  #new-deck-container
-    form(
-      enctype='multipart/form-data'
-      method='post'
-      action='/deck/new'
-      id='new-deck-form'
-      class='form'
-    )
-      label(class='form__label' for='file') Upload Anki Deck</br>(must be exported as json and zipped):
-      input(class='btn btn--input' name='zipfile' type='file')
-      button(id='new-deck-submit' class='btn btn--submit' type='submit') Add Deck
+  form(
+    method='post'
+    action='/corrections'
+    id='corrections-form'
+    class='form'
+  )
+    label(class='form__label') Issue Card Correction: 
+    label(class='qid-label') QID 
+    input(name='cardId' class='login--input' type='text' placeholder='12345')
+    input(name='wrongAnswer' class='login--input' type='text' placeholder='wrong answer')
+    input(name='newHint' class='login--input' type='text' placeholder='new hint')
+    input(id='corrections-submit' class='btn btn--submit corrections-submit' type='submit' value='Issue Correction')
 
-  #corrections-container
-    form(
-      method='post'
-      action='/corrections'
-      id='corrections-form'
-      class='form'
-    )
-      label(class='form__label') Issue Card Correction: 
-      label(class='qid-label') QID 
-      input(name='cardId' class='login--input' type='text' placeholder='12345')
-      input(name='wrongAnswer' class='login--input' type='text' placeholder='wrong answer')
-      input(name='newHint' class='login--input' type='text' placeholder='new hint')
-      input(id='corrections-submit' class='btn btn--submit' type='submit' value='Issue Correction')
+  form(
+    method='post'
+    action='/add-alt-answer'
+    id='alt-answer-form'
+    class='form'
+  )
+    label(class='form__label') Add Alternate Answer: 
+    label(class='qid-label') QID 
+    input(name='cardId' class='login--input' type='text' placeholder='12345')
+    input(name='altAnswer' class='login--input' type='text' placeholder='new alternate answer')
+    input(id='alt-answer-submit' class='btn btn--submit alt-answer-submit' type='submit' value='Add Alt Answer')
+
+  form(
+    enctype='multipart/form-data'
+    method='post'
+    action='/deck/new'
+    id='new-deck-form'
+    class='form'
+  )
+    label(class='form__label' for='file') Upload Anki Deck</br>(must be exported as json and zipped):
+    input(class='btn btn--input' name='zipfile' type='file')
+    button(id='new-deck-submit' class='btn btn--submit new-deck-submit' type='submit') Add Deck
 
   h3 Tweet Queue:
-  each card in queue
+  each card, index in queue
     .card
       h4(class='inline') Card ID:
       p(class='inline')= card.cardId
@@ -74,6 +84,8 @@ block content
       p= card.answers
 
       form(
+        id=`replace-card-form-${index}`
+        class='replace-card-form'
         method='post'
         action='/queue-card/replace'
       )
@@ -83,7 +95,8 @@ block content
           value=card.cardId
         )
         input(
-          class='btn btn--replace'
+          id=`replace-card-submit-${index}`
+          class='btn btn--replace replace-card-submit'
           type='submit'
           value='Replace This Card'
         )

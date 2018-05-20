@@ -1,45 +1,47 @@
 window.onload = () => {
 
   setTimeout(hideFlash, 6000);
-  addSpinner('new-deck-form');
-  addSpinner('corrections-form')
+
+  [ 'corrections-form',
+    'alt-answer-form',
+    'new-deck-form',
+    'replace-card-form'
+  ].forEach(addSpinner);
 
 };
 
 function hideFlash() {
-  const flash = document.querySelector('.banner');
-  hide(flash);
+  const flash = document.querySelector('.banner-container');
+  flash.classList.add('hidden');
 }
 
 function addSpinner(formId) {
-  getSubmitBtn(formId).addEventListener('click', showSpinner(formId));
+  getSubmitBtns(formId).forEach(submitBtn =>
+    submitBtn.addEventListener(
+      'click',
+      showSpinner
+    )
+  );
 }
 
-function showSpinner(formId) {
-  return () => {
-    const form = document.getElementById(formId);
-    hide(form);
+function showSpinner(event) {
+  const formId = event.target.id.replace('submit', 'form');
+  const form = document.getElementById(formId);
 
-    const formContainer = getContainer(formId);
+  const shroud = makeDiv('shroud');
+  const spinner = makeDiv('spinner');
 
-    const spinner = document.createElement('div');
-    spinner.classList.add('spinner');
-
-
-    formContainer.appendChild(spinner);
-  };
+  shroud.appendChild(spinner);
+  form.appendChild(shroud);
 }
 
-function hide(element) {
-  if (element) element.style.display = 'none';
+function getSubmitBtns(formId) {
+  const submitBtnClass = formId.replace('form', 'submit');
+  return document.querySelectorAll(`.${submitBtnClass}`);
 }
 
-function getSubmitBtn(formId) {
-  const submitBtnId = formId.replace('form', 'submit');
-  return document.getElementById(submitBtnId);
-}
-
-function getContainer(formId) {
-  const containerId = formId.replace('form', 'container');
-  return document.getElementById(containerId);
+function makeDiv(className) {
+  const div = document.createElement('div');
+  div.classList.add(className);
+  return div;
 }

@@ -5,6 +5,46 @@ import { tryCatch }     from 'Utils';
 const { TWITTER_ACCOUNT } = process.env;
 const { LiveQuestion } = Models;
 
+export async function addAltAnswer(req) {
+  const { 
+    body: {
+      cardId: rawCardId,
+      altAnswer: rawAltAnswer
+    }
+  } = req;
+
+  if (!rawCardId || !rawAltAnswer) {
+    throw new Error('Form fields must not be empty. Please try again.');
+  }
+
+  const cardId = rawCardId.replace(/QID/i, '').trim();
+  const altAnswer = rawAltAnswer.trim();
+
+  const cardToCorrect = await getLiveQuestion(cardId);
+  if (!cardToCorrect) { 
+    throw new Error(`QID${cardId} was not found in live questions. Please check the QID and try again.`);
+  }
+
+  const newAnswers = cardToCorrect.answers.concat(altAnswer);
+  const newUserPoints = cardToCorrect.userPoints.map(entry => {
+    if (entry.answer !== altAnswer)
+      return entry;
+
+    entry.points = calculateNewScore(entry.timeToAnswer);
+    return entry;
+  });
+
+  await tryCatch(
+    LiveQuestion.updateOne(
+      { cardId },
+      { $set: {
+          answers: newAnswers,
+          userPoints: newUserPoints
+        }
+      }
+    ).exec()
+  );
+}
 
 export async function issueAnswerCorrection(req) {
   const { 
@@ -37,6 +77,16 @@ export async function issueAnswerCorrection(req) {
 
 
 // private functions
+
+function calculateNewScore(secondsToAnswer) {
+  const hoursToAnswer = Math.floor(
+    secondsToAnswer / 3600
+  );
+  const deduction = Math.max(hoursToAnswer, 0);
+  const score = 24 - deduction;
+
+  return Math.max(score, 0);
+}
 
 function postCorrectionReply(newHint, questionId, cardId) {
   const correctionStatus = `@${TWITTER_ACCOUNT} NOTE: After this question (QID${cardId}) went live, we were made aware of another possible answer that wasn't ruled out.` +
@@ -119,6 +169,7 @@ function getLiveQuestion(cardId) {
       .select({
         _id: 0,
         alreadyAnswered: 1,
+        answers:         1,
         cardId:          1,
         questionId:      1,
         questionText:    1,
