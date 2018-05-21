@@ -40,7 +40,7 @@ export function getFollowing(userId) {
 // post a tweet with media
 //
 export async function postMedia(
-  status,
+  rawStatus,
   mainImages,
   altText1,
   prevLineImages,
@@ -75,6 +75,8 @@ export async function postMedia(
   }
 
   const media_ids = prevLineMediaIds.concat(mainMediaIds);
+
+  const status = ensureUnder280(rawStatus);
 
   const params = {
     status,
@@ -120,6 +122,22 @@ export async function processDMs() {
 
 
 // private functions
+
+function countChars(status) {
+  return status
+    .replace(/@\S+/g, '')
+    .replace(/http\S+/g, 'twenty-three-characters')
+    .length;
+}
+
+function ensureUnder280(status) {
+  if (countChars(status) <= 280)
+    return status;
+
+  return status.split('\n').filter(line =>
+    !line.startsWith('Game: ') && !line.startsWith('Question: ')
+  ).join('\n');
+}
 
 async function evaluateDMs(directMessages) {
   let reply;

@@ -18,14 +18,7 @@ export function addLinkAndResults(answerText, questionId, userPoints) {
   const lines = answerText.split('\n');
   lines.splice(-1, 0, questionLink, results);
 
-  let status = lines.join('\n');
-
-  if (status.length > 280) {
-    lines.splice(3, 1);
-    status = lines.join('\n');
-  }
-
-  return status;
+  return lines.join('\n');
 }
 
 export function average(newValue, oldAverage, n) {
