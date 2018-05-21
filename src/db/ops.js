@@ -44,19 +44,41 @@ export default ({
         .exec()
     );
 
-    const activeCards = oldCards.concat(liveQuestions);
     const ops = [];
     for (let i = 0; i < newCards.length; ++i) {
       const newCard = newCards[i];
       const { cardId } = newCard;
-      if (!activeCards.find(card => card.cardId === cardId))
-        ops.push({
-          replaceOne: {
-             filter: { cardId },
-             replacement: newCard,
-             upsert: true
-          }
-        });
+      if (oldCards.find(card => card.cardId === cardId))
+        continue;
+
+      if (liveQuestions.find(card => card.cardId === cardId)) {
+        await tryCatch(
+          LiveQuestion.updateOne(
+            { cardId },
+            { $set: {
+                answers: newCard.answers,
+                answerImages: newCard.answerImages,
+                answerAltText: newCard.answerAltText,
+                answerText: newCard.answerText,
+                game: newCard.game,
+                mainImageSlice: newCard.mainImageSlice,
+                otherVisibleContext: newCard.otherVisibleContext,
+                questionText: newCard.questionText
+              }
+            }
+          ).exec()
+        );
+
+        continue;
+      }
+
+      ops.push({
+        replaceOne: {
+          filter: { cardId },
+          replacement: newCard,
+          upsert: true
+        }
+      });
     }
 
     if (ops.length === 0)
