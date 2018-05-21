@@ -40,7 +40,7 @@ function topTen() {
 }
 
 function sampleStatus(timePeriod) {
-  return `Congrats to last ${timePeriod}'s Top Ten!` +
+  return `Congrats to this past ${timePeriod}'s Top Ten!\n` +
     '\n1. @user1' +
     '\n2. @user2' +
     '\n3. @user3' +
@@ -51,5 +51,5 @@ function sampleStatus(timePeriod) {
     '\n8. @user8' +
     '\n9. @user9' +
     '\n10. @user10' +
-    `\nLeaderboard: ${APP_URL}/stats`;
+    `\n\nランキング: ${APP_URL}/stats`;
 }

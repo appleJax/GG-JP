@@ -1,6 +1,6 @@
 window.onload = () => {
 
-  setTimeout(hideFlash, 6000);
+  setTimeout(hideFlash, 7000);
 
   [ 'corrections-form',
     'alt-answer-form',

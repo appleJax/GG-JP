@@ -1,6 +1,7 @@
 import models from 'Models'
 import { getFollowing } from 'Twitter/utils'
 import {
+  addLinkAndResults,
   average,
   tryCatch
 } from 'Utils'
@@ -12,8 +13,28 @@ const {
   LiveQuestion,
   Schedule,
   Scoreboard,
+  Sponsor,
   Timestamp
 } = models;
+
+export async function addSponsor(statusText) {
+  const sponsors = await tryCatch(
+    Sponsor.findOne().lean().exec()
+  );
+
+  if (!sponsors || sponsors.queue.length === 0)
+    return statusText;
+
+  const sponsorMessage = getSponsorMessage(sponsors);
+  await updateSponsorIndex(sponsors);
+
+  return insertSponsorMessage(statusText, sponsorMessage);
+}
+
+export async function formatAnswerStatus(answerText, questionId, userPoints) {
+  const status = addLinkAndResults(answerText, questionId, userPoints);
+  return addSponsor(status);
+}
 
 export async function aggregateStats() {
   return await tryCatch(Scoreboard.aggregate([
@@ -371,5 +392,43 @@ export async function findOrCreateUser(userId, twitterUser, noSideEffects) {
 export async function getUser(user) {
   return await tryCatch(
     Scoreboard.findOne(user).lean().exec()
+  );
+}
+
+
+// private functions
+
+function getSponsorMessage(sponsors) {
+  const sponsor = sponsors.queue[sponsors.index];
+
+  const numSponsorMessages = sponsors.messages.length;
+  const randomIndex = Math.floor(
+    Math.random() * numSponsorMessages
+  );
+
+  return sponsors.messages[randomIndex].replace('SPONSOR', sponsor);
+}
+
+function insertSponsorMessage(statusText, sponsorMessage) {
+  let statusLines = statusText.split('\n').filter(line =>
+    !line.startsWith('Game: ')
+  );
+
+  statusLines.splice(-1, 0, sponsorMessage);
+
+  return statusLines.join('\n');
+}
+
+function updateSponsorIndex(sponsors) {
+  const numSponsors = sponsors.queue.length;
+  let index = sponsors.index;
+
+  if (++index >= numSponsors)
+    index = 0;
+
+  return tryCatch(
+    Sponsor.updateOne({}, {
+      $set: { index }
+    }).exec()
   );
 }

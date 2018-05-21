@@ -5,6 +5,7 @@ import OldCard      from './OldCard';
 import Queue        from './Queue';
 import Schedule     from './Schedule';
 import Scoreboard   from './Scoreboard';
+import Sponsor      from './Sponsor';
 import Timestamp    from './Timestamp';
 
 
@@ -16,5 +17,6 @@ export default ({
   Queue,
   Schedule,
   Scoreboard,
+  Sponsor,
   Timestamp
 });

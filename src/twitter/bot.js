@@ -1,13 +1,11 @@
 import DB from 'DB/ops';
+import Twitter from 'Config/twitter';
 import {
   fillTweetQueue,
   getNextCardToTweet
 } from 'DB/tweetQueue';
-import Twitter from 'Config/twitter';
-//import evaluateResponse from './evaluateResponse';
 import {
   HOURS,
-  addLinkAndResults,
   getTimeTilNextTweet,
   getTimeUntil,
   tryCatch
@@ -18,6 +16,10 @@ import {
   postTweet,
   processDMs
 } from 'Twitter/utils';
+import {
+  addSponsor,
+  formatAnswerStatus
+} from 'DB/utils';
 
 const {
   BOT_URL,
@@ -32,7 +34,7 @@ const POLL_DM_INTERVAL = 90*1000;
 export default ({
 
   // tweet() {
-  //   tweetRandomQuestion();
+  //   tweetQuestion();
     // pollDMs();
   // },
 
@@ -68,8 +70,8 @@ async function scheduleActions() {
   const timeUntilMidnight = getTimeUntil(0);
 
   setTimeout(() => {
-    tweetRandomQuestion();
-    setInterval(tweetRandomQuestion, QUESTION_INTERVAL);
+    tweetQuestion();
+    setInterval(tweetQuestion, QUESTION_INTERVAL);
   }, timeUntilTweet);
 
   setTimeout(() => {
@@ -92,7 +94,7 @@ function tweetOrScheduleAnswers(liveQuestions) {
   });
 }
 
-async function tweetRandomQuestion() {
+async function tweetQuestion() {
   const {
     cardId,
     game,
@@ -105,13 +107,17 @@ async function tweetRandomQuestion() {
   } = await tryCatch(getNextCardToTweet());
   if (!cardId) return;
 
+  const status = await tryCatch(
+    addSponsor(questionText)
+  );
+
   const {
     mediaUrls,
     postedAt: questionPostedAt,
     tweetId:  questionId
   } = await tryCatch(
     postMedia(
-      questionText,
+      status,
       questionImages,
       questionAltText,
       prevLineImages,
@@ -139,6 +145,10 @@ async function tweetAnswer(cardId, questionId) {
     DB.getAnswerCard(cardId)
   );
 
+  const status = await tryCatch(
+    formatAnswerStatus(answerText, questionId, userPoints)
+  );
+
   const {
     mediaUrls,
     postedAt: answerPostedAt,
@@ -146,7 +156,7 @@ async function tweetAnswer(cardId, questionId) {
   } = await tryCatch(
     // Tweet the answer
     postMedia(
-      addLinkAndResults(answerText, questionId, userPoints),
+      status,
       answerImages,
       answerAltText
     )
@@ -165,19 +175,6 @@ async function pollDMs() {
   await processDMs();
   setInterval(processDMs, POLL_DM_INTERVAL);
 }
-
-// function openStream() {
-//   const stream = Twitter.stream(
-//     'statuses/filter',
-//     { track: `@${TWITTER_ACCOUNT}` }
-//   );
-//   stream.on('tweet', evaluateResponse);
-
-//   stream.on('disconnect', (disconnectMsg) => {
-//     console.error('Tweet stream disconnected:', disconnectMsg);
-//     setTimeout(() => stream.start(), 100);
-//   });
-// }
 
 async function tweetTopTen(category = 'monthlyStats') {
   const topTen = await DB.fetchTopTen(category);
@@ -199,3 +196,16 @@ async function updateStats() {
     DB.updateStats(newWeek, newMonth, newYear)
   );
 }
+
+// function openStream() {
+//   const stream = Twitter.stream(
+//     'statuses/filter',
+//     { track: `@${TWITTER_ACCOUNT}` }
+//   );
+//   stream.on('tweet', evaluateResponse);
+
+//   stream.on('disconnect', (disconnectMsg) => {
+//     console.error('Tweet stream disconnected:', disconnectMsg);
+//     setTimeout(() => stream.start(), 100);
+//   });
+// }
