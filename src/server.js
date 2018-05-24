@@ -19,18 +19,18 @@ app.use(bodyParser.json());
 
 route(app);
 
-// twitterBot.tweet();
-
-if (process.env.NODE_ENV !== 'dev')
-  twitterBot.start();
-
 const PORT = app.get('port');
 
 async function startApp() {
   await connectDB();
+
   app.listen(PORT, () =>
     console.log('Listening on port', PORT)
   );
+
+  if (process.env.NODE_ENV !== 'dev') {
+    twitterBot.start();
+  }
 }
 
 startApp();

@@ -23,7 +23,8 @@ import {
 
 const {
   BOT_URL,
-  TWITTER_ACCOUNT
+  TWITTER_ACCOUNT,
+  WEBHOOK_ID
 } = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;
@@ -42,21 +43,34 @@ export default ({
   //   pollDMs();
   // },
 
-  // register() {
-  //   Twitter.post('account_activity/webhooks',
-  //   { url: `${BOT_URL}/webhook/twitter` },
-  //   (err, data, response) => {
-  //     console.log('Error:', err);
-  //     console.log('Data:', data);
-  //   });
-  // },
+  getCRC() {
+    solicitCRC();
+  },
+
+  register() {
+    Twitter.post('account_activity/all/env-beta/webhooks',
+    { url: `${BOT_URL}/webhook/twitter` },
+    (err, data, response) => {
+      console.log('Webhook Error:', err);
+      console.log('Webhook Data:', data);
+    });
+  },
 
   start() {
-    //openStream();
+    // solicitCRC();
     scheduleActions();
   }
 
 });
+
+function solicitCRC() {
+  Twitter.put('account_activity/all/env-beta/webhooks',
+  { webhook_id: WEBHOOK_ID },
+  (err, data, response) => {
+    console.log('Webhook Error:', err);
+    console.log('Webhook Data:', data);
+  });
+}
 
 async function scheduleActions() {
   await pollDMs();
@@ -196,16 +210,3 @@ async function updateStats() {
     DB.updateStats(newWeek, newMonth, newYear)
   );
 }
-
-// function openStream() {
-//   const stream = Twitter.stream(
-//     'statuses/filter',
-//     { track: `@${TWITTER_ACCOUNT}` }
-//   );
-//   stream.on('tweet', evaluateResponse);
-
-//   stream.on('disconnect', (disconnectMsg) => {
-//     console.error('Tweet stream disconnected:', disconnectMsg);
-//     setTimeout(() => stream.start(), 100);
-//   });
-// }

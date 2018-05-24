@@ -48,6 +48,12 @@ export function contains(item, list) {
   return valid(list.indexOf(item));
 }
 
+export function createBuffer(contents = '') {
+  const buffer = new Buffer(256);
+  buffer.write(contents);
+  return buffer;
+}
+
 export function formatFlashCards(cards) {
   return cards.map(card => {
     const lines = card.questionText.split('\n');
@@ -77,11 +83,8 @@ export function getTimeTilNextTweet() {
 export const getTimeUntil = (hour) => _getTimeUntil(hour)
 
 export function isCorrect(password) {
-  const pw = new Buffer(256);
-  pw.write(password);
-
-  const adminPw = new Buffer(256);
-  adminPw.write(ADMIN_PW);
+  const pw = createBuffer(password);
+  const adminPw = createBuffer(ADMIN_PW);
 
   return crypto.timingSafeEqual(pw, adminPw);
 }

@@ -120,6 +120,38 @@ export async function processDMs() {
   );
 }
 
+// TEST!!!!!!!!!!
+export async function processWebhookEvent(payload, processMsg = evaluateResponse) {
+  const DMs = payload.direct_message_events;
+  if (!DMs) return;
+
+  const lastReadDM = await tryCatch(
+    Timestamp.findOne().lean().then(doc => doc.lastReadDM)
+  );
+  let newLastReadDM = lastReadDM;
+
+  for (let i = 0; i < DMs.length; i++) {
+    const DM = DMs[i];
+    if (
+      DM.type === 'message_create' &&
+      toTimestamp(DM.created_timestamp) > newLastReadDM
+    ) {
+      newLastReadDM = toTimestamp(DM.created_timestamp);
+      await tryCatch(
+        processMsg(DM)
+      );
+    }
+  }
+
+  if (newLastReadDM > lastReadDM) {
+    await tryCatch(
+      Timestamp.updateOne({},
+        { $set: { lastReadDM: newLastReadDM } }
+      ).exec()
+    );
+  }
+}
+
 
 // private functions
 
