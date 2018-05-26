@@ -5,8 +5,8 @@
   "scripts": {
     "build": "webpack --config webpack.dev.js",
     "buildProd": "webpack -p --config webpack.prod.js && npm start", 
-    "deploy": "webpack -p --config webpack.prod.js && gcloud app deploy app.yaml --project=gamegogakuen-jp --delete-previous-version",
-    "stage": "webpack -p --config webpack.staging.js && gcloud app deploy app_staging.yaml --project=gamegogakuen-jp-staging --delete-previous-version",
+    "deploy": "webpack -p --config webpack.prod.js && gcloud app deploy app.yaml --project=gamegogakuen-jp --stop-previous-version",
+    "stage": "webpack -p --config webpack.staging.js && gcloud app deploy app_staging.yaml --project=gamegogakuen-jp-staging --stop-previous-version",
     "server": "node --require dotenv/config ./dist/server.js",
     "devstart": "npm run build && npm run server",
     "start": "node ./dist/server.js",
@@ -17,7 +17,7 @@
   "author": "appleJax <appleJax@users.noreply.github.com>",
   "license": "MIT",
   "engines": {
-    "node": "^9.11.1"
+    "node": "^9.5.0"
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.39",
