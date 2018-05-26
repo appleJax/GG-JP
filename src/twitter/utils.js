@@ -6,7 +6,9 @@ import evaluateResponse from './evaluateResponse';
 const { Timestamp } = models;
 const {
   APP_URL,
+  // BOT_URL,      // for account_activity api (not currently used)
   TWITTER_ACCOUNT
+  // WEBHOOK_ID    // for account_activity api (not currently used)
 } = process.env;
 
 export function fetchTwitterUser(userId) {
@@ -120,7 +122,6 @@ export async function processDMs() {
   );
 }
 
-// TEST!!!!!!!!!!
 export async function processWebhookEvent(payload, processMsg = evaluateResponse) {
   const DMs = payload.direct_message_events;
   if (!DMs) return;
@@ -302,3 +303,26 @@ function uploadMedia(b64Image, altText) {
 
     }).catch(console.error);
 }
+
+
+
+// for account_activity api (not currently used)
+
+// function registerWebhook() {
+//   Twitter.post('account_activity/all/env-beta/webhooks',
+//     { url: `${BOT_URL}/webhook/twitter` },
+//     (err, data, response) => {
+//       console.log('Webhook Error:', err);
+//       console.log('Webhook Data:', data);
+//     }
+//   );
+// }
+
+// function solicitCRC() {
+//   Twitter.put('account_activity/all/env-beta/webhooks',
+//   { webhook_id: WEBHOOK_ID },
+//   (err, data, response) => {
+//     console.log('Webhook Error:', err);
+//     console.log('Webhook Data:', data);
+//   });
+// }

@@ -16,21 +16,22 @@ export default (app) => {
     res.json({ response_token: `sha256=${hash}` });
   });
 
-  app.post('/webhook/twitter', (req, res) => {
-    const isValid = validate(req);
-    if (isValid) {
-      console.log('Webhook req.body:', req.body)
-      processWebhookEvent(req.body).then(_ =>
-        res.sendStatus(200)
-      );
-    } else {
-      res.sendStatus(403);
-    }
+  app.post('/webhook/twitter',
+    (req, res) => {
+      const isValid = validate(req);
+      if (isValid) {
+        processWebhookEvent(req.body).then(_ =>
+          res.sendStatus(200)
+        );
+      } else {
+        res.sendStatus(403);
+      }
   });
 
 }
 
 // private
+
 
 function validate(req) {
   const twitterHash = req.header('X-Twitter-Webhooks-Signature');
@@ -38,11 +39,8 @@ function validate(req) {
 
   const hash = crypto
     .createHmac('sha256', TWITTER_API_SECRET)
-    .update(JSON.stringify(req.body))
+    .update(req.rawBody || '')
     .digest('base64');
-
-  console.log('Twitter hash:', twitterHash);
-  console.log('My hash:', hash);
   
   const expected = createBuffer(`sha256=${hash}`);
 

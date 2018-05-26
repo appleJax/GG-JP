@@ -49,7 +49,7 @@ export function contains(item, list) {
 }
 
 export function createBuffer(contents = '') {
-  const buffer = new Buffer(256);
+  const buffer = new Buffer.alloc(256);
   buffer.write(contents);
   return buffer;
 }

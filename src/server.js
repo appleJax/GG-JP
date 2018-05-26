@@ -1,8 +1,8 @@
 import express       from 'express';
-import bodyParser    from 'body-parser';
 import path          from 'path';
 import { session }   from 'Config/redis';
 import { connectDB } from 'Config/mongo';
+import useBodyParser from 'Config/bodyParser';
 import twitterBot    from 'Twitter/bot';
 import route         from './routes';
 
@@ -14,9 +14,8 @@ app.set('port', (process.env.PORT || 3000));
 app.set('view engine', 'pug');
 app.set('views', path.resolve('dist/views'));
 app.use(express.static(path.resolve('dist/public')));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
+useBodyParser(app);
 route(app);
 
 const PORT = app.get('port');

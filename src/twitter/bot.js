@@ -21,11 +21,6 @@ import {
   formatAnswerStatus
 } from 'DB/utils';
 
-const {
-  BOT_URL,
-  TWITTER_ACCOUNT,
-  WEBHOOK_ID
-} = process.env;
 
 const ANSWER_INTERVAL = 24*HOURS;
 const QUESTION_INTERVAL = 6*HOURS;
@@ -39,38 +34,11 @@ export default ({
     // pollDMs();
   // },
 
-  // listen() {
-  //   pollDMs();
-  // },
-
-  getCRC() {
-    solicitCRC();
-  },
-
-  register() {
-    Twitter.post('account_activity/all/env-beta/webhooks',
-    { url: `${BOT_URL}/webhook/twitter` },
-    (err, data, response) => {
-      console.log('Webhook Error:', err);
-      console.log('Webhook Data:', data);
-    });
-  },
-
   start() {
-    // solicitCRC();
     scheduleActions();
   }
 
 });
-
-function solicitCRC() {
-  Twitter.put('account_activity/all/env-beta/webhooks',
-  { webhook_id: WEBHOOK_ID },
-  (err, data, response) => {
-    console.log('Webhook Error:', err);
-    console.log('Webhook Data:', data);
-  });
-}
 
 async function scheduleActions() {
   await pollDMs();
