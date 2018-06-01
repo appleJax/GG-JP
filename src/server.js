@@ -32,6 +32,8 @@ async function startApp() {
   }
 }
 
+twitterBot.test();
+
 startApp();
 
 export default app;

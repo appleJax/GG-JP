@@ -7,7 +7,7 @@ const {
 
 // Normal +6 ... DST +5
 const UTC_OFFSET = 5;
-
+const ONE_WEEK = 1000 * 60 * 60 * 24 * 7
 
 export const HOURS = 3600000;
 
@@ -25,6 +25,21 @@ export function average(newValue, oldAverage, n) {
   return Math.floor(
     (n*oldAverage + newValue) / (n + 1)
   )
+}
+
+export function calculateOneWeekAgo() {
+  const now = new Date().getTime()
+  return now - ONE_WEEK;
+}
+
+export function calculateReplyResults(userPoints) {
+  const total = userPoints.length;
+  const correct = userPoints.filter(entry => entry.points > 0).length;
+  const percentCorrect = total > 0
+    ? Math.round(correct / total * 100)
+    : 0;
+
+  return `正解率: ${percentCorrect}% (${correct}/${total})`;
 }
 
 export function calculateScore(replyPostedAt, { questionPostedAt }) {
@@ -46,6 +61,10 @@ export function calculateTimeToAnswer(replyPostedAt, { questionPostedAt }) {
 
 export function contains(item, list) {
   return valid(list.indexOf(item));
+}
+
+export function countWrongAnswers(question) {
+  return question.userPoints.filter(entry => entry.points === 0).length;
 }
 
 export function createBuffer(contents = '') {
@@ -117,6 +136,12 @@ export function tryCatch(promise) {
    });
 }
 
+export function tweetLink(cardId) {
+  return 'https://twitter.com' +
+    `/search?q=from%3A${TWITTER_ACCOUNT}%20QID${cardId}` +
+    '&ref_src=twcamp%5Eshare%7Ctwsrc%5Em5%7Ctwgr%5Eemail%7Ctwcon%5E7046%7Ctwterm%5E1';
+}
+
 
 // private functions
 
@@ -134,16 +159,6 @@ function _getTimeUntil(hour) {
     millisUntilTime += 24*HOURS;
 
   return millisUntilTime;
-}
-
-function calculateReplyResults(userPoints) {
-  const total = userPoints.length;
-  const correct = userPoints.filter(entry => entry.points > 0).length;
-  const percentCorrect = total > 0
-    ? Math.round(correct / total * 100)
-    : 0;
-
-  return `正解率: ${percentCorrect}% (${correct}/${total})`;
 }
 
 function valid(index) {

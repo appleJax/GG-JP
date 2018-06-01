@@ -11,6 +11,7 @@ import {
   tryCatch
 } from 'Utils';
 import {
+  formatHardestQuestionTweet,
   formatTopTenTweet,
   postMedia,
   postTweet,
@@ -28,6 +29,11 @@ const POLL_DM_INTERVAL = 90*1000;
 
 
 export default ({
+
+  async test() {
+    await tweetHardestQuestion();
+    console.log('Success...')
+  },
 
   // tweet() {
   //   tweetQuestion();
@@ -158,6 +164,13 @@ async function pollDMs() {
   setInterval(processDMs, POLL_DM_INTERVAL);
 }
 
+async function tweetHardestQuestion() {
+  const hardestQuestion = await DB.getHardestQuestion();
+  const status = formatHardestQuestionTweet(hardestQuestion);
+
+  postTweet(status);
+}
+
 async function tweetTopTen(category = 'monthlyStats') {
   const topTen = await DB.fetchTopTen(category);
   const status = formatTopTenTweet(topTen, category);
@@ -171,7 +184,11 @@ async function updateStats() {
   const newMonth = now.getUTCDate() === 1;
   const newYear = newMonth && now.getUTCMonth() === 0;
 
-  if (newWeek)  await tryCatch(tweetTopTen('weeklyStats'));
+  if (newWeek) {
+    await tryCatch(tweetHardestQuestion());
+    await tryCatch(tweetTopTen('weeklyStats'));
+  }
+
   if (newMonth) await tryCatch(tweetTopTen('monthlyStats'));
 
   await tryCatch(

@@ -8,6 +8,8 @@ import {
 import { processDMs } from 'Twitter/utils';
 import {
   average,
+  calculateOneWeekAgo,
+  countWrongAnswers,
   formatFlashCards,
   tryCatch
 } from 'Utils';
@@ -219,11 +221,40 @@ export default ({
 
   async getDeckTitles() {
     return await tryCatch(
-      DeckTitle.find()
-               .sort({ slug: 'asc' })
-               .lean()
-               .exec()
+      DeckTitle
+      .find()
+      .sort({ slug: 'asc' })
+      .lean()
+      .exec()
     );
+  },
+
+  async getHardestQuestion() {
+    const oneWeekAgo = calculateOneWeekAgo();
+
+    const lastWeeksQuestions = await tryCatch(
+      OldCard
+      .find({
+        answerPostedAt: { $gte: oneWeekAgo }
+      })
+      .select({
+        _id:          0,
+        cardId:       1,
+        questionText: 1,
+        userPoints:   1
+      })
+      .lean()
+      .exec()
+    );
+
+    const hardestQuestion = lastWeeksQuestions.reduce((hardest, question) => {
+      const wrongAnswers = countWrongAnswers(question);
+      return (wrongAnswers > hardest.wrongAnswers)
+        ? { wrongAnswers, question }
+        : hardest;
+    }, { wrongAnswers: -1, question: null });
+
+    return hardestQuestion.question;
   },
   
   async getLiveQuestions() {

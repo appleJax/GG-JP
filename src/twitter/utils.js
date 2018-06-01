@@ -1,14 +1,18 @@
-import Twitter          from 'Config/twitter';
-import models           from 'Models';
-import { tryCatch }     from 'Utils';
+import Twitter from 'Config/twitter';
+import models from 'Models';
 import evaluateResponse from './evaluateResponse';
+import {
+  calculateReplyResults,
+  tryCatch,
+  tweetLink
+} from 'Utils';
 
 const { Timestamp } = models;
 const {
   APP_URL,
-  // BOT_URL,      // for account_activity api (not currently used)
+  // BOT_URL,      // for twitter account_activity api (not currently used)
   TWITTER_ACCOUNT
-  // WEBHOOK_ID    // for account_activity api (not currently used)
+  // WEBHOOK_ID    // for twitter account_activity api (not currently used)
 } = process.env;
 
 export function fetchTwitterUser(userId) {
@@ -16,6 +20,21 @@ export function fetchTwitterUser(userId) {
 
   return Twitter.get('users/show', params)
     .then(({ data }) => data);
+}
+
+export function formatHardestQuestionTweet(hardestQuestion) {
+  const questionText = hardestQuestion.questionText.split('\n').slice(0, 2);
+  if (!questionText[1].startsWith('Hint')) {
+    questionText.pop();
+  }
+  let status = `*REVIEW*\nThis past week's hardest question:\n\n`;
+  status += questionText.join('\n');
+
+  const replyResults = calculateReplyResults(hardestQuestion.userPoints);
+  status += '\n' + replyResults;
+  status += `\n覚えましたか？: ${tweetLink(hardestQuestion.cardId)}`;
+
+  return status;
 }
 
 export function formatTopTenTweet(topTen, category) {
@@ -306,7 +325,7 @@ function uploadMedia(b64Image, altText) {
 
 
 
-// for account_activity api (not currently used)
+// for twitter account_activity api (not currently used)
 
 // function registerWebhook() {
 //   Twitter.post('account_activity/all/env-beta/webhooks',

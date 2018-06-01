@@ -67,5 +67,5 @@ function browserCache(req, res, next) {
 
 function untilNextTweet() {
   const millis = getTimeTilNextTweet();
-  return Math.ceil(millis / 1000) + 4;
+  return Math.ceil(millis / 1000) + 5;
 }

@@ -1,7 +1,7 @@
 import routeAdminPanel from './admin';
 import routeAuth  from './auth';
 import routeApi   from './api';
-import addWebhook from './twitter';
+// import addWebhook from './twitter';  // for twitter account_activity api (not currently used)
 
 const { NODE_ENV, ORIGIN_URL } = process.env;
 
@@ -32,7 +32,7 @@ export default (app) => {
     }
   });
 
-  addWebhook(app);
+  // addWebhook(app); // for twitter account_activity api (not currently used)
   routeAuth(app);
   routeAdminPanel(app);
   routeApi(app);
