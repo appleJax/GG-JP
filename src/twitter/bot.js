@@ -30,11 +30,6 @@ const POLL_DM_INTERVAL = 90*1000;
 
 export default ({
 
-  async test() {
-    await tweetHardestQuestion();
-    console.log('Success...')
-  },
-
   // tweet() {
   //   tweetQuestion();
     // pollDMs();
