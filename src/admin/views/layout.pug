@@ -2,19 +2,19 @@ doctype html
 html
   head
     title GameGogakuen
-    link(rel='stylesheet' href='index.css')
+    link(rel='stylesheet' href='/admin.css')
     link(
       rel='stylesheet'
       href='https://fonts.googleapis.com/css?family=Roboto:300,400,500|Roboto+Mono|Cabin+Sketch'
     )
-    meta(name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
     meta(name='apple-mobile-web-app-capable' content='yes')
 
   body
     nav
       h3 GameGogakuen
       if adminUser
-        form(method='post' action='/logout')
+        form(method='post' action='/admin/logout')
           input(
             class='btn btn--logout'
             type='submit'

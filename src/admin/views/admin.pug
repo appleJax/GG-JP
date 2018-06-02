@@ -6,7 +6,7 @@ block content
 
   form(
     method='post'
-    action='/corrections'
+    action='/admin/corrections'
     id='corrections-form'
     class='form'
   )
@@ -19,7 +19,7 @@ block content
 
   form(
     method='post'
-    action='/add-alt-answer'
+    action='/admin/add-alt-answer'
     id='alt-answer-form'
     class='form'
   )
@@ -32,7 +32,7 @@ block content
   form(
     enctype='multipart/form-data'
     method='post'
-    action='/deck/new'
+    action='/admin/deck/new'
     id='new-deck-form'
     class='form'
   )
@@ -55,7 +55,7 @@ block content
       blockquote
         each line in card.questionText.split('\n')
           p= line
-
+    
       h4 Prevline Images:
       each image in card.prevLineImages
         img(src=`data:image/png;base64, ${image}` alt='prevLineImg')
@@ -87,7 +87,7 @@ block content
         id=`replace-card-form-${index}`
         class='replace-card-form'
         method='post'
-        action='/queue-card/replace'
+        action='/admin/queue-card/replace'
       )
         input(
           type='hidden'
@@ -101,4 +101,4 @@ block content
           value='Replace This Card'
         )
 
-      script(src='/index.js')
+  script(src='/admin.js')

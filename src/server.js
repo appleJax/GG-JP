@@ -1,4 +1,7 @@
 import express       from 'express';
+import serveStatic   from 'serve-static';
+import mime          from 'mime-types';
+import compression   from 'compression';
 import path          from 'path';
 import { session }   from 'Config/redis';
 import { connectDB } from 'Config/mongo';
@@ -8,12 +11,19 @@ import route         from './routes';
 
 const app = express();
 
+app.use(compression({ level: 4 }))
 app.use(session);
 
 app.set('port', (process.env.PORT || 3000));
 app.set('view engine', 'pug');
 app.set('views', path.resolve('dist/views'));
-app.use(express.static(path.resolve('dist/public')));
+app.use(serveStatic(path.resolve('dist/public'), {
+  maxAge: '1y',
+  setHeaders: (res, path) => {
+    if (noCache(path))
+      res.setHeader('Cache-Control', 'public, max-age=0');
+  }
+}));
 
 useBodyParser(app);
 route(app);
@@ -35,3 +45,12 @@ async function startApp() {
 startApp();
 
 export default app;
+
+// private
+
+function noCache(path) {
+  const mimeType = mime.lookup(path);
+  return mimeType === 'text/html' ||
+    mimeType === 'text/css' ||
+    mimeType === 'application/json';
+}

@@ -7,7 +7,10 @@ import { addAltAnswer, issueAnswerCorrection } from 'Admin/utils';
 import { tryCatch } from 'Utils';
 
 const upload = multer({ dest: 'uploads/' });
-const ensureAdmin = authorization.ensureRequest.isPermitted('admin');
+const ensureAdmin = authorization
+  .ensureRequest
+  .redirectTo('/admin/login')
+  .isPermitted('admin');
 
 export default (app) => {
 
@@ -24,26 +27,26 @@ export default (app) => {
 
   // Admin Panel
 
-  app.get('/',
-    redirectAdmin,
-    (req, res) => res.render('index')
-  );
+  // app.get('/',
+  //   redirectAdmin,
+  //   (req, res) => res.render('index')
+  // );
 
-  app.get('/login',
+  app.get('/admin/login',
     redirectAdmin,
     (req, res) => res.render('login')
   );
 
-  app.post('/login',
+  app.post('/admin/login',
     passport.authenticate('local', {
-      failureRedirect: '/',
+      failureRedirect: '/admin/login',
       successRedirect: '/admin'
     })
   );
 
-  app.post('/logout', (req, res) => {
+  app.post('/admin/logout', (req, res) => {
     req.session.destroy(console.error);
-    res.redirect('/login');
+    res.redirect('/admin/login');
   });
 
   app.get('/admin',
@@ -51,7 +54,7 @@ export default (app) => {
     serveAdminPage
   );
 
-  app.post('/deck/new',
+  app.post('/admin/deck/new',
     ensureAdmin,
     upload.single('zipfile'), (req, res) =>
       DB.addDeck(req).then(_ => {
@@ -70,12 +73,12 @@ export default (app) => {
       })
   );
 
-  app.post('/scores/edit',
+  app.post('/admin/scores/edit',
     ensureAdmin,
     DB.adjustScore
   );
 
-  app.post('/queue-card/replace',
+  app.post('/admin/queue-card/replace',
     ensureAdmin,
     (req, res) =>
       replaceQueueCard(req)
@@ -95,7 +98,7 @@ export default (app) => {
       })
   );
 
-  app.post('/corrections',
+  app.post('/admin/corrections',
     ensureAdmin,
     (req, res, next) =>
       issueAnswerCorrection(req)
@@ -115,7 +118,7 @@ export default (app) => {
       })
   );
 
-  app.post('/add-alt-answer',
+  app.post('/admin/add-alt-answer',
     ensureAdmin,
     (req, res, next) =>
       addAltAnswer(req)

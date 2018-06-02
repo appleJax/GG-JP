@@ -1,6 +1,7 @@
 import routeAdminPanel from './admin';
-import routeAuth  from './auth';
-import routeApi   from './api';
+import routeAuth       from './auth';
+import routeApi        from './api';
+import routeUI         from './ui';
 // import addWebhook from './twitter';  // for twitter account_activity api (not currently used)
 
 const { NODE_ENV, ORIGIN_URL } = process.env;
@@ -36,5 +37,6 @@ export default (app) => {
   routeAuth(app);
   routeAdminPanel(app);
   routeApi(app);
+  routeUI(app);
 
 };
