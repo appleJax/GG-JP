@@ -4,7 +4,7 @@ import routeApi        from './api';
 import routeUI         from './ui';
 // import addWebhook from './twitter';  // for twitter account_activity api (not currently used)
 
-const { NODE_ENV, ORIGIN_URL } = process.env;
+const { NODE_ENV, NO_HTTPS, ORIGIN_URL } = process.env;
 
 const dev = NODE_ENV === 'dev';
 
@@ -17,9 +17,7 @@ export default (app) => {
 
   // CORS
   app.use((req, res, next) => {
-    // For admin use, to upload decks to the production db from localhost
-    // if (true) {  // for uploading decks from local machine when too big for server
-    if (dev || req.secure) {
+    if (dev || NO_HTTPS || req.secure) {
       const protocol = dev ? 'http' : 'https';
       res.header('Access-Control-Allow-Origin', `${protocol}://${ORIGIN_URL}`);
       res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');

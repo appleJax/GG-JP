@@ -41,7 +41,7 @@ export function formatTopTenTweet(topTen, category) {
   const timePeriod = toTimePeriod(category);
   let status = `Congrats to this past ${timePeriod}'s Top Ten!\n`;
   topTen.forEach(user =>
-    status += `\n${user[category].rank}. @${user.handle}`
+    status += `\n${user[category].rank}. @${user.handle} - ${formatScore(user[category].score)}`
   );
   status += `\n\nランキング: ${APP_URL}/stats`;
   return status;
@@ -244,6 +244,13 @@ export async function fetchDMs(twitterClient = Twitter) {
   return directMessages.filter(msg =>
     toTimestamp(msg.created_timestamp) > lastReadDM
   );
+}
+
+function formatScore(score) {
+  return String(score)
+    .split('').reverse().join('')
+    .match(/(\d{1,3})/g).join(',')
+    .split('').reverse().join('');
 }
 
 function getLastTimestamp(events) {
