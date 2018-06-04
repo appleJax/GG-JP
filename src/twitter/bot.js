@@ -7,7 +7,7 @@ import {
 import {
   HOURS,
   getTimeTilNextTweet,
-  getTimeUntil,
+  getTimeTilUpdates,
   tryCatch
 } from 'Utils';
 import {
@@ -50,7 +50,7 @@ async function scheduleActions() {
   }
 
   const timeUntilTweet = getTimeTilNextTweet();
-  const timeUntilMidnight = getTimeUntil(0);
+  const timeUntilUpdates = getTimeTilUpdates();
 
   setTimeout(() => {
     tweetQuestion();
@@ -60,7 +60,7 @@ async function scheduleActions() {
   setTimeout(() => {
     updateStats();
     setInterval(updateStats, 24*HOURS);
-  }, timeUntilMidnight);
+  }, timeUntilUpdates);
 }
 
 function tweetOrScheduleAnswers(liveQuestions) {
@@ -174,10 +174,12 @@ async function tweetTopTen(category = 'monthlyStats') {
 }
 
 async function updateStats() {
-  const now = new Date();
-  const newWeek  = now.getUTCDay()  === 0;
-  const newMonth = now.getUTCDate() === 1;
-  const newYear = newMonth && now.getUTCMonth() === 0;
+  const now = new Date().getTime();
+  const tomorrow = new Date(now + 4*HOURS);
+
+  const newWeek  = tomorrow.getUTCDay()  === 0;
+  const newMonth = tomorrow.getUTCDate() === 1;
+  const newYear = newMonth && tomorrow.getUTCMonth() === 0;
 
   if (newWeek) {
     await tryCatch(tweetHardestQuestion());
@@ -186,7 +188,7 @@ async function updateStats() {
 
   if (newMonth) await tryCatch(tweetTopTen('monthlyStats'));
 
-  await tryCatch(
-    DB.updateStats(newWeek, newMonth, newYear)
-  );
+  setTimeout(() => {
+    DB.updateStats(newWeek, newMonth, newYear);
+  }, 3*HOURS);
 }

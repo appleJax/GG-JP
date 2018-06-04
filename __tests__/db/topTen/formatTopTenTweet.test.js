@@ -21,6 +21,53 @@ describe('it should return an appropriate tweet status', () => {
 
 });
 
+describe('it should recognize achievements', () => {
+
+
+  describe('personal best', () => {
+    test('for the week', () => {
+      const topTenPBWeekly = replaceLeader(
+        personalBest('weeklyStats'),
+        topTen()
+      );
+
+      const status = formatTopTenTweet(topTenPBWeekly, 'weeklyStats');
+      const expectedStatus = sampleStatus('week', 'PB');
+
+      expect(status).toEqual(expectedStatus);
+    });
+
+    test('for the month', () => {
+      const topTenPBMonthly = replaceLeader(
+        personalBest('monthlyStats'),
+        topTen()
+      );
+
+      const status = formatTopTenTweet(topTenPBMonthly, 'monthlyStats');
+      const expectedStatus = sampleStatus('month', 'PB');
+
+      expect(status).toEqual(expectedStatus);
+    });
+  });
+
+  test('perfect weekly score', () => {
+    const topTenPerfectWeekly = replaceLeader(
+      perfectScore(),
+      topTen()
+    );
+
+    const status = formatTopTenTweet(topTenPerfectWeekly, 'weeklyStats');
+    const expectedStatus = sampleStatus('week', 'perfect');
+
+    expect(status).toEqual(expectedStatus);
+  });
+
+});
+
+
+// helpers
+
+const BASE_SCORE = 10100;
 
 function topTen() {
   const users = [];
@@ -29,11 +76,17 @@ function topTen() {
       handle: `user${i}`,
       monthlyStats: {
         rank: i,
-        score: 10100 - i*100
+        score: BASE_SCORE - i*100,
+        highestScore: {
+          value: BASE_SCORE + 1
+        }
       },
       weeklyStats: {
         rank: i,
-        score: 10100 - i*100
+        score: BASE_SCORE - i*100,
+        highestScore: {
+          value: BASE_SCORE + 1
+        }
       }
     });
   }
@@ -41,9 +94,64 @@ function topTen() {
   return users;
 }
 
-function sampleStatus(timePeriod) {
+function perfectScore() {
+  return {
+    handle: 'perfectUser',
+    weeklyStats: {
+      rank: 1,
+      score: 672,
+      highestScore: {
+        value: 672
+      }
+    }
+  }
+}
+
+function personalBest(category) {
+  let monthlyOffset = 1;
+  let weeklyOffset = 1;
+  if (category === 'weeklyStats') {
+    weeklyOffset = -1;
+  } else {
+    monthlyOffset = -1;
+  }
+
+  const PB_BASE = BASE_SCORE - 100;
+  return {
+    handle: 'pbUser',
+    monthlyStats: {
+      rank: 1,
+      score: PB_BASE,
+      highestScore: {
+        value: PB_BASE + monthlyOffset
+      }
+    },
+    weeklyStats: {
+      rank: 1,
+      score: PB_BASE,
+      highestScore: {
+        value: PB_BASE + weeklyOffset
+      }
+    }
+  }
+}
+
+function replaceLeader(newUser, topTen) {
+  return [ newUser ].concat(topTen.slice(1));
+}
+
+function sampleStatus(timePeriod, achievement) {
+  let leader = '\n1. @user1 - 10,000';
+  if (achievement === 'PB') {
+    leader = '\n1. @pbUser - 10,000 (PB)';
+  }
+
+  if (achievement === 'perfect') {
+    leader = '\n1. @perfectUser - 672 🌟🏆🌟 PERFECT SCORE';
+  }
+      
   return `Congrats to this past ${timePeriod}'s Top Ten!\n` +
-    '\n1. @user1 - 10,000' +
+    leader +
     '\n2. @user2 - 9,900' +
     '\n3. @user3 - 9,800' +
     '\n4. @user4 - 9,700' +

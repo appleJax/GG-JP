@@ -99,7 +99,9 @@ export function getTimeTilNextTweet() {
   return Math.min(...startTimes);
 }
 
-export const getTimeUntil = (hour) => _getTimeUntil(hour)
+export function getTimeTilUpdates() {
+  return _getTimeUntil(21);
+}
 
 export function isCorrect(password) {
   const pw = createBuffer(password);

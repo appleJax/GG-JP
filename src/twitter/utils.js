@@ -40,9 +40,10 @@ export function formatHardestQuestionTweet(hardestQuestion) {
 export function formatTopTenTweet(topTen, category) {
   const timePeriod = toTimePeriod(category);
   let status = `Congrats to this past ${timePeriod}'s Top Ten!\n`;
-  topTen.forEach(user =>
-    status += `\n${user[category].rank}. @${user.handle} - ${formatScore(user[category].score)}`
-  );
+  topTen.forEach(user => {
+    const achievements = formatAchievements(user, category);
+    status += `\n${user[category].rank}. @${user.handle} - ${formatScore(user[category].score)}${achievements}`
+  });
   status += `\n\nランキング: ${APP_URL}/stats`;
   return status;
 }
@@ -244,6 +245,21 @@ export async function fetchDMs(twitterClient = Twitter) {
   return directMessages.filter(msg =>
     toTimestamp(msg.created_timestamp) > lastReadDM
   );
+}
+
+function formatAchievements(user, category) {
+  const MAX_WEEKLY_SCORE = 672;
+  const { score } = user[category];
+
+  if (category === 'weeklyStats' && score === MAX_WEEKLY_SCORE) {
+    return ' 🌟🏆🌟 PERFECT SCORE';
+  }
+
+  if (score >= user[category].highestScore.value) {
+    return ' (PB)';
+  }
+
+  return '';
 }
 
 function formatScore(score) {
