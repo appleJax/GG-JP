@@ -1,5 +1,4 @@
 import DB from 'DB/ops';
-import Twitter from 'Config/twitter';
 import {
   fillTweetQueue,
   getNextCardToTweet
@@ -23,16 +22,16 @@ import {
 } from 'DB/utils';
 
 
-const ANSWER_INTERVAL = 24*HOURS;
-const QUESTION_INTERVAL = 6*HOURS;
-const POLL_DM_INTERVAL = 90*1000;
+const ANSWER_INTERVAL = 24 * HOURS;
+const QUESTION_INTERVAL = 6 * HOURS;
+const POLL_DM_INTERVAL = 90 * 1000;
 
 
 export default ({
 
   // tweet() {
   //   tweetQuestion();
-    // pollDMs();
+  //   pollDMs();
   // },
 
   start() {
@@ -65,7 +64,7 @@ async function scheduleActions() {
 
 function tweetOrScheduleAnswers(liveQuestions) {
   liveQuestions.forEach(({ cardId, questionId, questionPostedAt }) => {
-    const scheduledAnswerTime = questionPostedAt + 24*HOURS;
+    const scheduledAnswerTime = questionPostedAt + 24 * HOURS;
     const now = new Date().getTime();
 
     if (scheduledAnswerTime < now) {
@@ -175,9 +174,9 @@ async function tweetTopTen(category = 'monthlyStats') {
 
 async function updateStats() {
   const now = new Date().getTime();
-  const tomorrow = new Date(now + 4*HOURS);
+  const tomorrow = new Date(now + 4 * HOURS);
 
-  const newWeek  = tomorrow.getUTCDay()  === 0;
+  const newWeek = tomorrow.getUTCDay() === 0;
   const newMonth = tomorrow.getUTCDate() === 1;
   const newYear = newMonth && tomorrow.getUTCMonth() === 0;
 

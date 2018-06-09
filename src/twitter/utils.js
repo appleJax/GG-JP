@@ -11,7 +11,6 @@ const { Timestamp } = models;
 const {
   APP_URL,
   // BOT_URL,      // for twitter account_activity api (not currently used)
-  TWITTER_ACCOUNT
   // WEBHOOK_ID    // for twitter account_activity api (not currently used)
 } = process.env;
 
@@ -184,8 +183,9 @@ function countChars(status) {
 }
 
 function ensureUnder280(status) {
-  if (countChars(status) <= 280)
+  if (countChars(status) <= 280) {
     return status;
+  }
 
   return status.split('\n').filter(line =>
     !line.startsWith('Game: ') && !line.startsWith('Question: ')
@@ -230,9 +230,9 @@ export async function fetchDMs(twitterClient = Twitter) {
     if (firstRequest) {
       const mostRecentTimestamp = getMostRecentTimestamp(events);
 
-      if (mostRecentTimestamp > lastReadDM)
+      if (mostRecentTimestamp > lastReadDM) {
         await updateLastReadDM(mostRecentTimestamp);
-      else return [];
+      } else return [];
     }
 
     lastTimestamp = getLastTimestamp(events);
@@ -282,7 +282,7 @@ function getLastQuestionPosted(liveQuestions) {
     (card.questionId > maxId)
       ? card.questionId
       : maxId
-  , 0);
+    , 0);
 }
 
 function getMostRecentTimestamp(events) {
@@ -303,12 +303,10 @@ function toTimestamp(timeString) {
   return new Date(+timeString).getTime();
 }
 
-async function updateLastReadDM(timestamp) {
-  return await tryCatch(
-    Timestamp.update({},
-      { $set: { lastReadDM: timestamp }}
-    ).exec()
-  );
+function updateLastReadDM(timestamp) {
+  return Timestamp.update({},
+    { $set: { lastReadDM: timestamp } }
+  ).exec();
 }
 
 // EFFECTS:
@@ -320,33 +318,31 @@ async function updateLastReadDM(timestamp) {
 function uploadMedia(b64Image, altText) {
     // first we must post the media to Twitter
   return Twitter.post(
-      'media/upload',
-      { media_data: b64Image }
-    ).then(({ data }) => {
+    'media/upload',
+    { media_data: b64Image }
+  ).then(({ data }) => {
 
-      // now we can assign alt text to the media, for use by screen readers and
-      // other text-based presentations and interpreters
-      const mediaIdStr = data.media_id_string;
-      if (!altText) return mediaIdStr;
+    // now we can assign alt text to the media, for use by screen readers and
+    // other text-based presentations and interpreters
+    const mediaIdStr = data.media_id_string;
+    if (!altText) return mediaIdStr;
 
-      const meta_params = {
-        media_id: mediaIdStr,
-        alt_text: { text: altText }
-      };
+    const metaParams = {
+      media_id: mediaIdStr,
+      alt_text: { text: altText }
+    };
 
-      return Twitter.post(
-        'media/metadata/create',
-        meta_params
-      ).then((_) =>
-        // now we can reference the media and post a tweet
-        // (media will attach to the tweet)
-        mediaIdStr
-      ).catch(console.error);
+    return Twitter.post(
+      'media/metadata/create',
+      metaParams
+    ).then((_) =>
+      // now we can reference the media and post a tweet
+      // (media will attach to the tweet)
+      mediaIdStr
+    ).catch(console.error);
 
-    }).catch(console.error);
+  }).catch(console.error);
 }
-
-
 
 // for twitter account_activity api (not currently used)
 

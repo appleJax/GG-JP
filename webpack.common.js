@@ -2,6 +2,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
+const path = require('path');
 
 const { ADMIN_PW } = require('./.env.js').common;
 
@@ -32,26 +33,26 @@ module.exports = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(__dirname + '/dist'),
-    new CopyWebpackPlugin([ { from: __dirname + '/src/admin' } ]),
+    new CleanWebpackPlugin(path.resolve(__dirname, 'dist')),
+    new CopyWebpackPlugin([ { from: path.resolve(__dirname, 'src', 'admin') } ]),
     new webpack.DefinePlugin({
       'process.env.ADMIN_PW': JSON.stringify(ADMIN_PW)
     })
   ],
   resolve: {
     alias: {
-      Admin:   __dirname + '/src/admin',
-      Anki:    __dirname + '/src/anki',
-      Config:  __dirname + '/src/config',
-      DB:      __dirname + '/src/db',
-      Models:  __dirname + '/src/db/models',
-      Src:     __dirname + '/src',
-      Twitter: __dirname + '/src/twitter',
-      Utils:   __dirname + '/src/utils'
+      Admin:   path.resolve(__dirname, 'src/admin'),
+      Anki:    path.resolve(__dirname, 'src/anki'),
+      Config:  path.resolve(__dirname, 'src/config'),
+      DB:      path.resolve(__dirname, 'src/db'),
+      Models:  path.resolve(__dirname, 'src/db/models'),
+      Src:     path.resolve(__dirname, 'src'),
+      Twitter: path.resolve(__dirname, 'src/twitter'),
+      Utils:   path.resolve(__dirname, 'src/utils')
     }
   },
   output: {
     filename: 'server.js',
-    path: __dirname + '/dist'
+    path: path.resolve(__dirname, 'dist')
   }
 };

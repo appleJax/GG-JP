@@ -20,8 +20,9 @@ app.set('views', path.resolve('dist/views'));
 app.use(serveStatic(path.resolve('dist/public'), {
   maxAge: '1y',
   setHeaders: (res, path) => {
-    if (noCache(path))
+    if (noCache(path)) {
       res.setHeader('Cache-Control', 'public, max-age=0');
+    }
   }
 }));
 

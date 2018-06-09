@@ -7,7 +7,7 @@ const {
 
 // Normal +6 ... DST +5
 const UTC_OFFSET = 5;
-const ONE_WEEK = 1000 * 60 * 60 * 24 * 7
+const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
 
 export const HOURS = 3600000;
 
@@ -23,7 +23,7 @@ export function addLinkAndResults(answerText, questionId, userPoints) {
 
 export function average(newValue, oldAverage, n) {
   return Math.floor(
-    (n*oldAverage + newValue) / (n + 1)
+    (n * oldAverage + newValue) / (n + 1)
   )
 }
 
@@ -68,7 +68,7 @@ export function countWrongAnswers(question) {
 }
 
 export function createBuffer(contents = '') {
-  const buffer = new Buffer.alloc(256);
+  const buffer = Buffer.alloc(256);
   buffer.write(contents);
   return buffer;
 }
@@ -157,8 +157,9 @@ function _getTimeUntil(hour) {
     now.getUTCDate(),
     hour, 0, 0, 0) - utcNow;
 
-  if (millisUntilTime < 0) // already passed for today, wait until tomorrow
-    millisUntilTime += 24*HOURS;
+  if (millisUntilTime < 0) { // already passed for today, wait until tomorrow
+    millisUntilTime += 24 * HOURS;
+  }
 
   return millisUntilTime;
 }

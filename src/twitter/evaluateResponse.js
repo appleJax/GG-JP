@@ -9,9 +9,6 @@ import {
   tryCatch
 } from 'Utils';
 
-const { TWITTER_ACCOUNT } = process.env;
-
-
 export default async function evaluateResponse({
   created_timestamp: replyPostedAt,
   message_create: {
@@ -23,24 +20,27 @@ export default async function evaluateResponse({
 }) {
   const [ cardId, userAnswer ] = parseDM(text);
 
-  if (!cardId || !userAnswer)
+  if (!cardId || !userAnswer) {
     return;
+  }
 
   const liveQuestions = await tryCatch(DB.getLiveQuestions());
   const foundQuestion = liveQuestions.find(
     questionCard => questionCard.cardId === cardId
   );
 
-  if (!foundQuestion)
+  if (!foundQuestion) {
     return;
+  }
 
   const {
     alreadyAnswered,
     answers: acceptedAnswers
   } = foundQuestion;
 
-  if (contains(userId, alreadyAnswered))
+  if (contains(userId, alreadyAnswered)) {
     return;
+  }
 
   const user = await tryCatch(
     fetchTwitterUser(userId)

@@ -126,14 +126,14 @@ async function getQueuedCards() {
   return queuedCards;
 }
 
-async function getQueuedIds() {
-  return await getTweetQueue().then(
+function getQueuedIds() {
+  return getTweetQueue().then(
     queue => queue.map(card => card.cardId)
   );
 }
 
-async function getTweetQueue() {
-  return await tryCatch(
+function getTweetQueue() {
+  return tryCatch(
     Queue.findOne().lean().then(obj => obj.queue)
   );
 }

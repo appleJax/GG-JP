@@ -1,8 +1,8 @@
 require('dotenv').config();
-const MongodbMemoryServer = require('mongodb-memory-server');
+const MongodbMemoryServer = require('mongodb-memory-server').default;
 
 const MONGO_DB_NAME = 'jest';
-const mongod = new MongodbMemoryServer.default({
+const mongod = new MongodbMemoryServer({
   instance: {
     dbName: MONGO_DB_NAME,
   },

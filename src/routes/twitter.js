@@ -26,7 +26,8 @@ export default (app) => {
       } else {
         res.sendStatus(403);
       }
-  });
+    }
+  );
 
 }
 
