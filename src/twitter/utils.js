@@ -38,13 +38,13 @@ export function formatHardestQuestionTweet(hardestQuestion) {
 
 export function formatTopTenTweet(topTen, category) {
   const timePeriod = toTimePeriod(category);
-  let status = `Congrats to this past ${timePeriod}'s Top Ten!\n`;
+  let status = `Congrats to this past ${timePeriod}'s Top 10!\n`;
   topTen.forEach(user => {
     const achievements = formatAchievements(user, category);
-    status += `\n${user[category].rank}. @${user.handle} - ${formatScore(user[category].score)}${achievements}`
+    status += `${user[category].rank} @${user.handle} ${formatScore(user[category].score)}${achievements}`
   });
-  status += `\n\nランキング: ${APP_URL}/stats`;
-  return status;
+  status += `\n🏅= PB\nランキング: ${APP_URL}/stats`;
+  return ensureUnder280(status, 'topTen');
 }
 
 export function getFollowing(userId) {
@@ -177,19 +177,22 @@ export async function processWebhookEvent(payload, processMsg = evaluateResponse
 
 function countChars(status) {
   return status
-    .replace(/@\S+/g, '')
     .replace(/http\S+/g, 'twenty-three-characters')
     .length;
 }
 
-function ensureUnder280(status) {
+function ensureUnder280(status, context = 'question') {
   if (countChars(status) <= 280) {
     return status;
   }
 
-  return status.split('\n').filter(line =>
-    !line.startsWith('Game: ') && !line.startsWith('Question: ')
-  ).join('\n');
+  if (context === 'question') {
+    return status.split('\n').filter(line =>
+      !line.startsWith('Game: ') && !line.startsWith('Question: ')
+    ).join('\n');
+  }
+
+  return status.replace('ランキング: ', '');
 }
 
 async function evaluateDMs(directMessages) {
@@ -252,11 +255,11 @@ function formatAchievements(user, category) {
   const { score } = user[category];
 
   if (category === 'weeklyStats' && score === MAX_WEEKLY_SCORE) {
-    return ' 🌟🏆🌟 PERFECT SCORE';
+    return '🏆 PERFECT';
   }
 
   if (score >= user[category].highestScore.value) {
-    return ' (PB)';
+    return '🏅';
   }
 
   return '';

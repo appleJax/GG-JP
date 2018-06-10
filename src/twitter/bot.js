@@ -162,14 +162,14 @@ async function tweetHardestQuestion() {
   const hardestQuestion = await DB.getHardestQuestion();
   const status = formatHardestQuestionTweet(hardestQuestion);
 
-  postTweet(status);
+  return postTweet(status);
 }
 
 async function tweetTopTen(category = 'monthlyStats') {
   const topTen = await DB.fetchTopTen(category);
   const status = formatTopTenTweet(topTen, category);
 
-  postTweet(status)
+  return postTweet(status)
 }
 
 async function updateStats() {

@@ -147,15 +147,15 @@ export default ({
     );
   },
 
-  async fetchTopTen(stats) {
+  fetchTopTen(stats) {
     const category = `${stats}.rank`;
-    return await tryCatch(
+    return tryCatch(
       Scoreboard
       .find({ [category]: { $gt: 0, $lte: 10 } })
       .select({
         _id: 0,
         handle: 1,
-        [category]: 1
+        [stats]: 1
       })
       .sort({ [category]: 'asc' })
       .limit(10)
