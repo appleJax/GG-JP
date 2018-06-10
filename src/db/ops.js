@@ -155,7 +155,9 @@ export default ({
       .select({
         _id: 0,
         handle: 1,
-        [stats]: 1
+        [category]: 1,
+        [`${stats}.score`]: 1,
+        [`${stats}.highestScore`]: 1
       })
       .sort({ [category]: 'asc' })
       .limit(10)

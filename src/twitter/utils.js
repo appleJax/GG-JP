@@ -38,10 +38,10 @@ export function formatHardestQuestionTweet(hardestQuestion) {
 
 export function formatTopTenTweet(topTen, category) {
   const timePeriod = toTimePeriod(category);
-  let status = `Congrats to this past ${timePeriod}'s Top 10!\n`;
+  let status = `Congrats to this past ${timePeriod}'s Top 10!`;
   topTen.forEach(user => {
     const achievements = formatAchievements(user, category);
-    status += `${user[category].rank} @${user.handle} ${formatScore(user[category].score)}${achievements}`
+    status += `\n${user[category].rank} @${user.handle} ${formatScore(user[category].score)}${achievements}`
   });
   status += `\n🏅= PB\nランキング: ${APP_URL}/stats`;
   return ensureUnder280(status, 'topTen');
@@ -255,7 +255,7 @@ function formatAchievements(user, category) {
   const { score } = user[category];
 
   if (category === 'weeklyStats' && score === MAX_WEEKLY_SCORE) {
-    return '🏆 PERFECT';
+    return '🏆PERFECT';
   }
 
   if (score >= user[category].highestScore.value) {

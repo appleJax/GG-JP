@@ -141,25 +141,26 @@ function replaceLeader(newUser, topTen) {
 }
 
 function sampleStatus(timePeriod, achievement) {
-  let leader = '\n1. @user1 - 10,000';
+  let leader = '\n1 @user1 10,000';
   if (achievement === 'PB') {
-    leader = '\n1. @pbUser - 10,000 (PB)';
+    leader = '\n1 @pbUser 10,000🏅';
   }
 
   if (achievement === 'perfect') {
-    leader = '\n1. @perfectUser - 672 🌟🏆🌟 PERFECT SCORE';
+    leader = '\n1 @perfectUser 672🏆PERFECT';
   }
       
-  return `Congrats to this past ${timePeriod}'s Top Ten!\n` +
+  return `Congrats to this past ${timePeriod}'s Top 10!` +
     leader +
-    '\n2. @user2 - 9,900' +
-    '\n3. @user3 - 9,800' +
-    '\n4. @user4 - 9,700' +
-    '\n5. @user5 - 9,600' +
-    '\n6. @user6 - 9,500' +
-    '\n7. @user7 - 9,400' +
-    '\n8. @user8 - 9,300' +
-    '\n9. @user9 - 9,200' +
-    '\n10. @user10 - 9,100' +
-    `\n\nランキング: ${APP_URL}/stats`;
+    '\n2 @user2 9,900' +
+    '\n3 @user3 9,800' +
+    '\n4 @user4 9,700' +
+    '\n5 @user5 9,600' +
+    '\n6 @user6 9,500' +
+    '\n7 @user7 9,400' +
+    '\n8 @user8 9,300' +
+    '\n9 @user9 9,200' +
+    '\n10 @user10 9,100' +
+    '\n🏅= PB' +
+    `\nランキング: ${APP_URL}/stats`;
 }

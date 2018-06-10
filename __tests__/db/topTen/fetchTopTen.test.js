@@ -60,7 +60,12 @@ function expectedResults(category) {
   return topTen.map(user => ({
     handle: user.handle,
     [category]: {
-      rank: user[category].rank
+      rank: user[category].rank,
+      score: 0,
+      highestScore: {
+        timestamp: 0,
+        value: 0
+      }
     }
   }));
 }
