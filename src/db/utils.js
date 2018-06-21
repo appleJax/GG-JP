@@ -36,8 +36,8 @@ export async function formatAnswerStatus(answerText, questionId, userPoints) {
   return addSponsor(status);
 }
 
-export async function aggregateStats() {
-  return await tryCatch(Scoreboard.aggregate([
+export function aggregateStats() {
+  return Scoreboard.aggregate([
     { $project: {
         _id: 0,
         orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'yearlyStats', 'allTimeStats' ] },
@@ -92,7 +92,7 @@ export async function aggregateStats() {
         }
       }
     }
-  ]).exec());
+  ]).exec();
 }
 
 export async function buildStatUpdates(newWeek, newMonth, newYear) {

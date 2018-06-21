@@ -102,16 +102,17 @@ async function isNotUpdated(stats) {
   });
 }
 
-async function fetchUsers() {
-  return await Scoreboard.find().select({
+function fetchUsers() {
+  return Scoreboard.find().select({
     _id:           0,
     __v:           0,
-    name:          0,
-    handle:        0,
+    allTimeStats:  0,
     avatar:        0,
-    profileBanner: 0,
+    handle:        0,
+    isPrivate:     0,
     following:     0,
-    allTimeStats:  0
+    name:          0,
+    profileBanner: 0
   }).sort({
     userId: 'asc'
   }).lean().exec();

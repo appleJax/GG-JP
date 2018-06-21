@@ -46,6 +46,7 @@ function sampleUser() {
     avatar: '',
     profileBanner: '',
     following: [],
+    isPrivate: false,
     permissions: [],
     allTimeStats: {
       attempts: 0,
@@ -163,12 +164,12 @@ function sampleUser() {
   };
 }
 
-async function getUserCount() {
-  return await Scoreboard.find().count().exec();
+function getUserCount() {
+  return Scoreboard.find().count().exec();
 }
 
-async function getUser(userId) {
-  return await Scoreboard
+function getUser(userId) {
+  return Scoreboard
     .findOne({ userId })
     .select({ _id: 0, __v: 0 })
     .lean()
