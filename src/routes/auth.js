@@ -21,7 +21,11 @@ export default (app) => {
 
   app.get('/api/session/user', (req, res) => {
     res.json(req.session.user || null);
+  });
+
+  app.post('/api/logout', (req, res) => {
     req.session.destroy(console.error);
+    res.sendStatus(200);
   });
 
 };

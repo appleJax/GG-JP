@@ -28,6 +28,12 @@ export default (app) => {
     (req, res) => DB.serveRecentAnswers().then(send(res))
   );
 
+  app.post('/api/togglePrivacy',
+    (req, res) => req.session.user
+      ? DB.togglePrivacy(req.session.user.userId).then(send(res))
+      : res.send(null)
+  );
+
   app.get('/api/stats',
     browserCache,
     cache.route(untilNextTweet()),
@@ -59,6 +65,7 @@ export default (app) => {
 
 }
 
+// private
 
 function browserCache(req, res, next) {
   res.set('Cache-Control', `max-age=${untilNextTweet()}`);

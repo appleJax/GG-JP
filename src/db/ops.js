@@ -288,6 +288,7 @@ export default ({
     const pageSizeNum = Number(pageSize);
 
     const match = {
+      isPrivate: false,
       handle: { $regex: search, $options: 'i' },
       [`${view}.score`]: { $gt: 0 }
     };
@@ -323,13 +324,12 @@ export default ({
     return { users, total };
   },
 
-  async getUserStats({ params: { handle }}) {
+  async getUserStats({ params: { handle } }) {
     const user = await tryCatch(
-      Scoreboard.findOne({ handle }).lean().exec()
+      Scoreboard.findOne({ handle, isPrivate: false }).lean().exec()
     );
 
-    if (!user)
-      return null;
+    if (!user) return null;
 
     const cardIds = user.allTimeStats.correct.map(card => card.cardId);
     const earnedCards = await tryCatch(
@@ -352,6 +352,21 @@ export default ({
     await tryCatch(addPointsToScoreboard(currentQuestion));
     await tryCatch(OldCard.create(currentQuestion))
     await tryCatch(LiveQuestion.remove({ cardId }).exec());
+  },
+
+  async togglePrivacy(userId) {
+    const dbUser = await tryCatch(
+      Scoreboard.findOne(
+        { userId }
+      ).lean().exec()
+    );
+
+    return Scoreboard
+      .findOneAndUpdate(
+        { userId },
+        { $set: { isPrivate: !dbUser.isPrivate } },
+        { new: true, lean: true }
+      ).exec()
   },
 
   async serveCards({ query: { ids } }) {
@@ -663,7 +678,7 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
 
 // Exported for testing
 export async function recalculateRank() {
-  const stats = await aggregateStats();
+  const stats = await tryCatch(aggregateStats());
   const { day: currentTimestamp } = await tryCatch(
     Timestamp.findOne().lean().exec()
   );

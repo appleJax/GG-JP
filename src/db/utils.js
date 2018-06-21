@@ -38,6 +38,7 @@ export async function formatAnswerStatus(answerText, questionId, userPoints) {
 
 export function aggregateStats() {
   return Scoreboard.aggregate([
+    { $match: { isPrivate: false } },
     { $project: {
         _id: 0,
         orderBy: { $literal: [ 'weeklyStats', 'monthlyStats', 'yearlyStats', 'allTimeStats' ] },
@@ -168,8 +169,9 @@ export function buildRankUpdates(stats, currentTimestamp) {
     let i = 0;
     for (; i < end; i++) {
       const currentStat = scores[i];
-      if (currentStat.score === 0)
+      if (currentStat.score === 0) {
         continue;
+      }
 
       currentStat.users.sort(
         (a, b) =>
