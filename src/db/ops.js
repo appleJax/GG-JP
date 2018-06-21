@@ -290,7 +290,8 @@ export default ({
     const match = {
       isPrivate: false,
       handle: { $regex: search, $options: 'i' },
-      [`${view}.score`]: { $gt: 0 }
+      [`${view}.score`]: { $gt: 0 },
+      [`${view}.rank`]: { $gt: 0 }
     };
     const skipCount = (pageNum - 1) * pageSizeNum;
     const sortBy = {
@@ -364,7 +365,13 @@ export default ({
     return Scoreboard
       .findOneAndUpdate(
         { userId },
-        { $set: { isPrivate: !dbUser.isPrivate } },
+        { $set: {
+          isPrivate: !dbUser.isPrivate,
+          'allTimeStats.rank': 0,
+          'yearlyStats.rank':  0,
+          'monthlyStats.rank': 0,
+          'weeklyStats.rank':  0
+        }},
         { new: true, lean: true }
       ).exec()
   },
