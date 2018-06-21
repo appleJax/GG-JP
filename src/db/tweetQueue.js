@@ -167,20 +167,18 @@ export async function getScheduledDeck(hour) {
   return newScheduledDeck;
 }
 
-async function pullCard(deck) {
-  return await tryCatch(
-    NewCard.aggregate([
+function pullCard(deck) {
+  return NewCard.aggregate([
       { $match: deck },
       { $sample: { size: 1 }}
     ])
-    .then(cards => Promise.resolve(cards[0]))
-  );
+    .then(cards => Promise.resolve(cards[0]));
 }
 
-async function saveQueue(tweetQueue) {
-  return await tryCatch(
-    Queue.update({}, { $set: { queue: tweetQueue } }).exec()
-  );
+function saveQueue(tweetQueue) {
+  return Queue.update({},
+    { $set: { queue: tweetQueue } }
+  ).exec();
 }
 
 async function SpoilChecker(queuePosition) {
