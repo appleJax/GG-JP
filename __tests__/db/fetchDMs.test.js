@@ -94,8 +94,8 @@ describe('if first fetched DM is the same as lastReadDM', () => {
 
 // helpers
 
-async function fetchLastReadDM() {
-  return await Timestamp
+function fetchLastReadDM() {
+  return Timestamp
     .findOne()
     .lean()
     .then(doc => doc.lastReadDM);
@@ -105,8 +105,8 @@ function keepDMsNewerThan(time) {
   return (msg) => msg.created_timestamp > time;
 }
 
-async function setLastReadDM(timestamp) {
-  return await Timestamp.update({},
+function setLastReadDM(timestamp) {
+  return Timestamp.update({},
     { $set: { lastReadDM: timestamp }}
   ).exec();
 }

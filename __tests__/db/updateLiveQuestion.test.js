@@ -65,18 +65,18 @@ it('should update the Live Question', async () => {
 
 // helper
 
-async function fetch(model) {
-  return await model.findOne({ cardId: CARD_ID })
-                    .select({
-                      _id: 0,
-                      cardId: 1,
-                      'mediaUrls.altText': 1,
-                      'mediaUrls.image': 1,
-                      questionId: 1,
-                      questionPostedAt: 1,
-                      questionImages: 1,
-                      questionAltText: 1,
-                      prevLineImages: 1,
-                      prevLineAltText: 1
-                    }).lean().exec();
+function fetch(model) {
+  return model.findOne({ cardId: CARD_ID })
+    .select({
+      _id: 0,
+      cardId: 1,
+      'mediaUrls.altText': 1,
+      'mediaUrls.image': 1,
+      questionId: 1,
+      questionPostedAt: 1,
+      questionImages: 1,
+      questionAltText: 1,
+      prevLineImages: 1,
+      prevLineAltText: 1
+    }).lean().exec();
 }

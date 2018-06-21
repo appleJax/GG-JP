@@ -135,8 +135,8 @@ const CATEGORIES = [
   'dailyStats'
 ];
 
-async function getUsers() {
-  return await Scoreboard.find().sort({ userId: 'asc' }).lean().exec();
+function getUsers() {
+  return Scoreboard.find().sort({ userId: 'asc' }).lean().exec();
 }
 
 async function setOnUser({ userId }, field, value) {
@@ -151,8 +151,8 @@ async function setOnUser({ userId }, field, value) {
   await Scoreboard.updateOne({ userId }, update).exec();
 }
 
-async function setCorrectStreak({ userId }, value) {
-  return await Scoreboard
+function setCorrectStreak({ userId }, value) {
+  return Scoreboard
     .updateOne(
       { userId },
       { $set:

@@ -55,8 +55,8 @@ it('should add the given points to the given LiveQuestion', async () => {
 
 // helpers
 
-async function fetchLiveQuestion(id) {
-  return await LiveQuestion.findOne(
+function fetchLiveQuestion(id) {
+  return LiveQuestion.findOne(
     { cardId: id }
   ).select({
     _id: 0,

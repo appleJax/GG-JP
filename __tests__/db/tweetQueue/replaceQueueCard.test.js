@@ -69,8 +69,8 @@ it('should replace the given cardId in the queue', async () => {
 
 // helper
 
-async function getTweetQueue() {
-  return await Queue.findOne().lean().then(obj => obj.queue);
+function getTweetQueue() {
+  return Queue.findOne().lean().then(obj => obj.queue);
 }
 
 

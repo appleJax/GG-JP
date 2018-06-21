@@ -389,10 +389,8 @@ export async function findOrCreateUser(userId, twitterUser, noSideEffects) {
   return user;
 }
 
-export async function getUser(user) {
-  return await tryCatch(
-    Scoreboard.findOne(user).lean().exec()
-  );
+export function getUser(user) {
+  return Scoreboard.findOne(user).lean().exec();
 }
 
 

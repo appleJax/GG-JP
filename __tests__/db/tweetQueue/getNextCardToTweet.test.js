@@ -63,8 +63,8 @@ it('should add nextCardToTweet to LiveQuestions', async () => {
 
 // helper
 
-async function fetch(model) {
-  return await model.find().lean().exec();
+function fetch(model) {
+  return model.find().lean().exec();
 }
 
 function getId(fetchResult) {

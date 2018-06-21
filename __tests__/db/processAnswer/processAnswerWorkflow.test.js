@@ -80,18 +80,19 @@ xit('should addPointsToScoreboard', async () => {
 
 // helper
 
-async function fetch(model) {
-  return await model.findOne({ cardId: CARD_ID })
-                    .select({
-                      _id: 0,
-                      answerId: 1,
-                      answerAltText: 1,
-                      answerImages: 1,
-                      answerPostedAt: 1,
-                      cardId: 1,
-                      'mediaUrls.altText': 1,
-                      'mediaUrls.image': 1,
-                      userPoints: 1,
-                      alreadyAnswered: 1
-                    }).lean().exec();
+function fetch(model) {
+  return model
+    .findOne({ cardId: CARD_ID })
+    .select({
+      _id: 0,
+      answerId: 1,
+      answerAltText: 1,
+      answerImages: 1,
+      answerPostedAt: 1,
+      cardId: 1,
+      'mediaUrls.altText': 1,
+      'mediaUrls.image': 1,
+      userPoints: 1,
+      alreadyAnswered: 1
+    }).lean().exec();
 }

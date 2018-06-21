@@ -100,16 +100,16 @@ it('should return null if tweetQueue is empty and cannot be refilled', async () 
 
 // helpers
 
-async function getQueueSize() {
-  return await Queue.findOne().then(obj => obj.queue.length);
+function getQueueSize() {
+  return Queue.findOne().then(obj => obj.queue.length);
 }
 
-async function getQueuedTimeslots() {
-  return await Queue.findOne().then(obj => obj.queue.map(entry => entry.time));
+function getQueuedTimeslots() {
+  return Queue.findOne().then(obj => obj.queue.map(entry => entry.time));
 }
 
-async function newCardCount() {
-  return await NewCard.find().count().exec();
+function newCardCount() {
+  return NewCard.find().count().exec();
 }
 
 

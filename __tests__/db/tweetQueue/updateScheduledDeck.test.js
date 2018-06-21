@@ -73,6 +73,6 @@ it('should return an empty object if no new decks exist', async () => {
 
 // helper
 
-async function fetch(model, query) {
-  return await model.findOne(query).lean().exec();
+function fetch(model, query) {
+  return model.findOne(query).lean().exec();
 }

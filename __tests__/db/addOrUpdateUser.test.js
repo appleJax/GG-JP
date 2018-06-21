@@ -67,8 +67,8 @@ it('should update the user if the user exists', async () => {
 
 // helpers
 
-async function fetchUser(id) {
-  return await Scoreboard.findOne(
+function fetchUser(id) {
+  return Scoreboard.findOne(
     { userId: id }
   ).select({
     _id: 0,

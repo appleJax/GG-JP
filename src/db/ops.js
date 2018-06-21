@@ -129,22 +129,18 @@ export default ({
     // TODO adjust a score manually
   },
 
-  async cachePoints(cardId, userPoints) {
-    return await tryCatch(
-      LiveQuestion.update(
-        { cardId },
-        { $push: {
-            alreadyAnswered: userPoints.userId,
-            userPoints
-          }
-      }).exec()
-    );
+  cachePoints(cardId, userPoints) {
+    return LiveQuestion.update(
+      { cardId },
+      { $push: {
+          alreadyAnswered: userPoints.userId,
+          userPoints
+        }
+    }).exec();
   },
 
-  async createUser({ body: user }, res) {
-    return await tryCatch(
-      Scoreboard.create(user)
-    );
+  createUser({ body: user }, res) {
+    return Scoreboard.create(user);
   },
 
   fetchTopTen(stats) {
@@ -166,10 +162,8 @@ export default ({
     );
   },
 
-  async getAnswerCard(cardId) {
-    return await tryCatch(
-      LiveQuestion.findOne({ cardId }).lean().exec()
-    );
+  getAnswerCard(cardId) {
+    return LiveQuestion.findOne({ cardId }).lean().exec();
   },
 
   async getDeck(req) {
@@ -221,14 +215,12 @@ export default ({
     return { cards, total };
   },
 
-  async getDeckTitles() {
-    return await tryCatch(
-      DeckTitle
+  getDeckTitles() {
+    return DeckTitle
       .find()
       .sort({ slug: 'asc' })
       .lean()
-      .exec()
-    );
+      .exec();
   },
 
   async getHardestQuestion() {
@@ -259,10 +251,8 @@ export default ({
     return hardestQuestion.question;
   },
   
-  async getLiveQuestions() {
-    return await tryCatch(
-      LiveQuestion.find().lean().exec()
-    );
+  getLiveQuestions() {
+    return LiveQuestion.find().lean().exec();
   },
 
   async getQueue() {
@@ -408,10 +398,8 @@ export default ({
       : null;
   },
 
-  async serveUser({ params: { userId }}) {
-    return await tryCatch(
-      getUser({ userId })
-    );
+  serveUser({ params: { userId }}) {
+    return getUser({ userId });
   },
 
   async updateLiveQuestion({
@@ -457,19 +445,17 @@ export default ({
 
 }) // dbOps export
 
-export async function getRecentAnswers() {
-  return await tryCatch(
-    OldCard
-      .find()
-      .sort({ answerPostedAt: 'desc' })
-      .limit(12)
-      .select({
-        alreadyAnswered: 0,
-        userPoints:      0
-      })
-      .lean()
-      .exec()
-  );
+export function getRecentAnswers() {
+  return OldCard
+    .find()
+    .sort({ answerPostedAt: 'desc' })
+    .limit(12)
+    .select({
+      alreadyAnswered: 0,
+      userPoints:      0
+    })
+    .lean()
+    .exec();
 }
 
 
@@ -493,29 +479,25 @@ export async function addPointsToScoreboard(liveQuestion) {
   await tryCatch(recalculateRank());
 }
 
-async function fetchStats(match, sortBy, skipCount, pageSize) {
-  return await tryCatch(
-    Scoreboard
-      .find(match)
-      .sort(sortBy)
-      .skip(skipCount)
-      .limit(pageSize)
-      .lean()
-      .exec()
-  );
+function fetchStats(match, sortBy, skipCount, pageSize) {
+  return Scoreboard
+    .find(match)
+    .sort(sortBy)
+    .skip(skipCount)
+    .limit(pageSize)
+    .lean()
+    .exec();
 }
 
-async function finalizeLiveQuestion(answerId, answerPostedAt, cardId, mediaUrls) {
-  return await tryCatch(
-    LiveQuestion.findOneAndUpdate(
-      { cardId },
-      { $push:  { mediaUrls: { $each: mediaUrls } },
-        $set:   { answerId, answerPostedAt },
-        $unset: { answerImages: '', answerAltText: '' }
-      },
-      { new: true, lean: true }
-    ).exec()
-  );
+function finalizeLiveQuestion(answerId, answerPostedAt, cardId, mediaUrls) {
+  return LiveQuestion.findOneAndUpdate(
+    { cardId },
+    { $push:  { mediaUrls: { $each: mediaUrls } },
+      $set:   { answerId, answerPostedAt },
+      $unset: { answerImages: '', answerAltText: '' }
+    },
+    { new: true, lean: true }
+  ).exec();
 }
 
 function finishPointsUpdates(cachedUpdates, allUsers, cardId) {

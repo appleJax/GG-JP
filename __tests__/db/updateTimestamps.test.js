@@ -112,13 +112,13 @@ it('should update all timestamps whose params are truthy', async () => {
 
 // helpers
 
-async function fetchTimestamps() {
-  return await Timestamp
-               .findOne()
-               .select({
-                 _id: 0,
-                 __v: 0
-               }).lean().exec();
+function fetchTimestamps() {
+  return Timestamp
+    .findOne()
+    .select({
+      _id: 0,
+      __v: 0
+    }).lean().exec();
 }
 
 function newTimestamp() {
