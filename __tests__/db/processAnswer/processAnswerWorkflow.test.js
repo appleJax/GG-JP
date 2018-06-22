@@ -58,7 +58,7 @@ it('should add the updated card to OldCards and delete the card from LiveQuestio
   const liveQuestionBefore = await fetch(LiveQuestion);
   const oldCardBefore      = await fetch(OldCard);
 
-  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ]);
+  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ], 'noSideEffects');
 
   const liveQuestionAfter = await fetch(LiveQuestion);
   const oldCardAfter      = await fetch(OldCard);
@@ -72,7 +72,7 @@ it('should add the updated card to OldCards and delete the card from LiveQuestio
 });
 
 xit('should addPointsToScoreboard', async () => {
-  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ]);
+  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ], 'noSideEffects');
 
   // TODO: expect addPointsToScoreboard to be called
 });

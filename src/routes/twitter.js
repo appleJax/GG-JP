@@ -4,9 +4,7 @@ import { processWebhookEvent } from 'Twitter/utils';
 
 const { TWITTER_API_SECRET } = process.env;
 
-
 export default (app) => {
-
   app.get('/webhook/twitter', (req, res) => {
     const hash = crypto
       .createHmac('sha256', TWITTER_API_SECRET)
@@ -28,11 +26,9 @@ export default (app) => {
       }
     }
   );
-
 }
 
 // private
-
 
 function validate(req) {
   const twitterHash = req.header('X-Twitter-Webhooks-Signature');
@@ -42,7 +38,7 @@ function validate(req) {
     .createHmac('sha256', TWITTER_API_SECRET)
     .update(req.rawBody || '')
     .digest('base64');
-  
+
   const expected = createBuffer(`sha256=${hash}`);
 
   return crypto.timingSafeEqual(payload, expected);

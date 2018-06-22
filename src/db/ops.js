@@ -27,7 +27,6 @@ const {
 } = models;
 
 export default ({
-
   async addDeck(req, res) {
     const filePath = req.file.path;
     const newCards = await tryCatch(processUpload(filePath));
@@ -50,8 +49,9 @@ export default ({
     for (let i = 0; i < newCards.length; ++i) {
       const newCard = newCards[i];
       const { cardId } = newCard;
-      if (oldCards.find(card => card.cardId === cardId))
+      if (oldCards.find(card => card.cardId === cardId)) {
         continue;
+      }
 
       if (liveQuestions.find(card => card.cardId === cardId)) {
         await tryCatch(
@@ -147,18 +147,18 @@ export default ({
     const category = `${stats}.rank`;
     return tryCatch(
       Scoreboard
-      .find({ [category]: { $gt: 0, $lte: 10 } })
-      .select({
-        _id: 0,
-        handle: 1,
-        [category]: 1,
-        [`${stats}.score`]: 1,
-        [`${stats}.highestScore`]: 1
-      })
-      .sort({ [category]: 'asc' })
-      .limit(10)
-      .lean()
-      .exec()
+        .find({ [category]: { $gt: 0, $lte: 10 } })
+        .select({
+          _id: 0,
+          handle: 1,
+          [category]: 1,
+          [`${stats}.score`]: 1,
+          [`${stats}.highestScore`]: 1
+        })
+        .sort({ [category]: 'asc' })
+        .limit(10)
+        .lean()
+        .exec()
     );
   },
 
@@ -179,8 +179,9 @@ export default ({
       DeckTitle.findOne({ slug }).lean().exec()
     );
 
-    if (!deck)
+    if (!deck) {
       return { cards: null, total: 0 };
+    }
 
     const skipCount = (Number(page) - 1) * Number(pageSize);
 
@@ -206,8 +207,9 @@ export default ({
       .exec()
     );
 
-    if (rawCards.length === 0)
+    if (rawCards.length === 0) {
       return { cards: null, total: 0 };
+    }
 
     const cards = formatFlashCards(rawCards);
     const total = deck.tweetedCards;
@@ -228,17 +230,17 @@ export default ({
 
     const lastWeeksQuestions = await tryCatch(
       OldCard
-      .find({
-        answerPostedAt: { $gte: oneWeekAgo }
-      })
-      .select({
-        _id:          0,
-        cardId:       1,
-        questionText: 1,
-        userPoints:   1
-      })
-      .lean()
-      .exec()
+        .find({
+          answerPostedAt: { $gte: oneWeekAgo }
+        })
+        .select({
+          _id:          0,
+          cardId:       1,
+          questionText: 1,
+          userPoints:   1
+        })
+        .lean()
+        .exec()
     );
 
     const hardestQuestion = lastWeeksQuestions.reduce((hardest, question) => {
@@ -315,8 +317,9 @@ export default ({
       );
     }
 
-    if (users.length === 0)
+    if (users.length === 0) {
       return { users: [], total: 0 };
+    }
     
     const total = await tryCatch(
       Scoreboard.find(match).count().exec()
@@ -341,8 +344,12 @@ export default ({
     return user;
   },
 
-  async processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls) {
-    await processDMs();
+  // noSideEffects for testing purposes
+  async processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls, noSideEffects) {
+    if (!noSideEffects) {
+      await processDMs();
+    }
+
     const currentQuestion = await finalizeLiveQuestion(
       answerId,
       answerPostedAt,
@@ -377,8 +384,9 @@ export default ({
   },
 
   async serveCards({ query: { ids } }) {
-    if (!ids || ids.length === 0)
+    if (!ids || ids.length === 0) {
       return null;
+    }
 
     const cards = await tryCatch(
       getCards(ids, OldCard)
@@ -464,7 +472,6 @@ export default ({
         Scoreboard.bulkWrite(bulkUpdateOps)
       );
   }
-
 }) // dbOps export
 
 export function getRecentAnswers() {
@@ -480,9 +487,7 @@ export function getRecentAnswers() {
     .exec();
 }
 
-
 // private functions
-
 
 // Exported for testing
 export async function addPointsToScoreboard(liveQuestion) {
@@ -494,8 +499,7 @@ export async function addPointsToScoreboard(liveQuestion) {
 
   const ops = finishPointsUpdates(cachedUpdates, allUsers, liveQuestion.cardId);
 
-  if (ops.length === 0)
-    return;
+  if (ops.length === 0) return;
 
   await tryCatch(Scoreboard.bulkWrite(ops));
   await tryCatch(recalculateRank());
@@ -552,22 +556,23 @@ function finishPointsUpdates(cachedUpdates, allUsers, cardId) {
           }
         }
       };
-
     } else { // User attempted to answer the current question
-
       const longestAnswerStreak = currentUser.allTimeStats.longestAnswerStreak;
       const newAnswerStreak = currentUser.allTimeStats.currentAnswerStreak + 1;
-      if (newAnswerStreak > longestAnswerStreak)
+      if (newAnswerStreak > longestAnswerStreak) {
         update.updateOne.update.$set['allTimeStats.longestAnswerStreak'] = newAnswerStreak;
+      }
 
       const longestCorrectStreak = currentUser.allTimeStats.longestCorrectStreak;
       const answeredCorrectly = update.updateOne.update.$inc['allTimeStats.score'] > 0;
       let newCorrectStreak = currentUser.allTimeStats.currentCorrectStreak;
-      if (answeredCorrectly)
+      if (answeredCorrectly) {
         newCorrectStreak++;
+      }
       
-      if (newCorrectStreak > longestCorrectStreak)
+      if (newCorrectStreak > longestCorrectStreak) {
         update.updateOne.update.$set['allTimeStats.longestCorrectStreak'] = newCorrectStreak;
+      }
 
       const categories = [
         'allTimeStats',
@@ -594,21 +599,22 @@ function finishPointsUpdates(cachedUpdates, allUsers, cardId) {
 
 async function getCards(ids, model) {
   const data = await tryCatch(
-    model.find({ cardId: { $in: ids }})
-         .select({
-           _id:            0,
-           answerId:       1,
-           answerPostedAt: 1,
-           answers:        1,
-           cardId:         1,
-           game:           1,
-           mainImageSlice: 1,
-           mediaUrls:      1,
-           questionText:   1,
-         })
-         .sort({ answerPostedAt: 'desc' })
-         .lean()
-         .exec()
+    model
+      .find({ cardId: { $in: ids }})
+      .select({
+        _id:            0,
+        answerId:       1,
+        answerPostedAt: 1,
+        answers:        1,
+        cardId:         1,
+        game:           1,
+        mainImageSlice: 1,
+        mediaUrls:      1,
+        questionText:   1,
+      })
+      .sort({ answerPostedAt: 'desc' })
+      .lean()
+      .exec()
   );
 
   const cards = formatFlashCards(data);
@@ -665,12 +671,11 @@ function initialPointsUpdates({ userPoints = [], cardId = '' }) {
           timeToAnswer
         }
       };
-      op.updateOne.update.$inc['yearlyStats.correct']  = 1;
+      op.updateOne.update.$inc[ 'yearlyStats.correct'] = 1;
       op.updateOne.update.$inc['monthlyStats.correct'] = 1;
-      op.updateOne.update.$inc['weeklyStats.correct']  = 1;
-      op.updateOne.update.$inc['dailyStats.correct']   = 1;
+      op.updateOne.update.$inc[ 'weeklyStats.correct'] = 1;
+      op.updateOne.update.$inc[  'dailyStats.correct'] = 1;
       op.updateOne.update.$inc['allTimeStats.currentCorrectStreak'] = 1;
-
     } else {
       op.updateOne.update.$set['allTimeStats.currentCorrectStreak'] = 0;
       op.updateOne.update.$push = {
@@ -691,8 +696,9 @@ export async function recalculateRank() {
   );
   const bulkUpdateOps = buildRankUpdates(stats, currentTimestamp);
 
-  if (bulkUpdateOps.length === 0)
+  if (bulkUpdateOps.length === 0) {
     return;
+  }
 
   await tryCatch(Scoreboard.bulkWrite(bulkUpdateOps));
 }
@@ -721,4 +727,4 @@ export async function updateTimestamps(newWeek, newMonth, newYear) {
   await tryCatch(
     Timestamp.update({}, update).exec()
   );
-} 
+}

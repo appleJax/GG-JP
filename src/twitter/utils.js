@@ -9,7 +9,7 @@ import {
 
 const { Timestamp } = models;
 const {
-  APP_URL,
+  APP_URL
   // BOT_URL,      // for twitter account_activity api (not currently used)
   // WEBHOOK_ID    // for twitter account_activity api (not currently used)
 } = process.env;
@@ -67,7 +67,6 @@ export async function postMedia(
   prevLineImages,
   altText2
 ) {
-
   const mainImageId = await tryCatch(
     uploadMedia(mainImages[0], altText1)
   );
@@ -116,7 +115,7 @@ export async function postMedia(
       );
 
       return {
-        tweetId:  data.id_str,
+        tweetId: data.id_str,
         postedAt: new Date(data.created_at).getTime(),
         mediaUrls
       };
@@ -172,7 +171,6 @@ export async function processWebhookEvent(payload, processMsg = evaluateResponse
   }
 }
 
-
 // private functions
 
 function countChars(status) {
@@ -197,7 +195,6 @@ function ensureUnder280(status, context = 'question') {
 
 async function evaluateDMs(directMessages) {
   let reply;
-  
   for (let i = directMessages.length - 1; i >= 0; i--) {
     reply = directMessages[i];
     if (reply) {
@@ -220,7 +217,6 @@ export async function fetchDMs(twitterClient = Twitter) {
   let lastTimestamp = 0;
 
   do {
-
     const {
       data: {
         nextCursor,
@@ -242,8 +238,7 @@ export async function fetchDMs(twitterClient = Twitter) {
     directMessages = directMessages.concat(events);
     params.cursor = nextCursor;
     firstRequest = false;
-
-  } while (params.cursor && lastTimestamp > lastReadDM)
+  } while (params.cursor && lastTimestamp > lastReadDM);
 
   return directMessages.filter(msg =>
     toTimestamp(msg.created_timestamp) > lastReadDM
@@ -280,20 +275,12 @@ function getLastTimestamp(events) {
     );
 }
 
-function getLastQuestionPosted(liveQuestions) {
-  return liveQuestions.reduce((maxId, card) =>
-    (card.questionId > maxId)
-      ? card.questionId
-      : maxId
-    , 0);
-}
-
 function getMostRecentTimestamp(events) {
   return !events || !events[0]
     ? 0
     : toTimestamp(
-        events[0].created_timestamp
-      );
+      events[0].created_timestamp
+    );
 }
 
 function toTimePeriod(category) {
@@ -319,12 +306,11 @@ function updateLastReadDM(timestamp) {
 // media_id which is necessary for
 // attaching media to a tweet
 function uploadMedia(b64Image, altText) {
-    // first we must post the media to Twitter
+  // first we must post the media to Twitter
   return Twitter.post(
     'media/upload',
     { media_data: b64Image }
   ).then(({ data }) => {
-
     // now we can assign alt text to the media, for use by screen readers and
     // other text-based presentations and interpreters
     const mediaIdStr = data.media_id_string;

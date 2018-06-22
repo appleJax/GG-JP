@@ -2,9 +2,7 @@ import DB from 'DB/ops';
 import { cache } from 'Config/redis';
 import { getTimeTilNextTweet, send } from 'Utils';
 
-
 export default (app) => {
-
   app.get('/api/cards', (req, res) =>
     DB.serveCards(req).then(send(res))
   );
@@ -62,7 +60,6 @@ export default (app) => {
   app.get('/api/countdown', (req, res) =>
     res.json({ millis: getTimeTilNextTweet() })
   );
-
 }
 
 // private

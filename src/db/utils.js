@@ -7,11 +7,6 @@ import {
 } from 'Utils'
 
 const {
-  DeckTitle,
-  NewCard,
-  OldCard,
-  LiveQuestion,
-  Schedule,
   Scoreboard,
   Sponsor,
   Timestamp
@@ -22,8 +17,9 @@ export async function addSponsor(statusText) {
     Sponsor.findOne().lean().exec()
   );
 
-  if (!sponsors || sponsors.queue.length === 0)
+  if (!sponsors || sponsors.queue.length === 0) {
     return statusText;
+  }
 
   const sponsorMessage = getSponsorMessage(sponsors);
   await updateSponsorIndex(sponsors);
@@ -152,8 +148,9 @@ export async function buildStatUpdates(newWeek, newMonth, newYear) {
 }
 
 export function buildRankUpdates(stats, currentTimestamp) {
-  if (!stats || stats.length === 0)
+  if (!stats || stats.length === 0) {
     return [];
+  }
 
   const usersToUpdate = {};
   const currentRanks = {
@@ -193,7 +190,7 @@ export function buildRankUpdates(stats, currentTimestamp) {
           cachedUpdate[category] = currentRank;
 
           if (category === 'allTimeStats') {
-            const oldBestRank = user.allTimeStats.bestRank.value; 
+            const oldBestRank = user.allTimeStats.bestRank.value;
             if (
               currentRank > 0 &&
               (oldBestRank === 0 || currentRank <= oldBestRank)
@@ -230,17 +227,19 @@ export function buildRankUpdates(stats, currentTimestamp) {
     const userUpdates = usersToUpdate[currentUser];
     Object.keys(currentRanks).forEach(category => {
       const newRank = userUpdates[category];
-      if (newRank)
+      if (newRank) {
         op.updateOne.update.$set[`${category}.rank`] = newRank;
+      }
     });
 
     const newBestRank = userUpdates.bestRank;
-    if (newBestRank)
+    if (newBestRank) {
       op.updateOne.update.$set['allTimeStats.bestRank'] = newBestRank;
+    }
 
-    if (Object.keys(op.updateOne.update.$set).length > 0)
+    if (Object.keys(op.updateOne.update.$set).length > 0) {
       bulkUpdateOps.push(op);
-
+    }
   } // for loop
 
   return bulkUpdateOps;
@@ -318,7 +317,6 @@ export function calculateNewStats(oldStats, currentTimestamp, addRank) {
   return newStats;
 }
 
-
 // noSideEffects for testing purposes
 export async function createUserObject(profile, noSideEffects) {
   const {
@@ -353,12 +351,11 @@ export async function findOrCreateUser(userId, twitterUser, noSideEffects) {
 
   if (!user) {
     user = await tryCatch(
-      createUserObject(twitterUser)
+      createUserObject(twitterUser, noSideEffects)
     );
     await tryCatch(
       Scoreboard.create(user)
     );
-
   } else {
     const {
       name,
@@ -370,8 +367,8 @@ export async function findOrCreateUser(userId, twitterUser, noSideEffects) {
     const following = noSideEffects
       ? []
       : await tryCatch (
-          getFollowing(userId)
-        );
+        getFollowing(userId)
+      );
 
     user = await tryCatch(
       Scoreboard.findOneAndUpdate(
@@ -394,7 +391,6 @@ export async function findOrCreateUser(userId, twitterUser, noSideEffects) {
 export function getUser(user) {
   return Scoreboard.findOne(user).lean().exec();
 }
-
 
 // private functions
 
@@ -423,8 +419,9 @@ function updateSponsorIndex(sponsors) {
   const numSponsors = sponsors.queue.length;
   let index = sponsors.index;
 
-  if (++index >= numSponsors)
+  if (++index >= numSponsors) {
     index = 0;
+  }
 
   return tryCatch(
     Sponsor.updateOne({}, {

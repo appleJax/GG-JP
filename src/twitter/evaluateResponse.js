@@ -64,7 +64,6 @@ export default async function evaluateResponse({
         )
       );
     }
-
   } else {
     await tryCatch(
       DB.cachePoints(

@@ -22,8 +22,9 @@ export async function getNextCardToTweet() {
     updateTweetQueue()
   );
 
-  if (!nextCardId)
+  if (!nextCardId) {
     return NO_CARD;
+  }
 
   const nextCard = await tryCatch(
     NewCard.findOne({ cardId: nextCardId }).lean().exec()
@@ -34,7 +35,6 @@ export async function getNextCardToTweet() {
 
   return nextCard;
 }
-
 
 export async function replaceQueueCard(req) {
   const {
@@ -60,7 +60,6 @@ export async function replaceQueueCard(req) {
 
 // private functions
 
-
 // exported for testing
 export async function getCardForTimeslot(hour, queuePosition = 0) {
   const scheduledDeck = await tryCatch(
@@ -71,8 +70,9 @@ export async function getCardForTimeslot(hour, queuePosition = 0) {
     getCardFromDeck(scheduledDeck, queuePosition)
   );
 
-  if (!randomCardId)
+  if (!randomCardId) {
     console.error('No appropriate cards available.');
+  }
 
   return randomCardId;
 }
@@ -92,13 +92,14 @@ export async function getCardFromDeck(scheduledDeck, queuePosition) {
   let spoiled = Spoilers.check(randomCard);
 
   let tries = 0;
-  while(spoiled) {
+  while (spoiled) {
     if (tries > 20) {
       console.error('All new cards contain spoilers. Please try again later.');
       return null;
     }
-    if (tries++ > 10)
+    if (tries++ > 10) {
       scheduledDeck = {};
+    }
 
     randomCard = await tryCatch(
       pullCard(scheduledDeck)
@@ -138,7 +139,6 @@ function getTweetQueue() {
   );
 }
 
-
 // exported for testing
 export async function getScheduledDeck(hour) {
   hour = hour || getHour();
@@ -157,8 +157,9 @@ export async function getScheduledDeck(hour) {
     NewCard.find({ game: scheduledDeck }).count().exec()
   );
 
-  if (availableCards > 0)
+  if (availableCards > 0) {
     return { game: scheduledDeck };
+  }
 
   const newScheduledDeck = await tryCatch(
     updateScheduledDeck(hour, scheduledDeck)
@@ -169,10 +170,9 @@ export async function getScheduledDeck(hour) {
 
 function pullCard(deck) {
   return NewCard.aggregate([
-      { $match: deck },
-      { $sample: { size: 1 }}
-    ])
-    .then(cards => Promise.resolve(cards[0]));
+    { $match: deck },
+    { $sample: { size: 1 } }
+  ]).then(cards => Promise.resolve(cards[0]));
 }
 
 function saveQueue(tweetQueue) {
@@ -204,11 +204,10 @@ async function SpoilChecker(queuePosition) {
   const liveAnswers = getLiveAnswers(willBeLive);
 
   return {
-    check: (randomCard) => {
-     return empty(randomCard) ||
-            queuedCards.find(card => card.cardId === randomCard.cardId) ||
-            isSpoiled(randomCard, spoilerText, liveAnswers);
-    }
+    check: (randomCard) =>
+      empty(randomCard) ||
+      queuedCards.find(card => card.cardId === randomCard.cardId) ||
+      isSpoiled(randomCard, spoilerText, liveAnswers)
   };
 }
 
@@ -267,9 +266,10 @@ export async function fillTweetQueue(queueSize) {
       getCardForTimeslot(timeslot)
     );
 
-    if (empty(nextCardId))
+    if (empty(nextCardId)) {
       break;
-    
+    }
+
     tweetQueue.unshift({
       cardId: nextCardId,
       time: timeslot
@@ -287,15 +287,15 @@ export async function updateTweetQueue() {
   );
   const tweetQueue = await getTweetQueue();
 
-  if (tweetQueue.length === 0)
+  if (tweetQueue.length === 0) {
     return null;
+  }
 
   const nextCardToTweet = tweetQueue.pop().cardId;
   await saveQueue(tweetQueue);
 
   return nextCardToTweet;
 }
-
 
 // utility functions
 
@@ -304,7 +304,7 @@ function empty(obj) {
 }
 
 function getLastTimeslot(tweetQueue) {
-  let hour = (tweetQueue && tweetQueue[0] && tweetQueue[0].time); 
+  let hour = (tweetQueue && tweetQueue[0] && tweetQueue[0].time);
   if (!hour) {
     hour = getHour();
     while (TWEET_TIMES.indexOf(hour) === -1) {

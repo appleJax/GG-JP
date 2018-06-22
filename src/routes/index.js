@@ -9,7 +9,6 @@ const { NODE_ENV, NO_HTTPS, ORIGIN_URL } = process.env;
 const dev = NODE_ENV === 'dev';
 
 export default (app) => {
-
   // Enable reverse proxy support in Express. This causes the
   // the "X-Forwarded-Proto" header field to be trusted so its
   // value can be used to determine the protocol.
@@ -38,5 +37,4 @@ export default (app) => {
   routeAdminPanel(app);
   routeApi(app);
   routeUI(app);
-
 };

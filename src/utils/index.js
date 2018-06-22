@@ -130,12 +130,12 @@ export function t(type, defaultVal) {
 }
 
 export function tryCatch(promise) {
- return promise
-   .then(data => data)
-   .catch(err => {
-     console.error('Error:', err);
-     return {};
-   });
+  return promise
+    .then(data => data)
+    .catch(err => {
+      console.error('Error:', err);
+      return {};
+    });
 }
 
 export function tweetLink(cardId) {
@@ -143,7 +143,6 @@ export function tweetLink(cardId) {
     `/search?q=from%3A${TWITTER_ACCOUNT}%20QID${cardId}` +
     '&ref_src=twcamp%5Eshare%7Ctwsrc%5Em5%7Ctwgr%5Eemail%7Ctwcon%5E7046%7Ctwterm%5E1';
 }
-
 
 // private functions
 

@@ -3,7 +3,6 @@ import passport from 'Config/passport';
 const { UI_URL } = process.env;
 
 export default (app) => {
-
   app.use(passport.initialize())
   app.use(passport.session())
 
@@ -27,5 +26,4 @@ export default (app) => {
     req.session.destroy(console.error);
     res.sendStatus(200);
   });
-
 };

@@ -21,11 +21,9 @@ import {
   formatAnswerStatus
 } from 'DB/utils';
 
-
 const ANSWER_INTERVAL = 24 * HOURS;
 const QUESTION_INTERVAL = 6 * HOURS;
 const POLL_DM_INTERVAL = 90 * 1000;
-
 
 export default ({
 
@@ -58,7 +56,7 @@ async function scheduleActions() {
 
   setTimeout(() => {
     updateStats();
-    setInterval(updateStats, 24*HOURS);
+    setInterval(updateStats, 24 * HOURS);
   }, timeUntilUpdates);
 }
 
@@ -79,13 +77,11 @@ function tweetOrScheduleAnswers(liveQuestions) {
 async function tweetQuestion() {
   const {
     cardId,
-    game,
     questionText,
     questionImages,
     questionAltText,
     prevLineImages,
     prevLineAltText,
-    answers
   } = await tryCatch(getNextCardToTweet());
   if (!cardId) return;
 
@@ -189,5 +185,5 @@ async function updateStats() {
 
   setTimeout(() => {
     DB.updateStats(newWeek, newMonth, newYear);
-  }, 3*HOURS);
+  }, 3 * HOURS);
 }

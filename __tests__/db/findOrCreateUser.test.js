@@ -50,10 +50,12 @@ it('should create and return new user if user does not exist', async () => {
   const existingUser = await Scoreboard.findOne(
     { userId: USER_ID }
   ).lean().exec();
+  console.log('Found user');
 
   const newUser = await filterProps(
     findOrCreateUser(USER_ID, twitterProfile, 'noSideEffects')
   );
+  console.log('New user');
 
   expect(existingUser).toBeNull();
   expect(newUser).toEqual(result)
