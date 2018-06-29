@@ -16,7 +16,7 @@
     "stageit": "npm run build:staging && pushd ../GG-UI && npm run build:staging && popd && npm run deploy:staging",
     "serveit": "npm run build:dev && pushd ../GG-UI && npm run build:dev && popd && npm start",
     "start": "node ./dist/server.js",
-    "standard": "standard",
+    "standard": "standard || exit 0",
     "test": "jest --runInBand",
     "test:cov": "jest --runInBand --collectCoverage",
     "test:watch": "jest --runInBand --watch"

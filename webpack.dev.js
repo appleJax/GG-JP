@@ -1,6 +1,6 @@
-const merge = require('webpack-merge');
-const common = require('./webpack.common');
-const webpack = require('webpack');
+const merge = require('webpack-merge')
+const common = require('./webpack.common')
+const webpack = require('webpack')
 const {
   APP_URL,
   BOT_URL,
@@ -18,7 +18,7 @@ const {
   TWITTER_TOKEN,
   TWITTER_TOKEN_SECRET,
   UI_URL
-} = require('./.env.js').dev;
+} = require('./.env.js').dev
 
 module.exports = merge(common, {
   devtool: 'inline-source-map',
@@ -48,4 +48,4 @@ module.exports = merge(common, {
       'process.env.UI_URL':               JSON.stringify(UI_URL)
     })
   ]
-});
+})

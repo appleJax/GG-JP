@@ -1,55 +1,55 @@
-import passport from 'Config/passport';
-import authorization from 'express-authorization';
-import multer from 'multer';
-import DB from 'DB/ops';
-import { replaceQueueCard } from 'DB/tweetQueue';
-import { addAltAnswer, issueAnswerCorrection } from 'Admin/utils';
+import passport from 'Config/passport'
+import authorization from 'express-authorization'
+import multer from 'multer'
+import DB from 'DB/ops'
+import { replaceQueueCard } from 'DB/tweetQueue'
+import { addAltAnswer, issueAnswerCorrection } from 'Admin/utils'
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: 'uploads/' })
 const ensureAdmin = authorization
   .ensureRequest
   .redirectTo('/admin/login')
-  .isPermitted('admin');
+  .isPermitted('admin')
 
 export default (app) => {
   // if there's a flash message in the session request,
   // make it available in the response, then delete it
   app.use((req, res, next) => {
     if (req.session) {
-      res.locals.flash = req.session.flash;
-      delete req.session.flash;
-      next();
-    } else next();
-  });
+      res.locals.flash = req.session.flash
+      delete req.session.flash
+      next()
+    } else next()
+  })
 
   // Admin Panel
 
   // app.get('/',
   //   redirectAdmin,
   //   (req, res) => res.render('index')
-  // );
+  // )
 
   app.get('/admin/login',
     redirectAdmin,
     (req, res) => res.render('login')
-  );
+  )
 
   app.post('/admin/login',
     passport.authenticate('local', {
       failureRedirect: '/admin/login',
       successRedirect: '/admin'
     })
-  );
+  )
 
   app.post('/admin/logout', (req, res) => {
-    req.session.destroy(console.error);
-    res.redirect('/admin/login');
-  });
+    req.session.destroy(console.error)
+    res.redirect('/admin/login')
+  })
 
   app.get('/admin',
     ensureAdmin,
     serveAdminPage
-  );
+  )
 
   app.post('/admin/deck/new',
     ensureAdmin,
@@ -59,22 +59,22 @@ export default (app) => {
           req.session.flash = {
             type: 'success',
             message: 'Deck uploaded successfully.'
-          };
-          res.redirect('/admin');
+          }
+          res.redirect('/admin')
         })
         .catch(err => {
           req.session.flash = {
             type: 'error',
             message: err.message || 'Something went wrong. Please try again.'
-          };
-          res.redirect('/admin');
+          }
+          res.redirect('/admin')
         })
-  );
+  )
 
   app.post('/admin/scores/edit',
     ensureAdmin,
     DB.adjustScore
-  );
+  )
 
   app.post('/admin/queue-card/replace',
     ensureAdmin,
@@ -84,17 +84,17 @@ export default (app) => {
           req.session.flash = {
             type: 'success',
             message: `QID${req.body.cardId} successfully replaced.`
-          };
+          }
           res.redirect('/admin')
         })
         .catch(err => {
           req.session.flash = {
             type: 'error',
             message: err.message || 'Something went wrong. Please try again.'
-          };
+          }
           res.redirect('/admin')
         })
-  );
+  )
 
   app.post('/admin/corrections',
     ensureAdmin,
@@ -104,17 +104,17 @@ export default (app) => {
           req.session.flash = {
             type: 'success',
             message: `QID${req.body.cardId} successfully corrected.`
-          };
-          res.redirect('/admin');
+          }
+          res.redirect('/admin')
         })
         .catch(err => {
           req.session.flash = {
             type: 'error',
             message: err.message || 'Something went wrong. Please try again.'
-          };
-          res.redirect('/admin');
+          }
+          res.redirect('/admin')
         })
-  );
+  )
 
   app.post('/admin/add-alt-answer',
     ensureAdmin,
@@ -124,23 +124,23 @@ export default (app) => {
           req.session.flash = {
             type: 'success',
             message: `"${req.body.altAnswer}" successfully added as an alternate answer to QID${req.body.cardId}`
-          };
-          res.redirect('/admin');
+          }
+          res.redirect('/admin')
         })
         .catch(err => {
           req.session.flash = {
             type: 'error',
             message: err.message || 'Something went wrong. Please try again.'
-          };
-          res.redirect('/admin');
+          }
+          res.redirect('/admin')
         })
-  );
-}; // export default
+  )
+} // export default
 
 function redirectAdmin(req, res, next) {
   if (authorization.considerSubject(req.user).isPermitted('admin')) {
-    res.redirect('/admin');
-  } else next();
+    res.redirect('/admin')
+  } else next()
 }
 
 function serveAdminPage(req, res) {

@@ -1,10 +1,10 @@
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const nodeExternals = require('webpack-node-externals');
-const webpack = require('webpack');
-const path = require('path');
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const nodeExternals = require('webpack-node-externals')
+const webpack = require('webpack')
+const path = require('path')
 
-const { ADMIN_PW } = require('./.env.js').common;
+const { ADMIN_PW } = require('./.env.js').common
 
 module.exports = {
   entry: [
@@ -55,4 +55,4 @@ module.exports = {
     filename: 'server.js',
     path: path.resolve(__dirname, 'dist')
   }
-};
+}

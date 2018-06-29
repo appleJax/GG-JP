@@ -1,7 +1,7 @@
-import Mongoose from 'mongoose';
-import { t } from 'Utils';
+import Mongoose from 'mongoose'
+import { t } from 'Utils'
 
-const Schema = Mongoose.Schema;
+const Schema = Mongoose.Schema
 
 const schema = new Schema({
   alreadyAnswered: t( [String], [] ),
@@ -38,6 +38,6 @@ const schema = new Schema({
       userId: String
     }], []
   )
-});
+})
 
-export default Mongoose.model('liveQuestions', schema);
+export default Mongoose.model('liveQuestions', schema)

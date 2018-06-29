@@ -1,26 +1,26 @@
-const Mongoose = require('mongoose');
-const Models = require('Models').default;
+const Mongoose = require('mongoose')
+const Models = require('Models').default
 const { connectDB } = require('TestUtils')
-const { processAnswerWorkflow } = require('DB/ops').default;
+const { processAnswerWorkflow } = require('DB/ops').default
 
 const {
   LiveQuestion,
   OldCard,
   Timestamp
-} = Models;
+} = Models
 
 beforeAll(async () => {
-  await connectDB();
-});
+  await connectDB()
+})
 
 afterAll(async (done) => {
-  await Mongoose.disconnect(done);
-});
+  await Mongoose.disconnect(done)
+})
 
 const CARD_ID = 'c1'
-const mediaUrl1 = { altText: 'altText1', image: 'mediaUrl1' };
-const mediaUrl2 = { altText: 'altText2', image: 'mediaUrl2' };
-const mediaUrl3 = { altText: 'altText3', image: 'mediaUrl3' };
+const mediaUrl1 = { altText: 'altText1', image: 'mediaUrl1' }
+const mediaUrl2 = { altText: 'altText2', image: 'mediaUrl2' }
+const mediaUrl3 = { altText: 'altText3', image: 'mediaUrl3' }
 
 const sampleCard = {
   answerAltText: 'altText',
@@ -29,10 +29,10 @@ const sampleCard = {
   mediaUrls: [ mediaUrl1 ],
   userPoints: [],
   alreadyAnswered: []
-};
+}
 
 const ANSWER_ID = 'a1'
-const ANSWER_POSTED_AT = 1234;
+const ANSWER_POSTED_AT = 1234
 const updatedCard = {
   answerId: ANSWER_ID,
   answerPostedAt: ANSWER_POSTED_AT,
@@ -40,43 +40,41 @@ const updatedCard = {
   mediaUrls: [ mediaUrl1, mediaUrl2, mediaUrl3 ],
   userPoints: [],
   alreadyAnswered: []
-};
+}
 
 beforeEach(async () => {
-  await LiveQuestion.create(sampleCard);
-  await Timestamp.create({});
-});
+  await LiveQuestion.create(sampleCard)
+  await Timestamp.create({})
+})
 
 afterEach(async () => {
-  await LiveQuestion.remove();
-  await OldCard.remove();
-  await Timestamp.remove();
-});
-
+  await LiveQuestion.remove()
+  await OldCard.remove()
+  await Timestamp.remove()
+})
 
 it('should add the updated card to OldCards and delete the card from LiveQuestions', async () => {
-  const liveQuestionBefore = await fetch(LiveQuestion);
-  const oldCardBefore      = await fetch(OldCard);
+  const liveQuestionBefore = await fetch(LiveQuestion)
+  const oldCardBefore      = await fetch(OldCard)
 
-  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ], 'noSideEffects');
+  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ], 'noSideEffects')
 
-  const liveQuestionAfter = await fetch(LiveQuestion);
-  const oldCardAfter      = await fetch(OldCard);
+  const liveQuestionAfter = await fetch(LiveQuestion)
+  const oldCardAfter      = await fetch(OldCard)
 
 
-  expect(liveQuestionBefore).toEqual(sampleCard);
-  expect(liveQuestionAfter).toBeNull();
+  expect(liveQuestionBefore).toEqual(sampleCard)
+  expect(liveQuestionAfter).toBeNull()
 
-  expect(oldCardBefore).toBeNull();
-  expect(oldCardAfter).toEqual(updatedCard);
-});
+  expect(oldCardBefore).toBeNull()
+  expect(oldCardAfter).toEqual(updatedCard)
+})
 
 xit('should addPointsToScoreboard', async () => {
-  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ], 'noSideEffects');
+  await processAnswerWorkflow(ANSWER_ID, ANSWER_POSTED_AT, CARD_ID, [ mediaUrl2, mediaUrl3 ], 'noSideEffects')
 
   // TODO: expect addPointsToScoreboard to be called
-});
-
+})
 
 // helper
 
@@ -94,5 +92,5 @@ function fetch(model) {
       'mediaUrls.image': 1,
       userPoints: 1,
       alreadyAnswered: 1
-    }).lean().exec();
+    }).lean().exec()
 }

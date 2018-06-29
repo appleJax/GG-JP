@@ -1,77 +1,77 @@
-import DB from 'DB/ops';
+import DB from 'DB/ops'
 import {
   fillTweetQueue,
   getNextCardToTweet
-} from 'DB/tweetQueue';
+} from 'DB/tweetQueue'
 import {
   HOURS,
   getTimeTilNextTweet,
   getTimeTilUpdates,
   tryCatch
-} from 'Utils';
+} from 'Utils'
 import {
   formatHardestQuestionTweet,
   formatTopTenTweet,
   postMedia,
   postTweet,
   processDMs
-} from 'Twitter/utils';
+} from 'Twitter/utils'
 import {
   addSponsor,
   formatAnswerStatus
-} from 'DB/utils';
+} from 'DB/utils'
 
-const ANSWER_INTERVAL = 24 * HOURS;
-const QUESTION_INTERVAL = 6 * HOURS;
-const POLL_DM_INTERVAL = 90 * 1000;
+const ANSWER_INTERVAL = 24 * HOURS
+const QUESTION_INTERVAL = 6 * HOURS
+const POLL_DM_INTERVAL = 90 * 1000
 
 export default ({
 
   // tweet() {
-  //   tweetQuestion();
-  //   pollDMs();
+  //   tweetQuestion()
+  //   pollDMs()
   // },
 
   start() {
-    scheduleActions();
+    scheduleActions()
   }
 
-});
+})
 
 async function scheduleActions() {
-  await pollDMs();
-  await tryCatch(fillTweetQueue(5));
-  const liveQuestions = await tryCatch(DB.getLiveQuestions());
+  await pollDMs()
+  await tryCatch(fillTweetQueue(5))
+  const liveQuestions = await tryCatch(DB.getLiveQuestions())
   if (liveQuestions.length > 0) {
-    tweetOrScheduleAnswers(liveQuestions);
+    tweetOrScheduleAnswers(liveQuestions)
   }
 
-  const timeUntilTweet = getTimeTilNextTweet();
-  const timeUntilUpdates = getTimeTilUpdates();
+  const timeUntilTweet = getTimeTilNextTweet()
+  const timeUntilUpdates = getTimeTilUpdates()
 
   setTimeout(() => {
-    tweetQuestion();
-    setInterval(tweetQuestion, QUESTION_INTERVAL);
-  }, timeUntilTweet);
+    tweetQuestion()
+    setInterval(tweetQuestion, QUESTION_INTERVAL)
+  }, timeUntilTweet)
 
   setTimeout(() => {
-    updateStats();
-    setInterval(updateStats, 24 * HOURS);
-  }, timeUntilUpdates);
+    updateStats()
+    setInterval(updateStats, 24 * HOURS)
+  }, timeUntilUpdates)
 }
 
 function tweetOrScheduleAnswers(liveQuestions) {
   liveQuestions.forEach(({ cardId, questionId, questionPostedAt }) => {
-    const scheduledAnswerTime = questionPostedAt + 24 * HOURS;
-    const now = new Date().getTime();
+    const scheduledAnswerTime = questionPostedAt + 24 * HOURS
+    const now = new Date().getTime()
 
     if (scheduledAnswerTime < now) {
-      tweetAnswer(cardId, questionId);
+      tweetAnswer(cardId, questionId)
     } else {
-      const after24Hours = scheduledAnswerTime - now;
-      setTimeout(() => tweetAnswer(cardId, questionId), after24Hours);
+      const after24Hours = scheduledAnswerTime - now
+      setTimeout(() => tweetAnswer(cardId, questionId), after24Hours)
     }
-  });
+  })
 }
 
 async function tweetQuestion() {
@@ -81,13 +81,14 @@ async function tweetQuestion() {
     questionImages,
     questionAltText,
     prevLineImages,
-    prevLineAltText,
-  } = await tryCatch(getNextCardToTweet());
-  if (!cardId) return;
+    prevLineAltText
+  } = await tryCatch(getNextCardToTweet())
+
+  if (!cardId) return
 
   const status = await tryCatch(
     addSponsor(questionText)
-  );
+  )
 
   const {
     mediaUrls,
@@ -101,16 +102,16 @@ async function tweetQuestion() {
       prevLineImages,
       prevLineAltText
     )
-  );
+  )
 
   const update = {
     cardId,
     mediaUrls,
     questionId,
     questionPostedAt
-  };
-  DB.updateLiveQuestion(update);
-  setTimeout(() => tweetAnswer(cardId, questionId), ANSWER_INTERVAL);
+  }
+  DB.updateLiveQuestion(update)
+  setTimeout(() => tweetAnswer(cardId, questionId), ANSWER_INTERVAL)
 }
 
 async function tweetAnswer(cardId, questionId) {
@@ -121,11 +122,11 @@ async function tweetAnswer(cardId, questionId) {
     userPoints
   } = await tryCatch(
     DB.getAnswerCard(cardId)
-  );
+  )
 
   const status = await tryCatch(
     formatAnswerStatus(answerText, questionId, userPoints)
-  );
+  )
 
   const {
     mediaUrls,
@@ -138,7 +139,7 @@ async function tweetAnswer(cardId, questionId) {
       answerImages,
       answerAltText
     )
-  );
+  )
 
   // EFFECTS:
   // - fetches/processes DM replies
@@ -146,44 +147,44 @@ async function tweetAnswer(cardId, questionId) {
   // - adds mediaUrls to card
   // - adds userPoints to scoreboard
   // - moves card from LiveQuestion to OldCard
-  DB.processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls);
+  DB.processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls)
 }
 
 async function pollDMs() {
-  await processDMs();
-  setInterval(processDMs, POLL_DM_INTERVAL);
+  await processDMs()
+  setInterval(processDMs, POLL_DM_INTERVAL)
 }
 
 async function tweetHardestQuestion() {
-  const hardestQuestion = await DB.getHardestQuestion();
-  const status = formatHardestQuestionTweet(hardestQuestion);
+  const hardestQuestion = await DB.getHardestQuestion()
+  const status = formatHardestQuestionTweet(hardestQuestion)
 
-  return postTweet(status);
+  return postTweet(status)
 }
 
 async function tweetTopTen(category = 'monthlyStats') {
-  const topTen = await DB.fetchTopTen(category);
-  const status = formatTopTenTweet(topTen, category);
+  const topTen = await DB.fetchTopTen(category)
+  const status = formatTopTenTweet(topTen, category)
 
   return postTweet(status)
 }
 
 async function updateStats() {
-  const now = new Date().getTime();
-  const tomorrow = new Date(now + 4 * HOURS);
+  const now = new Date().getTime()
+  const tomorrow = new Date(now + 4 * HOURS)
 
-  const newWeek = tomorrow.getUTCDay() === 0;
-  const newMonth = tomorrow.getUTCDate() === 1;
-  const newYear = newMonth && tomorrow.getUTCMonth() === 0;
+  const newWeek = tomorrow.getUTCDay() === 0
+  const newMonth = tomorrow.getUTCDate() === 1
+  const newYear = newMonth && tomorrow.getUTCMonth() === 0
 
   if (newWeek) {
-    await tryCatch(tweetHardestQuestion());
-    await tryCatch(tweetTopTen('weeklyStats'));
+    await tryCatch(tweetHardestQuestion())
+    await tryCatch(tweetTopTen('weeklyStats'))
   }
 
-  if (newMonth) await tryCatch(tweetTopTen('monthlyStats'));
+  if (newMonth) await tryCatch(tweetTopTen('monthlyStats'))
 
   setTimeout(() => {
-    DB.updateStats(newWeek, newMonth, newYear);
-  }, 3 * HOURS);
+    DB.updateStats(newWeek, newMonth, newYear)
+  }, 3 * HOURS)
 }

@@ -2,12 +2,12 @@
  * @jest-environment node
  */
 
-const { buildRankUpdates } = require('DB/utils');
+const { buildRankUpdates } = require('DB/utils')
 
-const NEW_TIMESTAMP = 123456;
-const NEW_BEST_RANK_VALUE = 1;
+const NEW_TIMESTAMP = 123456
+const NEW_BEST_RANK_VALUE = 1
 
-const updateOps = buildRankUpdates(sampleStats(), NEW_TIMESTAMP);
+const updateOps = buildRankUpdates(sampleStats(), NEW_TIMESTAMP)
 
 const users = [
   getUser('1', updateOps),
@@ -15,7 +15,7 @@ const users = [
   getUser('3', updateOps),
   getUser('4', updateOps),
   getUser('5', updateOps)
-];
+]
 
 describe(`
   new ranks are calculated according to
@@ -25,53 +25,50 @@ describe(`
   rank numbers are skipped for ties
   e.g. if two players tie for 2nd, the next rank will be 4
 `, () => {
-
   test('basic ranking by score', () => {
     expect(
       ranks(users, 'allTimeStats')
-    ).toEqual([1, 2, 3, 4, 5]);
-  });
+    ).toEqual([1, 2, 3, 4, 5])
+  })
 
   test('if score is tied, ranks by avgAnswerTime', () => {
     expect(
       ranks(users, 'yearlyStats')
-    ).toEqual([1, 2, 3, 4, 5]);
-  });
+    ).toEqual([1, 2, 3, 4, 5])
+  })
 
   test('next rank skips when tied score AND tied avgAnswerTime', () => {
     expect(
       ranks(users, 'monthlyStats')
-    ).toEqual([1, 1, 3, 4, 5]);
-  });
+    ).toEqual([1, 1, 3, 4, 5])
+  })
 
   test('no update if rank is unchanged', () => {
     expect(
       ranks(users, 'weeklyStats')
-    ).toEqual([undefined, 2, undefined, 4, 5]);
-  });
-
-}); // describe
+    ).toEqual([undefined, 2, undefined, 4, 5])
+  })
+}) // describe
 
 test('allTimeStats.bestRank is updated if new rank is better than previous bestRank', () => {
-  const newBestRank = getBestRank(users[0]);
+  const newBestRank = getBestRank(users[0])
   const expectedBestRank = {
     value: NEW_BEST_RANK_VALUE,
     timestamp: NEW_TIMESTAMP
-  };
-  expect(newBestRank).toEqual(expectedBestRank);
-});
-
+  }
+  expect(newBestRank).toEqual(expectedBestRank)
+})
 
 // helpers
 
 function getUser(userId, ops) {
   return ops.find(
     op => op.updateOne.filter.userId === userId
-  ).updateOne.update;
+  ).updateOne.update
 }
 
 function ranks(users, category) {
-  return users.map(rank(category));
+  return users.map(rank(category))
 }
 
 function rank(category) {
@@ -79,7 +76,7 @@ function rank(category) {
 }
 
 function getBestRank(user) {
-  return user.$set['allTimeStats.bestRank'];
+  return user.$set['allTimeStats.bestRank']
 }
 
 function sampleStats() {
@@ -291,5 +288,5 @@ function sampleStats() {
         }
       ] // scores
     }
-  ]; // stats
+  ] // stats
 }

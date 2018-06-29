@@ -1,18 +1,16 @@
 window.onload = () => {
-
   setTimeout(hideFlash, 7000);
 
   [ 'corrections-form',
     'alt-answer-form',
     'new-deck-form',
     'replace-card-form'
-  ].forEach(addSpinner);
-
-};
+  ].forEach(addSpinner)
+}
 
 function hideFlash() {
-  const flash = document.querySelector('.banner-container');
-  flash.classList.add('hidden');
+  const flash = document.querySelector('.banner-container')
+  flash.classList.add('hidden')
 }
 
 function addSpinner(formId) {
@@ -21,27 +19,27 @@ function addSpinner(formId) {
       'click',
       showSpinner
     )
-  );
+  )
 }
 
 function showSpinner(event) {
-  const formId = event.target.id.replace('submit', 'form');
-  const form = document.getElementById(formId);
+  const formId = event.target.id.replace('submit', 'form')
+  const form = document.getElementById(formId)
 
-  const shroud = makeDiv('shroud');
-  const spinner = makeDiv('spinner');
+  const shroud = makeDiv('shroud')
+  const spinner = makeDiv('spinner')
 
-  shroud.appendChild(spinner);
-  form.appendChild(shroud);
+  shroud.appendChild(spinner)
+  form.appendChild(shroud)
 }
 
 function getSubmitBtns(formId) {
-  const submitBtnClass = formId.replace('form', 'submit');
-  return document.querySelectorAll(`.${submitBtnClass}`);
+  const submitBtnClass = formId.replace('form', 'submit')
+  return document.querySelectorAll(`.${submitBtnClass}`)
 }
 
 function makeDiv(className) {
-  const div = document.createElement('div');
-  div.classList.add(className);
-  return div;
+  const div = document.createElement('div')
+  div.classList.add(className)
+  return div
 }

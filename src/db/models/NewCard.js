@@ -1,7 +1,7 @@
-import Mongoose from 'mongoose';
-import { t } from 'Utils';
+import Mongoose from 'mongoose'
+import { t } from 'Utils'
 
-const Schema = Mongoose.Schema;
+const Schema = Mongoose.Schema
 
 const schema = new Schema({
   answerAltText: t( String, '' ),
@@ -25,6 +25,6 @@ const schema = new Schema({
   questionId: String,
   questionImages: t( [String], [] ),
   questionText: String
-});
+})
 
-export default Mongoose.model('newCards', schema);
+export default Mongoose.model('newCards', schema)

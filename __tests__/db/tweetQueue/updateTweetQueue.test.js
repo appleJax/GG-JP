@@ -1,117 +1,114 @@
-const Mongoose = require('mongoose');
-const Models = require('Models').default;
+const Mongoose = require('mongoose')
+const Models = require('Models').default
 const { connectDB } = require('TestUtils')
-const { QUEUE_SIZE, updateTweetQueue } = require('DB/tweetQueue');
+const { QUEUE_SIZE, updateTweetQueue } = require('DB/tweetQueue')
 
 const {
   NewCard,
   Queue,
   Schedule
-} = Models;
-
+} = Models
 
 beforeAll(async () => {
-  await connectDB();
-});
+  await connectDB()
+})
 
 afterAll(async (done) => {
-  await Mongoose.disconnect(done);
-});
+  await Mongoose.disconnect(done)
+})
 
 beforeEach(async () => {
   await Schedule.insertMany([
-    { time: 2,  deck: 'Game at 2'},
-    { time: 8,  deck: 'Game at 8'},
-    { time: 14, deck: 'Game at 14'},
-    { time: 20, deck: 'Game at 20'}
-  ]);
+    { time: 2,  deck: 'Game at 2' },
+    { time: 8,  deck: 'Game at 8' },
+    { time: 14, deck: 'Game at 14' },
+    { time: 20, deck: 'Game at 20' }
+  ])
 
   await NewCard.insertMany(
     sampleNewCards()
-  );
+  )
 
-  await Queue.create(sampleQueue());
-});
+  await Queue.create(sampleQueue())
+})
 
 afterEach(async () => {
-  await NewCard.remove();
-  await Queue.remove();
-  await Schedule.remove();
-});
-
+  await NewCard.remove()
+  await Queue.remove()
+  await Schedule.remove()
+})
 
 it('should return the id for the next card to be tweeted', async () => {
-  const nextCardId = await updateTweetQueue();
+  const nextCardId = await updateTweetQueue()
 
-  expect(nextCardId).toEqual(sampleQueueCard().cardId);
-});
+  expect(nextCardId).toEqual(sampleQueueCard().cardId)
+})
 
 it('should ensure the queue has QUEUE_SIZE elements', async () => {
-  const queueSizeBefore = await getQueueSize();
-  await updateTweetQueue();
-  const queueSizeAfter = await getQueueSize();
+  const queueSizeBefore = await getQueueSize()
+  await updateTweetQueue()
+  const queueSizeAfter = await getQueueSize()
 
-  expect(queueSizeBefore).toEqual(1);
-  expect(queueSizeAfter).toEqual(QUEUE_SIZE);
-});
+  expect(queueSizeBefore).toEqual(1)
+  expect(queueSizeAfter).toEqual(QUEUE_SIZE)
+})
 
 it('should not queue a new card if a unique card cannot be found', async () => {
-  const queueSizeBefore = await getQueueSize();
-  await NewCard.remove();
+  const queueSizeBefore = await getQueueSize()
+  await NewCard.remove()
   await NewCard.create({
     cardId: '1',
     game: 'sample game'
-  });
-  await updateTweetQueue();
-  const queueSizeAfter = await getQueueSize();
+  })
+  await updateTweetQueue()
+  const queueSizeAfter = await getQueueSize()
 
-  expect(queueSizeBefore).toEqual(1);
-  expect(queueSizeAfter).toEqual(0);
-});
+  expect(queueSizeBefore).toEqual(1)
+  expect(queueSizeAfter).toEqual(0)
+})
 
 it('should not affect the NewCard collection', async () => {
-  const newCardCountBefore = await newCardCount();
+  const newCardCountBefore = await newCardCount()
 
-  await updateTweetQueue();
-  await updateTweetQueue();
-  await updateTweetQueue();
+  await updateTweetQueue()
+  await updateTweetQueue()
+  await updateTweetQueue()
 
-  const newCardCountAfter = await newCardCount();
+  const newCardCountAfter = await newCardCount()
 
-  expect(newCardCountBefore).toEqual(newCardCountAfter);
-});
+  expect(newCardCountBefore).toEqual(newCardCountAfter)
+})
 
 it('should queue tweets in the correct timeslot order', async () => {
-  await updateTweetQueue();
+  await updateTweetQueue()
 
-  const queuedTimeslots = await getQueuedTimeslots();
+  const queuedTimeslots = await getQueuedTimeslots()
 
-  expect(queuedTimeslots).toEqual([ 14, 8, 2, 20, 14, 8 ]);
-});
+  expect(queuedTimeslots).toEqual([ 14, 8, 2, 20, 14, 8 ])
+})
 
 it('should return null if tweetQueue is empty and cannot be refilled', async () => {
-  await NewCard.remove();
-  await updateTweetQueue();
+  await NewCard.remove()
+  await updateTweetQueue()
 
-  const nextCardId = await updateTweetQueue();
+  const nextCardId = await updateTweetQueue()
 
-  expect(nextCardId).toBeNull();
-});
+  expect(nextCardId).toBeNull()
+})
 
 // helpers
 
 function getQueueSize() {
-  return Queue.findOne().then(obj => obj.queue.length);
+  return Queue.findOne().then(obj => obj.queue.length)
 }
 
 function getQueuedTimeslots() {
-  return Queue.findOne().then(obj => obj.queue.map(entry => entry.time));
+  return Queue.findOne().then(obj => obj.queue.map(entry => entry.time))
 }
 
 function newCardCount() {
-  return NewCard.find().count().exec();
+  return NewCard.find().count().exec()
 }
-
 
 // Data initialization
 
@@ -145,14 +142,14 @@ function sampleNewCards() {
       cardId: '1',
       game: 'sample game'
     }
-  ];
+  ]
 }
 
 function sampleQueueCard() {
   return {
     cardId: '1',
     time: 2
-  };
+  }
 }
 
 function sampleQueue() {

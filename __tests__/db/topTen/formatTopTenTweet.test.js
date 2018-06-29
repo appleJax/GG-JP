@@ -1,97 +1,90 @@
-const { formatTopTenTweet } = require('Twitter/utils');
+const { formatTopTenTweet } = require('Twitter/utils')
 
-const { APP_URL } = process.env;
-
+const { APP_URL } = process.env
 
 describe('it should return an appropriate tweet status', () => {
-
   test('for the week', () => {
-    const category = 'weeklyStats';
-    const status = formatTopTenTweet(topTen(), category);
+    const category = 'weeklyStats'
+    const status = formatTopTenTweet(topTen(), category)
 
-    expect(status).toEqual(sampleStatus('week'));
-  });
+    expect(status).toEqual(sampleStatus('week'))
+  })
 
   test('for the month', () => {
-    const category = 'monthlyStats';
-    const status = formatTopTenTweet(topTen(), category);
+    const category = 'monthlyStats'
+    const status = formatTopTenTweet(topTen(), category)
 
-    expect(status).toEqual(sampleStatus('month'));
-  });
-
-});
+    expect(status).toEqual(sampleStatus('month'))
+  })
+})
 
 describe('it should recognize achievements', () => {
-
-
   describe('personal best', () => {
     test('for the week', () => {
       const topTenPBWeekly = replaceLeader(
         personalBest('weeklyStats'),
         topTen()
-      );
+      )
 
-      const status = formatTopTenTweet(topTenPBWeekly, 'weeklyStats');
-      const expectedStatus = sampleStatus('week', 'PB');
+      const status = formatTopTenTweet(topTenPBWeekly, 'weeklyStats')
+      const expectedStatus = sampleStatus('week', 'PB')
 
-      expect(status).toEqual(expectedStatus);
-    });
+      expect(status).toEqual(expectedStatus)
+    })
 
     test('for the month', () => {
       const topTenPBMonthly = replaceLeader(
         personalBest('monthlyStats'),
         topTen()
-      );
+      )
 
-      const status = formatTopTenTweet(topTenPBMonthly, 'monthlyStats');
-      const expectedStatus = sampleStatus('month', 'PB');
+      const status = formatTopTenTweet(topTenPBMonthly, 'monthlyStats')
+      const expectedStatus = sampleStatus('month', 'PB')
 
-      expect(status).toEqual(expectedStatus);
-    });
-  });
+      expect(status).toEqual(expectedStatus)
+    })
+  })
 
   test('perfect weekly score', () => {
     const topTenPerfectWeekly = replaceLeader(
       perfectScore(),
       topTen()
-    );
+    )
 
-    const status = formatTopTenTweet(topTenPerfectWeekly, 'weeklyStats');
-    const expectedStatus = sampleStatus('week', 'perfect');
+    const status = formatTopTenTweet(topTenPerfectWeekly, 'weeklyStats')
+    const expectedStatus = sampleStatus('week', 'perfect')
 
-    expect(status).toEqual(expectedStatus);
-  });
-
-});
-
+    expect(status).toEqual(expectedStatus)
+  })
+})
 
 // helpers
 
-const BASE_SCORE = 10100;
+const BASE_SCORE = 10100
 
 function topTen() {
-  const users = [];
+  const users = []
   for (let i = 1; i <= 10; i++) {
     users.push({
       handle: `user${i}`,
       monthlyStats: {
         rank: i,
-        score: BASE_SCORE - i*100,
+        score: BASE_SCORE - (i * 100),
         highestScore: {
           value: BASE_SCORE + 1
         }
       },
       weeklyStats: {
         rank: i,
-        score: BASE_SCORE - i*100,
+        score: BASE_SCORE - (i * 100),
         highestScore: {
           value: BASE_SCORE + 1
         }
       }
-    });
+    })
   }
 
-  return users;
+  return users
 }
 
 function perfectScore() {
@@ -108,15 +101,15 @@ function perfectScore() {
 }
 
 function personalBest(category) {
-  let monthlyOffset = 1;
-  let weeklyOffset = 1;
+  let monthlyOffset = 1
+  let weeklyOffset = 1
   if (category === 'weeklyStats') {
-    weeklyOffset = -1;
+    weeklyOffset = -1
   } else {
-    monthlyOffset = -1;
+    monthlyOffset = -1
   }
 
-  const PB_BASE = BASE_SCORE - 100;
+  const PB_BASE = BASE_SCORE - 100
   return {
     handle: 'pbUser',
     monthlyStats: {
@@ -137,19 +130,19 @@ function personalBest(category) {
 }
 
 function replaceLeader(newUser, topTen) {
-  return [ newUser ].concat(topTen.slice(1));
+  return [ newUser ].concat(topTen.slice(1))
 }
 
 function sampleStatus(timePeriod, achievement) {
-  let leader = '\n1 @user1 10,000';
+  let leader = '\n1 @user1 10,000'
   if (achievement === 'PB') {
-    leader = '\n1 @pbUser 10,000🏅';
+    leader = '\n1 @pbUser 10,000🏅'
   }
 
   if (achievement === 'perfect') {
-    leader = '\n1 @perfectUser 672🏆PERFECT';
+    leader = '\n1 @perfectUser 672🏆PERFECT'
   }
-      
+
   return `Congrats to this past ${timePeriod}'s Top 10!` +
     leader +
     '\n2 @user2 9,900' +
@@ -162,5 +155,5 @@ function sampleStatus(timePeriod, achievement) {
     '\n9 @user9 9,200' +
     '\n10 @user10 9,100' +
     '\n🏅= PB' +
-    `\nランキング: ${APP_URL}/stats`;
+    `\nランキング: ${APP_URL}/stats`
 }

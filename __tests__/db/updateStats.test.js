@@ -1,84 +1,84 @@
-const Mongoose = require('mongoose');
-const Models = require('Models').default;
+const Mongoose = require('mongoose')
+const Models = require('Models').default
 const { connectDB } = require('TestUtils')
-const { updateStats } = require('DB/ops').default;
+const { updateStats } = require('DB/ops').default
 
 const {
   Scoreboard,
   Timestamp
-} = Models;
+} = Models
 
 beforeAll(async () => {
-  await connectDB();
-});
+  await connectDB()
+})
 
 afterAll(async (done) => {
-  await Mongoose.disconnect(done);
-});
+  await Mongoose.disconnect(done)
+})
 
 beforeEach(async () => {
-  await Scoreboard.create(sampleUsers());
-  await Timestamp.create(sampleTimestamps());
-  const users = await fetchUsers();
-  expect(users).toEqual(sampleUsers());
-});
+  await Scoreboard.create(sampleUsers())
+  await Timestamp.create(sampleTimestamps())
+  const users = await fetchUsers()
+  expect(users).toEqual(sampleUsers())
+})
 
 afterEach(async () => {
-  await Scoreboard.remove();
-  await Timestamp.remove();
-});
+  await Scoreboard.remove()
+  await Timestamp.remove()
+})
 
-let updatedUsers;
+let updatedUsers
 
 it('should always update daily Stats', async () => {
-  await updateStats(false, false, false);
-  updatedUsers = await fetchUsers();
+  await updateStats(false, false, false)
+  updatedUsers = await fetchUsers()
 
-  isNotUpdated('yearlyStats');
-  isNotUpdated('monthlyStats',);
-  isNotUpdated('weeklyStats');
-  isUpdated('dailyStats');
-});
+  isNotUpdated('yearlyStats')
+  isNotUpdated('monthlyStats')
+  isNotUpdated('weeklyStats')
+  isUpdated('dailyStats')
+})
 
 it('should update weeklyStats when newWeek param is true', async () => {
-  await updateStats(true, false, false);
-  updatedUsers = await fetchUsers();
+  await updateStats(true, false, false)
+  updatedUsers = await fetchUsers()
 
-  isNotUpdated('yearlyStats');
-  isNotUpdated('monthlyStats');
-  isUpdated('weeklyStats');
-  isUpdated('dailyStats');
-});
+  isNotUpdated('yearlyStats')
+  isNotUpdated('monthlyStats')
+  isUpdated('weeklyStats')
+  isUpdated('dailyStats')
+})
 
 it('should update monthlyStats when newMonth param is true', async () => {
-  await updateStats(false, true, false);
-  updatedUsers = await fetchUsers();
+  await updateStats(false, true, false)
+  updatedUsers = await fetchUsers()
 
-  isNotUpdated('yearlyStats');
-  isUpdated('monthlyStats');
-  isNotUpdated('weeklyStats');
-  isUpdated('dailyStats');
-});
+  isNotUpdated('yearlyStats')
+  isUpdated('monthlyStats')
+  isNotUpdated('weeklyStats')
+  isUpdated('dailyStats')
+})
 
 it('should update yearlyStats when newYear param is true', async () => {
-  await updateStats(false, false, true);
-  updatedUsers = await fetchUsers();
+  await updateStats(false, false, true)
+  updatedUsers = await fetchUsers()
 
-  isUpdated('yearlyStats');
-  isNotUpdated('monthlyStats');
-  isNotUpdated('weeklyStats');
-  isUpdated('dailyStats');
-});
+  isUpdated('yearlyStats')
+  isNotUpdated('monthlyStats')
+  isNotUpdated('weeklyStats')
+  isUpdated('dailyStats')
+})
 
 it('should update yearlyStats, monthlyStats and weeklyStats when all params are true', async () => {
-  await updateStats(true, true, true);
-  updatedUsers = await fetchUsers();
+  await updateStats(true, true, true)
+  updatedUsers = await fetchUsers()
 
-  isUpdated('yearlyStats');
-  isUpdated('monthlyStats');
-  isUpdated('weeklyStats');
-  isUpdated('dailyStats');
-});
+  isUpdated('yearlyStats')
+  isUpdated('monthlyStats')
+  isUpdated('weeklyStats')
+  isUpdated('dailyStats')
+})
 
 // helpers
 
@@ -87,9 +87,9 @@ async function isUpdated(stats) {
     const updated = (stats === 'dailyStats')
       ? updatedStatsNoRank()
       : updatedStats()
-    
-    expect(user[stats]).toEqual(updated);
-  });
+
+    expect(user[stats]).toEqual(updated)
+  })
 }
 
 async function isNotUpdated(stats) {
@@ -97,9 +97,9 @@ async function isNotUpdated(stats) {
     const original = (stats === 'dailyStats')
       ? sampleStatsNoRank()
       : sampleStats()
-    
-    expect(user[stats]).toEqual(original);
-  });
+
+    expect(user[stats]).toEqual(original)
+  })
 }
 
 function fetchUsers() {
@@ -115,7 +115,7 @@ function fetchUsers() {
     profileBanner: 0
   }).sort({
     userId: 'asc'
-  }).lean().exec();
+  }).lean().exec()
 }
 
 function sampleUsers() {
@@ -136,7 +136,7 @@ function sampleUsers() {
       weeklyStats:  sampleStats(),
       dailyStats:   sampleStatsNoRank()
     }
-  ];
+  ]
 }
 
 function sampleTimestamps() {
@@ -144,8 +144,8 @@ function sampleTimestamps() {
     year: 123456,
     month: 123456,
     week: 123456,
-    day: 123456 
-  };
+    day: 123456
+  }
 }
 
 function sampleStatsNoRank() {
@@ -168,7 +168,7 @@ function sampleStatsNoRank() {
       timestamp: 0
     },
     history: []
-  };
+  }
 }
 
 function sampleStats(){
@@ -179,7 +179,7 @@ function sampleStats(){
       value: 10,
       timestamp: 0
     }
-  };
+  }
 }
 
 function updatedStatsNoRank() {
@@ -206,7 +206,7 @@ function updatedStatsNoRank() {
       avgAnswerTime: 9,
       timestamp: 123456
     }]
-  };
+  }
 }
 
 function updatedStats() {
@@ -223,5 +223,5 @@ function updatedStats() {
       avgAnswerTime: 9,
       timestamp: 123456
     }]
-  };
+  }
 }

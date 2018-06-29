@@ -1,7 +1,7 @@
-import Mongoose from 'mongoose';
-import { t } from 'Utils';
+import Mongoose from 'mongoose'
+import { t } from 'Utils'
 
-const Schema = Mongoose.Schema;
+const Schema = Mongoose.Schema
 
 const schema = new Schema({
   year:  t( Number, 0 ),
@@ -9,6 +9,6 @@ const schema = new Schema({
   week:  t( Number, 0 ),
   day:   t( Number, 0 ),
   lastReadDM: t( Number, 0 )
-});
+})
 
-export default Mongoose.model('timestamps', schema);
+export default Mongoose.model('timestamps', schema)

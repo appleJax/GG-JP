@@ -1,78 +1,74 @@
-const Mongoose = require('mongoose');
-const Models = require('Models').default;
+const Mongoose = require('mongoose')
+const Models = require('Models').default
 const { connectDB } = require('TestUtils')
-const { replaceQueueCard } = require('DB/tweetQueue');
+const { replaceQueueCard } = require('DB/tweetQueue')
 
 const {
   NewCard,
   Queue,
   Schedule
-} = Models;
+} = Models
 
 beforeAll(async () => {
-  await connectDB();
-});
+  await connectDB()
+})
 
 afterAll(async (done) => {
-  await Mongoose.disconnect(done);
-});
+  await Mongoose.disconnect(done)
+})
 
-
-const NEW_CARD_ID = 'newID';
-const SCHEDULED_DECK = 'scheduled deck';
-const CARD_ID_TO_REPLACE = 'oldID';
-const TIMESLOT_TO_REPLACE = 20;
+const NEW_CARD_ID = 'newID'
+const SCHEDULED_DECK = 'scheduled deck'
+const CARD_ID_TO_REPLACE = 'oldID'
+const TIMESLOT_TO_REPLACE = 20
 
 beforeEach(async () => {
   await Schedule.create({
     deck: SCHEDULED_DECK,
     time: TIMESLOT_TO_REPLACE
-  });
+  })
 
   await NewCard.insertMany(
     sampleNewCards()
-  );
+  )
 
   await Queue.create(
     sampleQueue()
-  );
-});
+  )
+})
 
 afterEach(async () => {
-  await NewCard.remove();
-  await Queue.remove();
-  await Schedule.remove();
-});
-
+  await NewCard.remove()
+  await Queue.remove()
+  await Schedule.remove()
+})
 
 it('should replace the given cardId in the queue', async () => {
   const cardToReplace = {
     body: {
       cardId: CARD_ID_TO_REPLACE
     }
-  };
+  }
 
-  const queueBefore = await getTweetQueue();
-  await replaceQueueCard(cardToReplace);
-  const queueAfter = await getTweetQueue();
+  const queueBefore = await getTweetQueue()
+  await replaceQueueCard(cardToReplace)
+  const queueAfter = await getTweetQueue()
 
-  const updatedQueue = sampleQueue().queue;
+  const updatedQueue = sampleQueue().queue
   const replacedEntry = updatedQueue.find(
     entry => entry.time === TIMESLOT_TO_REPLACE
-  );
-  replacedEntry.cardId = NEW_CARD_ID;
+  )
+  replacedEntry.cardId = NEW_CARD_ID
 
-  expect(queueBefore).toEqual(sampleQueue().queue);
-  expect(queueAfter).toEqual(updatedQueue);
-});
-
+  expect(queueBefore).toEqual(sampleQueue().queue)
+  expect(queueAfter).toEqual(updatedQueue)
+})
 
 // helper
 
 function getTweetQueue() {
-  return Queue.findOne().lean().then(obj => obj.queue);
+  return Queue.findOne().lean().then(obj => obj.queue)
 }
-
 
 // Data initialization
 
@@ -104,7 +100,7 @@ function sampleQueue() {
         time: 8
       }
     ]
-  };
+  }
 }
 
 function sampleNewCards() {
@@ -119,5 +115,5 @@ function sampleNewCards() {
     { cardId: CARD_ID_TO_REPLACE },
     { cardId: '5' },
     { cardId: '6' }
-  ];
+  ]
 }

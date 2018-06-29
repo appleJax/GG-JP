@@ -1,11 +1,11 @@
-import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
-import { Strategy as TwitterStrategy } from 'passport-twitter';
-import { isCorrect, tryCatch } from 'Utils';
+import passport from 'passport'
+import { Strategy as LocalStrategy } from 'passport-local'
+import { Strategy as TwitterStrategy } from 'passport-twitter'
+import { isCorrect, tryCatch } from 'Utils'
 import {
   findOrCreateUser,
   getUser
-} from 'DB/utils';
+} from 'DB/utils'
 
 const {
   BOT_URL,
@@ -17,14 +17,15 @@ passport.use(
   new LocalStrategy(
     async (username, password, done) => {
       if (isCorrect(password)) {
-        const user = await getUser({ handle: username });
-        if (user && user.permissions.includes('admin'))
-          return done(null, user);
+        const user = await getUser({ handle: username })
+        if (user && user.permissions.includes('admin')) {
+          return done(null, user)
+        }
       }
-      return done(null, false, { message: 'Not Authorized' });
+      return done(null, false, { message: 'Not Authorized' })
     }
   )
-);
+)
 
 passport.use(
   new TwitterStrategy({
@@ -33,26 +34,25 @@ passport.use(
     callbackURL: `${BOT_URL}/oauth_callback`
   },
   async (token, tokenSecret, profile, done) => {
-
     let user = await tryCatch(
       findOrCreateUser(profile.id, profile._json)
-    );
+    )
 
-    return done(null, user);
+    return done(null, user)
   })
-);
+)
 
 passport.serializeUser(
   (user, done) => done(null, user.userId)
-);
+)
 
 passport.deserializeUser(
   async (userId, done) => {
     const user = await tryCatch(
       getUser({ userId })
-    );
-    done(null, user);
+    )
+    done(null, user)
   }
-);
+)
 
-export default passport;
+export default passport

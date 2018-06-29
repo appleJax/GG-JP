@@ -1,76 +1,74 @@
-const Mongoose = require('mongoose');
-const Models = require('Models').default;
+const Mongoose = require('mongoose')
+const Models = require('Models').default
 const { connectDB } = require('TestUtils')
-const { getNextCardToTweet } = require('DB/tweetQueue');
+const { getNextCardToTweet } = require('DB/tweetQueue')
 
 const {
   LiveQuestion,
   NewCard,
   Queue
-} = Models;
+} = Models
 
-const NEXT_CARD_ID = 'c1';
+const NEXT_CARD_ID = 'c1'
 
 beforeAll(async () => {
-  await connectDB();
-});
+  await connectDB()
+})
 
 afterAll(async (done) => {
-  await Mongoose.disconnect(done);
-});
+  await Mongoose.disconnect(done)
+})
 
 beforeEach(async () => {
-  await NewCard.create({ cardId: NEXT_CARD_ID });
-  await Queue.create(sampleQueue());
-});
+  await NewCard.create({ cardId: NEXT_CARD_ID })
+  await Queue.create(sampleQueue())
+})
 
 afterEach(async () => {
-  await LiveQuestion.remove();
-  await NewCard.remove();
-  await Queue.remove();
-});
+  await LiveQuestion.remove()
+  await NewCard.remove()
+  await Queue.remove()
+})
 
 it('should return the next card in the queue', async () => {
-  const nextCard = await getNextCardToTweet();
+  const nextCard = await getNextCardToTweet()
 
-  expect(nextCard.cardId).toEqual(NEXT_CARD_ID);
-});
+  expect(nextCard.cardId).toEqual(NEXT_CARD_ID)
+})
 
 it('should remove nextCardToTweet from NewCards', async () => {
-  const beforeNewCards = await fetch(NewCard);
-  await getNextCardToTweet();
-  const afterNewCards = await fetch(NewCard);
+  const beforeNewCards = await fetch(NewCard)
+  await getNextCardToTweet()
+  const afterNewCards = await fetch(NewCard)
 
-  const beforeNewCardId = getId(beforeNewCards);
+  const beforeNewCardId = getId(beforeNewCards)
 
-  expect(beforeNewCards).toHaveLength(1);
-  expect(beforeNewCardId).toEqual(NEXT_CARD_ID);
-  expect(afterNewCards).toHaveLength(0);
-});
+  expect(beforeNewCards).toHaveLength(1)
+  expect(beforeNewCardId).toEqual(NEXT_CARD_ID)
+  expect(afterNewCards).toHaveLength(0)
+})
 
 it('should add nextCardToTweet to LiveQuestions', async () => {
-  const beforeLiveQuestions = await fetch(LiveQuestion);
-  await getNextCardToTweet();
-  const afterLiveQuestions = await fetch(LiveQuestion);
+  const beforeLiveQuestions = await fetch(LiveQuestion)
+  await getNextCardToTweet()
+  const afterLiveQuestions = await fetch(LiveQuestion)
 
-  const liveQuestionId = getId(afterLiveQuestions);
+  const liveQuestionId = getId(afterLiveQuestions)
 
-  expect(beforeLiveQuestions).toHaveLength(0);
-  expect(afterLiveQuestions).toHaveLength(1);
-  expect(liveQuestionId).toEqual(NEXT_CARD_ID);
-});
-
+  expect(beforeLiveQuestions).toHaveLength(0)
+  expect(afterLiveQuestions).toHaveLength(1)
+  expect(liveQuestionId).toEqual(NEXT_CARD_ID)
+})
 
 // helper
 
 function fetch(model) {
-  return model.find().lean().exec();
+  return model.find().lean().exec()
 }
 
 function getId(fetchResult) {
-  return fetchResult[0].cardId;
+  return fetchResult[0].cardId
 }
-
 
 // Data initialization
 
@@ -106,5 +104,5 @@ function sampleQueue() {
         time: 2
       }
     ]
-  };
+  }
 }
