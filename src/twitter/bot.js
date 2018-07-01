@@ -182,7 +182,9 @@ async function updateStats() {
     await tryCatch(tweetTopTen('weeklyStats'))
   }
 
-  if (newMonth) await tryCatch(tweetTopTen('monthlyStats'))
+  if (newMonth) {
+    setTimeout(() => tweetTopTen('monthlyStats'), 5000)
+  }
 
   setTimeout(() => {
     DB.updateStats(newWeek, newMonth, newYear)

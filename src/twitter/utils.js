@@ -190,7 +190,7 @@ function ensureUnder280(status, context = 'question') {
     ).join('\n')
   }
 
-  return status.replace('ランキング: ', '')
+  return status.split('\n').slice(0, -1).join('\n');
 }
 
 async function evaluateDMs(directMessages) {
