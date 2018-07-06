@@ -49,7 +49,7 @@ export function formatQuestionText(
 
   if (notes) tweetText += `\nNotes: ${notes}`
 
-  tweetText += `\nGame: ${game.replace(/\s(ENG|JP)$/, '')}`
+  tweetText += `\nGame: ${game.replace(/\s+JP$/, '')}`
   tweetText += `\nHow to Play: ${APP_URL}/how-to-play`
   tweetText += `\nSubmit Answer ➡️ ${DM_URL}${cardId}%20`
   tweetText += `\nQID${cardId}`

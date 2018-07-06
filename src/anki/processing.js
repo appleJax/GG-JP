@@ -13,15 +13,19 @@ import { tryCatch } from 'Utils'
 
 const UPLOADS_PATH = path.resolve(__dirname, '../uploads')
 
-export function processUpload(zipfilePath) {
+export function processUpload(zipfilePath, isPNG) {
   return tryCatch(new Promise(async (resolve, reject) => {
     const stream = fs.createReadStream(zipfilePath)
       .pipe(unzip.Extract({ path: 'uploads' }))
 
     stream.on('close', async () => {
       const files = fs.readdirSync(UPLOADS_PATH)
-      await tryCatch(optimizeImages(UPLOADS_PATH + '/media'))
-      console.log('Finished optimizing images!')
+      if (isPNG) {
+        await tryCatch(
+          optimizeImages(UPLOADS_PATH + '/media')
+        )
+        console.log('Finished optimizing images!')
+      }
       const newCards = extractCardInfo(files)
 
       cleanUp(files)
@@ -65,7 +69,7 @@ export function parseAnkiJson(filePath) {
       cardId,
       expression,
       , // reading,
-      , // jpMeaning,
+      jpMeaning,
       engMeaning,
       , // officialEng,
       questionImages,

@@ -27,8 +27,11 @@ const {
 
 export default ({
   async addDeck(req, res) {
+    const { isPNG }  = (req.body || {})
     const filePath = req.file.path
-    const newCards = await tryCatch(processUpload(filePath))
+    const newCards = await tryCatch(
+      processUpload(filePath, isPNG)
+    )
     const oldCards = await tryCatch(
       OldCard
         .find()
