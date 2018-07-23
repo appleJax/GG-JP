@@ -1,6 +1,6 @@
 import models from 'Models'
 import { getRecentAnswers } from 'DB/ops'
-import { getHour, tryCatch } from 'Utils'
+import { tryCatch } from 'Utils'
 
 const {
   DeckTitle,
@@ -10,7 +10,7 @@ const {
   Schedule
 } = models
 
-const TWEET_TIMES = [ 2, 8, 14, 20 ]
+const TWEET_TIMES = [ 2, 14 ]
 const NO_CARD = {}
 const RANDOM_DECK = {}
 
@@ -43,14 +43,13 @@ export async function replaceQueueCard(req) {
     }
   } = req
 
-  // console.log('Card Id:', cardId)
   const tweetQueue = await getTweetQueue()
 
   const index = tweetQueue.findIndex(entry => entry.cardId === cardId)
-  const timeslot = tweetQueue[index].time
+  const timeslot = tweetQueue[index].deck
 
   const newCardId = await tryCatch(
-    getCardForTimeslot(timeslot, index + 1)
+    getCardFromDeck(deck, index + 1)
   )
 
   tweetQueue[index].cardId = newCardId
@@ -61,31 +60,19 @@ export async function replaceQueueCard(req) {
 // private functions
 
 // exported for testing
-export async function getCardForTimeslot(hour, queuePosition = 0) {
-  const scheduledDeck = await tryCatch(
-    getScheduledDeck(hour)
-  )
-
-  const randomCardId = await tryCatch(
-    getCardFromDeck(scheduledDeck, queuePosition)
-  )
-
-  if (!randomCardId) {
-    console.error('No appropriate cards available.')
-  }
-
-  return randomCardId
-}
-
-// exported for testing
 export async function getCardFromDeck(scheduledDeck, queuePosition) {
   let randomCard = await tryCatch(
     pullCard(scheduledDeck)
   )
 
   if (empty(randomCard)) {
-    console.error('Empty deck. Please Add More Cards to DB.')
-    return null
+    scheduledDeck = await tryCatch(
+      updateScheduledDeck(scheduledDeck.game)
+    )
+
+    randomCard = await tryCatch(
+      pullCard(scheduledDeck)
+    )
   }
 
   const Spoilers = await SpoilChecker(queuePosition)
@@ -139,35 +126,6 @@ function getTweetQueue() {
   )
 }
 
-// exported for testing
-export async function getScheduledDeck(hour) {
-  hour = hour || getHour()
-  const timeslot = await tryCatch(
-    Schedule.findOne({ time: hour }).lean().exec()
-  )
-
-  if (!timeslot) {
-    console.log('No timeslot found in schedule for:', hour)
-    console.log('Picking card from random deck...')
-    return RANDOM_DECK
-  }
-
-  const scheduledDeck = timeslot.deck
-  const availableCards = await tryCatch(
-    NewCard.find({ game: scheduledDeck }).count().exec()
-  )
-
-  if (availableCards > 0) {
-    return { game: scheduledDeck }
-  }
-
-  const newScheduledDeck = await tryCatch(
-    updateScheduledDeck(hour, scheduledDeck)
-  )
-
-  return newScheduledDeck
-}
-
 function pullCard(deck) {
   return NewCard.aggregate([
     { $match: deck },
@@ -212,7 +170,7 @@ async function SpoilChecker(queuePosition) {
 }
 
 // exported for testing
-export async function updateScheduledDeck(hour, scheduledDeck) {
+export async function updateScheduledDeck(scheduledDeck) {
   await tryCatch(
     DeckTitle.updateOne(
       { fullTitle: scheduledDeck },
@@ -229,13 +187,12 @@ export async function updateScheduledDeck(hour, scheduledDeck) {
   allDecks = allDecks.map(doc => doc.fullTitle)
 
   let alreadyScheduled = await tryCatch(
-    Schedule.find().lean().exec()
+    Schedule.findOne().lean().then(doc => doc.lineup)
   )
-  alreadyScheduled = alreadyScheduled.map(doc => doc.deck)
 
   for (let i = 0; i < allDecks.length; i++) {
     const currentTitle = allDecks[i]
-    if (alreadyScheduled.find(title => title === currentTitle)) {
+    if (alreadyScheduled.includes(currentTitle)) {
       continue
     }
 
@@ -244,10 +201,17 @@ export async function updateScheduledDeck(hour, scheduledDeck) {
     )
 
     if (availableCards > 0) {
+      const oldDeckIndex = alreadyScheduled.indexOf(scheduledDeck)
+      const newLineup = alreadyScheduled.slice()
+      if (oldDeckIndex < 0) {
+        newLineup.push(currentTitle)
+      } else {
+        newLineup[oldDeckIndex] = currentTitle
+      }
       await tryCatch(
         Schedule.updateOne(
-          { time: hour },
-          { $set: { deck: currentTitle } }
+          {},
+          { $set: { lineup: newLineup } }
         ).exec()
       )
       return { game: currentTitle }
@@ -259,12 +223,12 @@ export async function updateScheduledDeck(hour, scheduledDeck) {
 export async function fillTweetQueue(queueSize) {
   const tweetQueue = await getTweetQueue()
 
-  const lastTimeslot = getLastTimeslot(tweetQueue)
-  let timeslot = getNextTimeslot(lastTimeslot)
+  const currentDeck = await getQueuedDeck(tweetQueue)
+  let nextDeck = await getNextDeck(currentDeck)
   
   while (tweetQueue.length <= queueSize) {
     const nextCardId = await tryCatch(
-      getCardForTimeslot(timeslot)
+      getCardFromDeck(nextDeck)
     )
 
     if (empty(nextCardId)) {
@@ -273,12 +237,36 @@ export async function fillTweetQueue(queueSize) {
 
     tweetQueue.unshift({
       cardId: nextCardId,
-      time: timeslot
+      deck: nextDeck.game
     })
 
     await saveQueue(tweetQueue)
-    timeslot = getNextTimeslot(timeslot)
+    nextDeck = await getNextDeck(nextDeck)
   }
+}
+
+async function getQueuedDeck(tweetQueue) {
+  if (tweetQueue && tweetQueue[0]) {
+    return { game: tweetQueue[0].deck }
+  }
+
+  const game = await tryCatch(
+    Schedule.findOne().lean().then(doc => doc.lineup[doc.lineup.length - 1])
+  )
+
+  return { game }
+}
+
+// exported for testing
+export async function getNextDeck(queueSlot) {
+  const deckLineup = await tryCatch(
+    Schedule.findOne().lean().then(doc => doc.lineup)
+  )
+
+  const index = deckLineup.indexOf(queueSlot.game)
+  const nextDeck = deckLineup[index + 1] || deckLineup[0]
+
+  return { game: nextDeck }
 }
 
 // exported for testing
@@ -304,29 +292,11 @@ function empty(obj) {
   return !obj || Object.keys(obj).length === 0
 }
 
-function getLastTimeslot(tweetQueue) {
-  let hour = (tweetQueue && tweetQueue[0] && tweetQueue[0].time)
-  if (!hour) {
-    hour = getHour()
-    while (TWEET_TIMES.indexOf(hour) === -1) {
-      if (--hour <= 0) hour = 23
-    }
-  }
-
-  return hour
-}
-
 function getLiveAnswers(cards) {
   return cards.filter(Boolean).reduce(
     (allAnswers, card) =>
       allAnswers.concat(card.answers)
     , [])
-}
-
-function getNextTimeslot(lastTimeslot) {
-  return lastTimeslot < 0
-    ? getHour()
-    : (lastTimeslot + 6) % 24
 }
 
 function getQuestionSpoilerText(cards) {

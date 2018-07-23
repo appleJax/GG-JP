@@ -22,7 +22,7 @@ import {
 } from 'DB/utils'
 
 const ANSWER_INTERVAL = 24 * HOURS
-const QUESTION_INTERVAL = 6 * HOURS
+const QUESTION_INTERVAL = 12 * HOURS
 const POLL_DM_INTERVAL = 90 * 1000
 
 export default ({
@@ -93,7 +93,7 @@ async function tweetQuestion() {
   const {
     mediaUrls,
     postedAt: questionPostedAt,
-    tweetId:  questionId
+    tweetId: questionId
   } = await tryCatch(
     postMedia(
       status,
@@ -131,7 +131,7 @@ async function tweetAnswer(cardId, questionId) {
   const {
     mediaUrls,
     postedAt: answerPostedAt,
-    tweetId:  answerId
+    tweetId: answerId
   } = await tryCatch(
     // Tweet the answer
     postMedia(

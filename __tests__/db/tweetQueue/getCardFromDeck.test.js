@@ -7,7 +7,8 @@ const {
   LiveQuestion,
   NewCard,
   OldCard,
-  Queue
+  Queue,
+  Schedule
 } = Models
 
 beforeAll(async () => {
@@ -26,6 +27,10 @@ beforeEach(async () => {
   await Queue.create({
     queue: []
   })
+
+  await Schedule.create({
+    lineup: []
+  })
 })
 
 afterEach(async () => {
@@ -33,17 +38,22 @@ afterEach(async () => {
   await NewCard.remove()
   await OldCard.remove()
   await Queue.remove()
+  await Schedule.remove()
 })
 
 it('should return a random card from NewCards', async () => {
-  const scheduledDeck = { game: 'Scheduled Game' }
+  const SCHEDULED_GAME = 'Scheduled Game'
+  const scheduledDeck = { game: SCHEDULED_GAME }
   const randomIds = []
   for (let i = 0; i < 5; i++) {
     const randomCardId = await getCardFromDeck(scheduledDeck)
     randomIds.push(randomCardId)
   }
 
-  const sampleIds = sampleNewCards().map(card => card.cardId)
+  const sampleIds = sampleNewCards()
+    .filter(card => card.game === SCHEDULED_GAME)
+    .map(card => card.cardId)
+
   const uniqueIds = getUnique(randomIds)
 
   randomIds.forEach(
@@ -52,11 +62,12 @@ it('should return a random card from NewCards', async () => {
   expect(uniqueIds).not.toHaveLength(1)
 })
 
-it('should return null if no matching cards exist', async () => {
+it('should return a random card if no matching cards exist', async () => {
   const scheduledDeck = { game: 'Not found' }
   const randomCardId = await getCardFromDeck(scheduledDeck)
+  const sampleIds = sampleNewCards().map(card => card.cardId)
 
-  expect(randomCardId).toBeNull()
+  expect(sampleIds).toContain(randomCardId)
 })
 
 // helpers
@@ -114,6 +125,15 @@ function sampleNewCards() {
     {
       cardId: 'New5',
       game: 'Scheduled Game',
+      answers: [],
+      prevLineAltText: '',
+      questionAltText: '',
+      answerAltText: '',
+      otherVisibleContext: ''
+    },
+    {
+      cardId: 'New6',
+      game: 'Other Game',
       answers: [],
       prevLineAltText: '',
       questionAltText: '',

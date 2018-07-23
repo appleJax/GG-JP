@@ -5,8 +5,8 @@ const Schema = Mongoose.Schema
 const schema = new Schema({
   queue: [{
     _id: false,
-    time: Number,
-    cardId: String
+    cardId: String,
+    deck: String
   }]
 })
 

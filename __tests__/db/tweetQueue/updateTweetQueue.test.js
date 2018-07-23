@@ -18,12 +18,9 @@ afterAll(async (done) => {
 })
 
 beforeEach(async () => {
-  await Schedule.insertMany([
-    { time: 2,  deck: 'Game at 2' },
-    { time: 8,  deck: 'Game at 8' },
-    { time: 14, deck: 'Game at 14' },
-    { time: 20, deck: 'Game at 20' }
-  ])
+  await Schedule.create({
+    lineup: [ 'Game 1', 'Game 2', 'Game 3' ]
+  })
 
   await NewCard.insertMany(
     sampleNewCards()
@@ -79,12 +76,13 @@ it('should not affect the NewCard collection', async () => {
   expect(newCardCountBefore).toEqual(newCardCountAfter)
 })
 
-it('should queue tweets in the correct timeslot order', async () => {
+it('should queue tweets in the correct deck order', async () => {
+  await emptyTweetQueue()
   await updateTweetQueue()
 
-  const queuedTimeslots = await getQueuedTimeslots()
+  const queuedDecks = await getQueuedDecks()
 
-  expect(queuedTimeslots).toEqual([ 14, 8, 2, 20, 14, 8 ])
+  expect(queuedDecks).toEqual([ 'Game 1', 'Game 3', 'Game 2', 'Game 1', 'Game 3', 'Game 2' ])
 })
 
 it('should return null if tweetQueue is empty and cannot be refilled', async () => {
@@ -98,12 +96,18 @@ it('should return null if tweetQueue is empty and cannot be refilled', async () 
 
 // helpers
 
-function getQueueSize() {
-  return Queue.findOne().then(obj => obj.queue.length)
+function emptyTweetQueue() {
+  return Queue.updateOne({}, {
+    $set: { queue: [] }
+  }).exec()
 }
 
-function getQueuedTimeslots() {
-  return Queue.findOne().then(obj => obj.queue.map(entry => entry.time))
+function getQueueSize() {
+  return Queue.findOne().lean().then(obj => obj.queue.length)
+}
+
+function getQueuedDecks() {
+  return Queue.findOne().lean().then(obj => obj.queue.map(entry => entry.deck))
 }
 
 function newCardCount() {
@@ -115,32 +119,40 @@ function newCardCount() {
 function sampleNewCards() {
   return [
     {
-      cardId: '2',
-      game: 'Game at 2'
-    },
-    {
-      cardId: '8',
-      game: 'Game at 8'
-    },
-    {
-      cardId: '14',
-      game: 'Game at 14'
-    },
-    {
-      cardId: '20',
-      game: 'Game at 20'
-    },
-    {
-      cardId: '8-2',
-      game: 'Game at 8'
-    },
-    {
-      cardId: '14-2',
-      game: 'Game at 14'
-    },
-    {
       cardId: '1',
-      game: 'sample game'
+      game: 'Game 1'
+    },
+    {
+      cardId: '1-2',
+      game: 'Game 1'
+    },
+    {
+      cardId: '2',
+      game: 'Game 2'
+    },
+    {
+      cardId: '2-2',
+      game: 'Game 2'
+    },
+    {
+      cardId: '3',
+      game: 'Game 3'
+    },
+    {
+      cardId: '3-2',
+      game: 'Game 3'
+    },
+    {
+      cardId: '4',
+      game: 'Game 4'
+    },
+    {
+      cardId: '5',
+      game: 'Game 5'
+    },
+    {
+      cardId: '6',
+      game: 'Game 6'
     }
   ]
 }
@@ -148,7 +160,7 @@ function sampleNewCards() {
 function sampleQueueCard() {
   return {
     cardId: '1',
-    time: 2
+    deck: 'Game 1'
   }
 }
 
