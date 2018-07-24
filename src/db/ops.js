@@ -349,7 +349,13 @@ export default ({
   },
 
   // noSideEffects for testing purposes
-  async processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls, noSideEffects) {
+  async processAnswerWorkflow(
+    answerId,
+    answerPostedAt,
+    cardId,
+    mediaUrls,
+    noSideEffects
+  ) {
     if (!noSideEffects) {
       await processDMs()
     }

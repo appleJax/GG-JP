@@ -71,27 +71,19 @@ export async function getCardFromDeck(scheduledDeck, queuePosition) {
     pullCard(scheduledDeck)
   )
 
-  if (empty(randomCard)) {
-    scheduledDeck = await tryCatch(
-      updateScheduledDeck(scheduledDeck.game)
-    )
-
-    randomCard = await tryCatch(
-      pullCard(scheduledDeck)
-    )
-  }
-
   const Spoilers = await SpoilChecker(queuePosition)
   let spoiled = Spoilers.check(randomCard)
 
   let tries = 0
   while (spoiled) {
     if (tries > 20) {
-      console.error('All new cards contain spoilers. Please try again later.')
+      console.error('Could not schedule new deck. Please add more decks to DB.')
       return null
     }
     if (tries++ > 10) {
-      scheduledDeck = {}
+      scheduledDeck = await tryCatch(
+        updateScheduledDeck(scheduledDeck.game)
+      )
     }
 
     randomCard = await tryCatch(
@@ -239,7 +231,7 @@ export async function fillTweetQueue(queueSize) {
     )
 
     if (empty(nextCard)) {
-      break
+      return
     }
 
     tweetQueue.unshift({

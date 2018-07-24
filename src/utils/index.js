@@ -7,7 +7,8 @@ const {
 
 const UTC_OFFSET = 5 // Normal +6 ... DST +5
 const ONE_WEEK = 1000 * 60 * 60 * 24 * 7
-const TWEET_TIMES = [ 2, 14 ] // 2AM, 2PM
+const TWEET_TIMES = [ 2, 8, 14, 20 ]
+//const TWEET_TIMES = [ 2, 14 ] // 2AM, 2PM
 
 export const HOURS = 3600000
 

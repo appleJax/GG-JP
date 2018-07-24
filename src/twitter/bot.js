@@ -23,13 +23,8 @@ import {
 
 const ANSWER_INTERVAL = 24 * HOURS
 //const QUESTION_INTERVAL = 12 * HOURS
+const QUESTION_INTERVAL = 6 * HOURS
 const POLL_DM_INTERVAL = 90 * 1000
-
-
-// DELETE ME
-const QUESTION_INTERVAL = 10 * 1000
-// DELETE ME
-
 
 export default ({
 
@@ -52,13 +47,7 @@ async function scheduleActions() {
     tweetOrScheduleAnswers(liveQuestions)
   }
 
-
-  // DELETE ME
-  const timeUntilTweet = 5000
-  // DELETE ME
-
-
-  //const timeUntilTweet = getTimeTilNextTweet()
+  const timeUntilTweet = getTimeTilNextTweet()
   const timeUntilUpdates = getTimeTilUpdates()
 
   setTimeout(() => {
