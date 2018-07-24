@@ -110,8 +110,13 @@ async function tweetQuestion() {
     questionId,
     questionPostedAt
   }
+
   DB.updateLiveQuestion(update)
-  setTimeout(() => tweetAnswer(cardId, questionId), ANSWER_INTERVAL)
+
+  setTimeout(() =>
+    tweetAnswer(cardId, questionId),
+    ANSWER_INTERVAL
+  )
 }
 
 async function tweetAnswer(cardId, questionId) {
@@ -125,7 +130,11 @@ async function tweetAnswer(cardId, questionId) {
   )
 
   const status = await tryCatch(
-    formatAnswerStatus(answerText, questionId, userPoints)
+    formatAnswerStatus(
+      answerText,
+      questionId,
+      userPoints
+    )
   )
 
   const {
@@ -147,7 +156,12 @@ async function tweetAnswer(cardId, questionId) {
   // - adds mediaUrls to card
   // - adds userPoints to scoreboard
   // - moves card from LiveQuestion to OldCard
-  DB.processAnswerWorkflow(answerId, answerPostedAt, cardId, mediaUrls)
+  DB.processAnswerWorkflow(
+    answerId,
+    answerPostedAt,
+    cardId,
+    mediaUrls
+  )
 }
 
 async function pollDMs() {

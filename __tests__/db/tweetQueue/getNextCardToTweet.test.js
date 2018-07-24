@@ -6,7 +6,8 @@ const { getNextCardToTweet } = require('DB/tweetQueue')
 const {
   LiveQuestion,
   NewCard,
-  Queue
+  Queue,
+  Schedule
 } = Models
 
 const NEXT_CARD_ID = 'c1'
@@ -22,12 +23,14 @@ afterAll(async (done) => {
 beforeEach(async () => {
   await NewCard.create({ cardId: NEXT_CARD_ID })
   await Queue.create(sampleQueue())
+  await Schedule.create({ lineup: [] })
 })
 
 afterEach(async () => {
   await LiveQuestion.remove()
   await NewCard.remove()
   await Queue.remove()
+  await Schedule.remove()
 })
 
 it('should return the next card in the queue', async () => {

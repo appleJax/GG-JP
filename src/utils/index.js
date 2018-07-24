@@ -5,9 +5,9 @@ const {
   TWITTER_ACCOUNT
 } = process.env
 
-// Normal +6 ... DST +5
-const UTC_OFFSET = 5
+const UTC_OFFSET = 5 // Normal +6 ... DST +5
 const ONE_WEEK = 1000 * 60 * 60 * 24 * 7
+const TWEET_TIMES = [ 2, 14 ] // 2AM, 2PM
 
 export const HOURS = 3600000
 
@@ -95,8 +95,8 @@ export function getHour() {
 }
 
 export function getTimeTilNextTweet() {
-  const startTimes = [ 2, 8, 14, 20 ].map(_getTimeUntil)
-  return Math.min(...startTimes)
+  const timeUntilTweet = TWEET_TIMES.map(_getTimeUntil)
+  return Math.min(...timeUntilTweet)
 }
 
 export function getTimeTilUpdates() {
@@ -122,12 +122,10 @@ export function parseDM(rawText) {
 export const send = (res) =>
   (data) => res.json(data)
 
-export function t(type, defaultVal) {
-  return {
-    type,
-    default: defaultVal
-  }
-}
+export const t = (type, defaultVal) => ({
+  type,
+  default: defaultVal
+})
 
 export function tryCatch(promise) {
   return promise

@@ -10,9 +10,7 @@ const {
   Schedule
 } = models
 
-const TWEET_TIMES = [ 2, 14 ]
 const NO_CARD = {}
-const RANDOM_DECK = {}
 
 // exported for testing
 export const QUEUE_SIZE = 6
@@ -46,10 +44,10 @@ export async function replaceQueueCard(req) {
   const tweetQueue = await getTweetQueue()
 
   const index = tweetQueue.findIndex(entry => entry.cardId === cardId)
-  const timeslot = tweetQueue[index].deck
+  const deck = tweetQueue[index].deck
 
   const newCardId = await tryCatch(
-    getCardFromDeck(deck, index + 1)
+    getCardFromDeck({ game: deck }, index + 1)
   )
 
   tweetQueue[index].cardId = newCardId

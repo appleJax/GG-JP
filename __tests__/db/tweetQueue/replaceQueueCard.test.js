@@ -20,12 +20,10 @@ afterAll(async (done) => {
 const NEW_CARD_ID = 'newID'
 const SCHEDULED_DECK = 'scheduled deck'
 const CARD_ID_TO_REPLACE = 'oldID'
-const TIMESLOT_TO_REPLACE = 20
 
 beforeEach(async () => {
   await Schedule.create({
-    deck: SCHEDULED_DECK,
-    time: TIMESLOT_TO_REPLACE
+    lineup: [ SCHEDULED_DECK ]
   })
 
   await NewCard.insertMany(
@@ -56,7 +54,7 @@ it('should replace the given cardId in the queue', async () => {
 
   const updatedQueue = sampleQueue().queue
   const replacedEntry = updatedQueue.find(
-    entry => entry.time === TIMESLOT_TO_REPLACE
+    entry => entry.cardId === CARD_ID_TO_REPLACE
   )
   replacedEntry.cardId = NEW_CARD_ID
 
@@ -77,27 +75,27 @@ function sampleQueue() {
     queue: [
       {
         cardId: '1',
-        time: 14
+        deck: 'Some Deck'
       },
       {
         cardId: '2',
-        time: 8
+        deck: 'Some Deck'
       },
       {
         cardId: '3',
-        time: 2
+        deck: 'Some Deck'
       },
       {
         cardId: CARD_ID_TO_REPLACE,
-        time: TIMESLOT_TO_REPLACE
+        deck: SCHEDULED_DECK
       },
       {
         cardId: '5',
-        time: 14
+        deck: 'Some Deck'
       },
       {
         cardId: '6',
-        time: 8
+        deck: 'Some Deck'
       }
     ]
   }

@@ -103,11 +103,17 @@ function emptyTweetQueue() {
 }
 
 function getQueueSize() {
-  return Queue.findOne().lean().then(obj => obj.queue.length)
+  return Queue
+    .findOne()
+    .lean()
+    .then(obj => obj.queue.length)
 }
 
 function getQueuedDecks() {
-  return Queue.findOne().lean().then(obj => obj.queue.map(entry => entry.deck))
+  return Queue
+    .findOne()
+    .lean()
+    .then(obj => obj.queue.map(entry => entry.deck))
 }
 
 function newCardCount() {
