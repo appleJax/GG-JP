@@ -1,14 +1,15 @@
 import Mongoose from 'mongoose'
 import OldCard from './OldCard'
+import { t } from 'Utils'
 
 const Schema = Mongoose.Schema
 
 const schema = new Schema({
-  finished: { type: Boolean, default: false },
+  finished: t( Boolean, false ),
   fullTitle: String,
   slug: String,
-  totalCards: String,
-  tweetedCards: Number
+  totalCards: Number,
+  tweetedCards: t( Number, 0 )
 })
 
 schema.post('find', getTotalTweeted)

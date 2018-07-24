@@ -46,11 +46,19 @@ export async function replaceQueueCard(req) {
   const index = tweetQueue.findIndex(entry => entry.cardId === cardId)
   const deck = tweetQueue[index].deck
 
-  const newCardId = await tryCatch(
+  const newCard = await tryCatch(
     getCardFromDeck({ game: deck }, index + 1)
   )
 
-  tweetQueue[index].cardId = newCardId
+  if (!newCard) {
+    console.error('Tried to replace card from deck, but all other cards from this deck contain spoilers.')
+    return
+  }
+
+  tweetQueue[index] = {
+    cardId: newCard.cardId,
+    deck: newCard.game
+  }
 
   await saveQueue(tweetQueue)
 }
@@ -93,7 +101,7 @@ export async function getCardFromDeck(scheduledDeck, queuePosition) {
     spoiled = Spoilers.check(randomCard)
   }
 
-  return randomCard.cardId
+  return randomCard
 }
 
 async function getQueuedCards() {
@@ -128,7 +136,7 @@ function pullCard(deck) {
   return NewCard.aggregate([
     { $match: deck },
     { $sample: { size: 1 } }
-  ]).then(cards => Promise.resolve(cards[0]))
+  ]).then(cards => cards[0])
 }
 
 function saveQueue(tweetQueue) {
@@ -206,6 +214,7 @@ export async function updateScheduledDeck(scheduledDeck) {
       } else {
         newLineup[oldDeckIndex] = currentTitle
       }
+
       await tryCatch(
         Schedule.updateOne(
           {},
@@ -225,21 +234,21 @@ export async function fillTweetQueue(queueSize) {
   let nextDeck = await getNextDeck(currentDeck)
   
   while (tweetQueue.length <= queueSize) {
-    const nextCardId = await tryCatch(
+    const nextCard = await tryCatch(
       getCardFromDeck(nextDeck)
     )
 
-    if (empty(nextCardId)) {
+    if (empty(nextCard)) {
       break
     }
 
     tweetQueue.unshift({
-      cardId: nextCardId,
-      deck: nextDeck.game
+      cardId: nextCard.cardId,
+      deck: nextCard.game
     })
 
     await saveQueue(tweetQueue)
-    nextDeck = await getNextDeck(nextDeck)
+    nextDeck = await getNextDeck({ game: nextCard.game })
   }
 }
 

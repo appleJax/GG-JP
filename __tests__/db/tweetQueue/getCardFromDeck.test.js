@@ -46,8 +46,8 @@ it('should return a random card from NewCards', async () => {
   const scheduledDeck = { game: SCHEDULED_GAME }
   const randomIds = []
   for (let i = 0; i < 5; i++) {
-    const randomCardId = await getCardFromDeck(scheduledDeck)
-    randomIds.push(randomCardId)
+    const randomCard = await getCardFromDeck(scheduledDeck)
+    randomIds.push(randomCard.cardId)
   }
 
   const sampleIds = sampleNewCards()
@@ -64,10 +64,10 @@ it('should return a random card from NewCards', async () => {
 
 it('should return a random card if no matching cards exist', async () => {
   const scheduledDeck = { game: 'Not found' }
-  const randomCardId = await getCardFromDeck(scheduledDeck)
+  const randomCard = await getCardFromDeck(scheduledDeck)
   const sampleIds = sampleNewCards().map(card => card.cardId)
 
-  expect(sampleIds).toContain(randomCardId)
+  expect(sampleIds).toContain(randomCard.cardId)
 })
 
 // helpers

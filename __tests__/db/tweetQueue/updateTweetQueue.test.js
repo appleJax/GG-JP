@@ -133,6 +133,10 @@ function sampleNewCards() {
       game: 'Game 1'
     },
     {
+      cardId: '1-3',
+      game: 'Game 1'
+    },
+    {
       cardId: '2',
       game: 'Game 2'
     },
