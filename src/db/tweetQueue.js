@@ -185,7 +185,8 @@ export async function updateScheduledDeck(scheduledDeck) {
   allDecks = allDecks.map(doc => doc.fullTitle)
 
   let alreadyScheduled = await tryCatch(
-    Schedule.findOne().lean().then(doc => doc.lineup)
+    // CHANGE TO Schedule.findOne() after refactor!!!!!
+    Schedule.findOne({ lineup: { $exists: true } }).lean().then(doc => doc.lineup)
   )
 
   for (let i = 0; i < allDecks.length; i++) {
@@ -250,7 +251,8 @@ async function getQueuedDeck(tweetQueue) {
   }
 
   const game = await tryCatch(
-    Schedule.findOne().lean().then(doc => doc.lineup[doc.lineup.length - 1])
+    // CHANGE TO Schedule.findOne() after refactor!!!!!
+    Schedule.findOne({ lineup: { $exists: true } }).lean().then(doc => doc.lineup[doc.lineup.length - 1])
   )
 
   return { game }
@@ -259,7 +261,8 @@ async function getQueuedDeck(tweetQueue) {
 // exported for testing
 export async function getNextDeck(queueSlot) {
   const deckLineup = await tryCatch(
-    Schedule.findOne().lean().then(doc => doc.lineup)
+    // CHANGE TO Schedule.findOne() after refactor!!!!!
+    Schedule.findOne({ lineup: { $exists: true } }).lean().then(doc => doc.lineup)
   )
 
   const index = deckLineup.indexOf(queueSlot.game)
