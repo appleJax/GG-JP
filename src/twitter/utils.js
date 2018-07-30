@@ -246,6 +246,7 @@ export async function fetchDMs(twitterClient = Twitter) {
 }
 
 function formatAchievements(user, category) {
+  //const MAX_WEEKLY_SCORE = 336 // 2 Questions per day * 7 days * 24 points
   const MAX_WEEKLY_SCORE = 672
   const { score } = user[category]
 
