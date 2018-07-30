@@ -177,10 +177,14 @@ export async function updateScheduledDeck(scheduledDeck) {
   )
 
   let allDecks = await tryCatch(
-    DeckTitle.find({
-      totalCards: { $gt: 0 },
-      finished:   { $ne: true }
-    }).lean().exec()
+    DeckTitle
+      .find({
+        finished: { $ne: true }
+      })
+      .lean()
+      .then(docs =>
+        docs.filter(doc => doc.totalCards > 0)
+      )
   )
   allDecks = allDecks.map(doc => doc.fullTitle)
 

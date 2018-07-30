@@ -1,5 +1,7 @@
 import Mongoose from 'mongoose'
 import OldCard from './OldCard'
+import NewCard from './NewCard'
+import LiveQuestion from './LiveQuestion'
 import { t } from 'Utils'
 
 const Schema = Mongoose.Schema
@@ -8,25 +10,32 @@ const schema = new Schema({
   finished: t( Boolean, false ),
   fullTitle: String,
   slug: String,
-  totalCards: Number,
   tweetedCards: t( Number, 0 )
 })
 
-schema.post('find', getTotalTweeted)
-schema.post('findOne', getTotalTweeted)
+schema.post('find', addFields)
+schema.post('findOne', addFields)
 
-async function getTotalTweeted(doc, next) {
+async function addFields(doc, next) {
   if (Array.isArray(doc)) {
     for (let i = 0; i < doc.length; i++) {
-      const totalTweeted = await OldCard.find({ game: doc[i].fullTitle }).count()
-      doc[i].tweetedCards = totalTweeted
+      await _addFields(doc[i])
     }
   } else if (doc) {
-    const totalTweeted = await OldCard.find({ game: doc.fullTitle }).count()
-    doc.tweetedCards = totalTweeted
+    await _addFields(doc)
   }
 
   next()
+}
+
+async function _addFields(doc) {
+  const query = { game: doc.fullTitle };
+  const totalTweeted = await OldCard.find(query).count()
+  doc.tweetedCards = totalTweeted
+
+  const notTweeted = await NewCard.find(query).count()
+  const liveCards = await LiveQuestion.find(query).count()
+  doc.totalCards = totalTweeted + notTweeted + liveCards
 }
 
 export default Mongoose.model('deckTitles', schema)

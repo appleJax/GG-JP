@@ -8,7 +8,7 @@ export default (app) => {
   )
 
   app.get('/api/decks',
-    cache.route(untilNextTweet()),
+    // cache.route(untilNextTweet()),
     (req, res) => DB.getDeckTitles().then(send(res))
   )
 
