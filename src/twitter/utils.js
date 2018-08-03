@@ -7,12 +7,19 @@ import {
   tweetLink
 } from 'Utils'
 
-const { Timestamp } = models
+const {
+  Timestamp,
+  TweetLog
+} = models
+
 const {
   APP_URL
   // BOT_URL,      // for twitter account_activity api (not currently used)
   // WEBHOOK_ID    // for twitter account_activity api (not currently used)
 } = process.env
+
+// exported for testing
+export const LOG_LENGTH = 70
 
 export function fetchTwitterUser(userId) {
   const params = { user_id: userId }
@@ -44,7 +51,10 @@ export function formatTopTenTweet(topTen, category) {
     status += `\n${user[category].rank} @${user.handle} ${formatScore(user[category].score)}${achievements}`
   })
   status += `\n🏅= PB\nランキング: ${APP_URL}/stats`
-  return ensureUnder280(status, 'topTen')
+
+  const finalStatus = ensureUnder280(status, 'topTen')
+
+  return finalStatus
 }
 
 export function getFollowing(userId) {
@@ -98,6 +108,10 @@ export async function postMedia(
 
   const status = ensureUnder280(rawStatus)
 
+  await tryCatch(
+    logTweet(status)
+  )
+
   const params = {
     status,
     media_ids,
@@ -123,7 +137,11 @@ export async function postMedia(
     .catch(console.error)
 }
 
-export function postTweet(status) {
+export async function postTweet(status) {
+  await tryCatch(
+    logTweet(status)
+  )
+
   return Twitter.post(
     'statuses/update',
     { status }
@@ -176,6 +194,7 @@ export async function processWebhookEvent(payload, processMsg = evaluateResponse
 function countChars(status) {
   return status
     .replace(/http\S+/g, 'twenty-three-characters')
+    .replace(/[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]/g, 'aa') // count Japanese characters as 2 to match Twitter's count
     .length
 }
 
@@ -282,6 +301,29 @@ function getMostRecentTimestamp(events) {
     : toTimestamp(
       events[0].created_timestamp
     )
+}
+
+// exported for testing
+export async function logTweet(status) {
+  const tweetLog = await tryCatch(
+    TweetLog.findOne().lean().then(doc => doc.log)
+  )
+
+  const timestamp = new Date().getTime()
+  tweetLog.push({
+    status,
+    timestamp
+  })
+
+  if (tweetLog.length > LOG_LENGTH) {
+    tweetLog.shift()
+  }
+
+  await tryCatch(
+    TweetLog.updateOne({},
+      { $set: { log: tweetLog } }
+    ).exec()
+  )
 }
 
 function toTimePeriod(category) {

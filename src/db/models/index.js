@@ -7,6 +7,7 @@ import Schedule     from './Schedule'
 import Scoreboard   from './Scoreboard'
 import Sponsor      from './Sponsor'
 import Timestamp    from './Timestamp'
+import TweetLog     from './TweetLog'
 
 export default ({
   DeckTitle,
@@ -17,5 +18,6 @@ export default ({
   Schedule,
   Scoreboard,
   Sponsor,
-  Timestamp
+  Timestamp,
+  TweetLog
 })
