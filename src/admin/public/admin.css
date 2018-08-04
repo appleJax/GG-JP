@@ -96,6 +96,18 @@ nav {
   padding: 0 10px;
 }
 
+.error {
+  background: rgba(255, 0, 0, 0.6);
+}
+
+.errorMsg {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 5px;
+  color: #a00;
+  padding: 10px 15px;
+  width: fit-content;
+}
+
 .form {
   margin: 2px auto 40px;
   position: relative;

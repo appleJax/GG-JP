@@ -4,6 +4,7 @@ import multer from 'multer'
 import DB from 'DB/ops'
 import { replaceQueueCard } from 'DB/tweetQueue'
 import { addAltAnswer, issueAnswerCorrection } from 'Admin/utils'
+import { countChars } from 'Twitter/utils'
 
 const upload = multer({ dest: 'uploads/' })
 const ensureAdmin = authorization
@@ -148,7 +149,12 @@ function serveAdminPage(req, res) {
     res.render('admin', {
       adminUser: true,
       queue: tweetQueue,
+      over280,
       flash: res.locals.flash
     })
   })
+}
+
+function over280(text) {
+  return countChars(text) > 280
 }

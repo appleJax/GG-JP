@@ -43,7 +43,11 @@ block content
 
   h3 Tweet Queue:
   each card, index in queue
-    .card
+    - var invalidTweet = over280(card.questionText) || over280(card.answerText)
+    div(class={ card: true, error: invalidTweet })
+      if invalidTweet
+        .errorMsg Question or answer tweet has too many characters.
+
       h4(class='inline') Card ID:
       p(class='inline')= card.cardId
       br
