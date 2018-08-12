@@ -8,7 +8,8 @@ const schema = new Schema({
   month: t( Number, 0 ),
   week:  t( Number, 0 ),
   day:   t( Number, 0 ),
-  lastReadDM: t( Number, 0 )
+  lastReadDM: t( Number, 0 ),
+  downloadUpdated: t( Number, 0 )
 })
 
 export default Mongoose.model('timestamps', schema)
