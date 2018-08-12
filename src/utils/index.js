@@ -80,8 +80,8 @@ export function formatFlashCards(cards) {
     if (lines[1] && lines[1].startsWith('Hint')) {
       card.questionText += '\n' + lines[1]
     }
-    card.questionMediaUrls = card.mediaUrls.slice(...card.mainImageSlice)
-    card.answerMediaUrls = card.mediaUrls.slice(card.mainImageSlice[1])
+    card.questionMediaUrls = (card.mediaUrls && card.mediaUrls.slice(...card.mainImageSlice)) || []
+    card.answerMediaUrls = (card.mediaUrls && card.mediaUrls.slice(card.mainImageSlice[1])) || []
     return card
   })
 }

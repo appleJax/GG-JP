@@ -16,6 +16,10 @@ export default (app) => {
     DB.getDeck(req).then(send(res))
   )
 
+  app.get('/api/downloadLastUpdated', (req, res) =>
+    DB.getDownloadLastUpdated().then(send(res))
+  )
+
   app.get('/api/live', (req, res) =>
     DB.serveLiveQuestions().then(send(res))
   )

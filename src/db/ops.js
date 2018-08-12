@@ -229,6 +229,13 @@ export default ({
       .exec()
   },
 
+  getDownloadLastUpdated() {
+    return Timestamp
+      .findOne()
+      .lean()
+      .then(doc => doc.downloadUpdated)
+  },
+
   async getHardestQuestion() {
     const oneWeekAgo = calculateOneWeekAgo()
 
