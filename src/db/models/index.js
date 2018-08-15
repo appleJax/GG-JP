@@ -1,3 +1,4 @@
+import Analytics    from './Analytics'
 import DeckTitle    from './DeckTitle'
 import LiveQuestion from './LiveQuestion'
 import NewCard      from './NewCard'
@@ -10,6 +11,7 @@ import Timestamp    from './Timestamp'
 import TweetLog     from './TweetLog'
 
 export default ({
+  Analytics,
   DeckTitle,
   LiveQuestion,
   NewCard,

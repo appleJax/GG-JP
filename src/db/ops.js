@@ -16,6 +16,7 @@ import {
 
 import models from 'Models'
 const {
+  Analytics,
   DeckTitle,
   NewCard,
   OldCard,
@@ -353,6 +354,13 @@ export default ({
     user.earnedCards = earnedCards
 
     return user
+  },
+
+  logDownload() {
+    const timestamp = new Date().getTime()
+    Analytics.updateOne({},
+      { $push: { downloads: timestamp } }
+    ).exec()
   },
 
   // noSideEffects for testing purposes

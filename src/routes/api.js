@@ -30,6 +30,11 @@ export default (app) => {
     (req, res) => DB.serveRecentAnswers().then(send(res))
   )
 
+  app.post('/api/logDownload', (req, res) => {
+    DB.logDownload()
+    res.status(200)
+  })
+
   app.post('/api/togglePrivacy',
     (req, res) => req.session.user
       ? DB.togglePrivacy(req.session.user.userId).then(send(res))
