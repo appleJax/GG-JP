@@ -48,11 +48,29 @@ export default ({
         .exec()
     )
 
-    const ops = []
+    const newCardOps = []
+    const oldCardOps = []
+
     for (let i = 0; i < newCards.length; ++i) {
       const newCard = newCards[i]
       const { cardId } = newCard
+
       if (oldCards.find(card => card.cardId === cardId)) {
+        oldCardOps.push({
+          updateOne: {
+            filter: { cardId },
+            update: {
+              $set: {
+                answers: newCard.answers,
+                answerText: newCard.answerText,
+                game: newCard.game,
+                otherVisibleContext: newCard.otherVisibleContext,
+                questionText: newCard.questionText
+              }
+            }
+          }
+        })
+
         continue
       }
 
@@ -77,7 +95,7 @@ export default ({
         continue
       }
 
-      ops.push({
+      newCardOps.push({
         replaceOne: {
           filter: { cardId },
           replacement: newCard,
@@ -86,11 +104,14 @@ export default ({
       })
     }
 
-    if (ops.length === 0) {
-      return
+    if (oldCardOps.length > 0) {
+      await tryCatch(OldCard.bulkWrite(oldCardOps))
     }
 
-    await tryCatch(NewCard.bulkWrite(ops))
+    if (newCardOps.length > 0) {
+      await tryCatch(NewCard.bulkWrite(newCardOps))
+    }
+
     console.log('Finished uploading/updating cards!')
   },
 
