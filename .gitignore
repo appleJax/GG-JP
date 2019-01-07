@@ -1,10 +1,8 @@
-**/.DS_Store
-.env
-.env.js
-.vscode
 __DBScripts
-*.yaml
-node_modules
+**/.DS_Store
+.env*
+.vscode
 coverage
 dist
+node_modules
 TODO.md

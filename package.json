@@ -12,7 +12,7 @@
     "serve:staging": "npm run build:staging && NO_HTTPS=true npm start",
     "serve:prod": "npm run build:prod && NO_HTTPS=true npm start",
     "server": "node --require dotenv/config ./dist/server.js",
-    "shipit": "git checkout -b deploy && npm run build:prod && pushd ../GG-UI && npm run build:prod && popd && rm .gitignore && echo 'node_modules\n.env*\n__DBScripts\ncoverage' > .gitignore && npm run deploy:prod && git checkout master && git branch -D deploy",
+    "shipit": "git checkout -b deploy && rm .gitignore && echo 'node_modules\n.env*\n__DBScripts\ncoverage' > .gitignore && npm run build:prod && pushd ../GG-UI && npm run build:prod && popd && git add . && git commit -m 'build' && npm run deploy:prod && git checkout master && git branch -D deploy",
     "stageit": "npm run build:staging && pushd ../GG-UI && npm run build:staging && popd && npm run deploy:staging",
     "serveit": "npm run build:dev && pushd ../GG-UI && npm run build:dev && popd && npm start",
     "start": "node ./dist/server.js",
