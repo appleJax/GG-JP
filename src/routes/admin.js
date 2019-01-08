@@ -12,7 +12,7 @@ let ensureAdmin = authorization
   .redirectTo('/admin/login')
   .isPermitted('admin')
 
- if (process.env.NODE_ENV === 'development') {
+ if (process.env.NODE_ENV === 'development' || process.env.NO_HTTPS) {
   ensureAdmin = (req, res, next) => next();
 }
 
