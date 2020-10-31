@@ -8,7 +8,6 @@ const { ADMIN_PW } = require('./.env.js').common
 
 module.exports = {
   entry: [
-    '@babel/polyfill',
     './src/server.js'
   ],
   target: 'node',

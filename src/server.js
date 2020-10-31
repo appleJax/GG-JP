@@ -1,3 +1,5 @@
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import express       from 'express'
 import serveStatic   from 'serve-static'
 import mime          from 'mime-types'
