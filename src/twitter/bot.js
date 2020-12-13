@@ -178,6 +178,9 @@ async function tweetHardestQuestion() {
 
 async function tweetTopTen(category = 'monthlyStats') {
   const topTen = await DB.fetchTopTen(category)
+  if (!topTen || topTen.length === 0) {
+    return;
+  }
   const status = formatTopTenTweet(topTen, category)
 
   return postTweet(status)
