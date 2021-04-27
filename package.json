@@ -44,7 +44,7 @@
     "passport-twitter": "^1.0.4",
     "pngjs2": "^2.0.0",
     "pug": "^2.0.3",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "regenerator-runtime": "^0.13.7",
     "serve-static": "^1.13.2",
     "source-map-support": "^0.5.3",
