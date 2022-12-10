@@ -31,7 +31,7 @@
     "compression": "^1.7.2",
     "connect-redis": "^3.3.3",
     "core-js": "^3.6.5",
-    "express": "^4.16.2",
+    "express": "^4.17.3",
     "express-authorization": "^1.0.0",
     "express-redis-cache": "^1.1.1",
     "express-session": "^1.15.6",
